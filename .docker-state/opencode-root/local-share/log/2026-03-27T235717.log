@@ -1,0 +1,9 @@
+INFO  2026-03-27T23:57:17 +207ms service=default version=1.2.26 args=[] opencode
+INFO  2026-03-27T23:57:17 +0ms service=db path=/root/.local/share/opencode/opencode.db opening database
+INFO  2026-03-27T23:57:17 +21ms service=db count=9 mode=bundled applying migrations
+INFO  2026-03-27T23:57:18 +10ms service=json-migration storage directory does not exist, skipping migration
+INFO  2026-03-27T23:57:18 +1ms service=default directory=/workspace/gvibu-ai-lab creating instance
+INFO  2026-03-27T23:57:18 +1ms service=project directory=/workspace/gvibu-ai-lab fromDirectory
+INFO  2026-03-27T23:57:18 +18ms service=config path=/root/.config/opencode/config.json loading
+INFO  2026-03-27T23:57:18 +0ms service=config path=/root/.config/opencode/opencode.json loading
+INFO  2026-03-27T23:57:18 +0ms service=config path=/root/.config/opencode/opencode.jsonc loading

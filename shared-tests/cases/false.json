@@ -1,0 +1,27 @@
+{
+  "command": "false",
+  "description": "Return unsuccessful exit status",
+  "cases": [
+    {
+      "name": "basic false",
+      "args": [],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 1
+    },
+    {
+      "name": "false with arguments ignored",
+      "args": ["foo", "bar"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 1
+    },
+    {
+      "name": "false with many arguments",
+      "args": ["--help", "-v", "extra"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 1
+    }
+  ]
+}

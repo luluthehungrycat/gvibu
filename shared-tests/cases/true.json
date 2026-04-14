@@ -1,0 +1,18 @@
+{
+  "cases": [
+    {
+      "name": "no_args",
+      "args": [],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "with_args",
+      "args": ["a", "b"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}

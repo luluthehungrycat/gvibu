@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gvibu-ref"
+version = "0.1.0"
+description = "Unix-style multicall utility suite (Python reference)"
+requires-python = ">=3.10"
+entry-points = {gvibu_ref = "gvibu_ref.main:dispatch"}
+
+[project.scripts]
+gvibu-ref = "gvibu_ref.main:dispatch"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["gvibu_ref*"]

@@ -1,0 +1,18 @@
+{
+  "cases": [
+    {
+      "name": "no_args",
+      "args": [],
+      "stdout": "/home/moritz/agent/repos/gvibu-ai-lab\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "with_args",
+      "args": ["extra"],
+      "stdout": "",
+      "stderr": "pwd: usage: pwd\n",
+      "exit_code": 2
+    }
+  ]
+}

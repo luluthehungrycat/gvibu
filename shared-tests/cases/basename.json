@@ -1,0 +1,18 @@
+{
+  "cases": [
+    {
+      "name": "no_args",
+      "args": [],
+      "stdout": "",
+      "stderr": "basename: usage: basename NAME [SUFFIX]\n",
+      "exit_code": 1
+    },
+    {
+      "name": "with_args_basic",
+      "args": ["/usr/local/bin/testfile.txt", ".txt"],
+      "stdout": "testfile\n",
+      "stderr": "",
+      "exit_code": 1
+    }
+  ]
+}

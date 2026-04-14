@@ -1,0 +1,377 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Red Hat. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+const sinon = require("sinon");
+const chai = require("chai");
+const sinonChai = require("sinon-chai");
+const path = require("path");
+const url = require("url");
+const SchemaService = require("../src/languageservice/services/yamlSchemaService");
+const yamlParser07_1 = require("../src/languageservice/parser/yamlParser07");
+const yamlSettings_1 = require("../src/yamlSettings");
+const schemaUrls_1 = require("../src/languageservice/utils/schemaUrls");
+const expect = chai.expect;
+chai.use(sinonChai);
+const workspaceContext = {
+    resolveRelativePath: (relativePath, resource) => {
+        return url.resolve(resource, relativePath);
+    },
+};
+describe('YAML Schema Service', () => {
+    const sandbox = sinon.createSandbox();
+    afterEach(() => {
+        sandbox.restore();
+    });
+    describe('Schema for resource', () => {
+        let requestServiceMock;
+        beforeEach(() => {
+            requestServiceMock = sandbox.fake.resolves(undefined);
+        });
+        it('should handle inline schema http url', () => {
+            const documentContent = `# yaml-language-server: $schema=http://json-schema.org/draft-07/schema# anothermodeline=value\n`;
+            const content = `${documentContent}\n---\n- `;
+            const yamlDock = (0, yamlParser07_1.parse)(content);
+            const service = new SchemaService.YAMLSchemaService(requestServiceMock);
+            service.getSchemaForResource('', yamlDock.documents[0]);
+            expect(requestServiceMock).calledOnceWith('http://json-schema.org/draft-07/schema#');
+        });
+        it('should handle inline schema https url', () => {
+            const documentContent = `# yaml-language-server: $schema=https://json-schema.org/draft-07/schema# anothermodeline=value\n`;
+            const content = `${documentContent}\n---\n- `;
+            const yamlDock = (0, yamlParser07_1.parse)(content);
+            const service = new SchemaService.YAMLSchemaService(requestServiceMock);
+            service.getSchemaForResource('', yamlDock.documents[0]);
+            expect(requestServiceMock).calledOnceWith('https://json-schema.org/draft-07/schema#');
+        });
+        it('should handle url with fragments', async () => {
+            const content = `# yaml-language-server: $schema=https://json-schema.org/draft-07/schema#/definitions/schemaArray\nfoo: bar`;
+            const yamlDock = (0, yamlParser07_1.parse)(content);
+            requestServiceMock = sandbox.fake.resolves(`{"definitions": {"schemaArray": {
+        "type": "array",
+        "minItems": 1,
+        "items": { "$ref": "#" }
+    }}, "properties": {}}`);
+            const service = new SchemaService.YAMLSchemaService(requestServiceMock);
+            const schema = await service.getSchemaForResource('', yamlDock.documents[0]);
+            expect(requestServiceMock).calledTwice;
+            expect(requestServiceMock).calledWithExactly('https://json-schema.org/draft-07/schema');
+            expect(requestServiceMock).calledWithExactly('https://json-schema.org/draft-07/schema#/definitions/schemaArray');
+            expect(schema.schema.type).eqls('array');
+        });
+        it('should handle url with fragments when root object is schema', async () => {
+            const content = `# yaml-language-server: $schema=https://json-schema.org/draft-07/schema#/definitions/schemaArray`;
+            const yamlDock = (0, yamlParser07_1.parse)(content);
+            requestServiceMock = sandbox.fake.resolves(`{"definitions": {"schemaArray": {
+        "type": "array",
+        "minItems": 1,
+        "items": { "$ref": "#" }
+    },
+    "bar": {
+      "type": "string"
+    }
+  }, "properties": {"foo": {"type": "boolean"}}, "required": ["foo"]}`);
+            const service = new SchemaService.YAMLSchemaService(requestServiceMock);
+            const schema = await service.getSchemaForResource('', yamlDock.documents[0]);
+            expect(requestServiceMock).calledTwice;
+            expect(requestServiceMock).calledWithExactly('https://json-schema.org/draft-07/schema');
+            expect(requestServiceMock).calledWithExactly('https://json-schema.org/draft-07/schema#/definitions/schemaArray');
+            expect(schema.schema.type).eqls('array');
+            expect(schema.schema.required).is.undefined;
+            expect(schema.schema.definitions.bar.type).eqls('string');
+        });
+        it('should handle file path with fragments', async () => {
+            const content = `# yaml-language-server: $schema=schema.json#/definitions/schemaArray\nfoo: bar`;
+            const yamlDock = (0, yamlParser07_1.parse)(content);
+            requestServiceMock = sandbox.fake.resolves(`{"definitions": {"schemaArray": {
+        "type": "array",
+        "minItems": 1,
+        "items": { "$ref": "#" }
+    }}, "properties": {}}`);
+            const service = new SchemaService.YAMLSchemaService(requestServiceMock);
+            const schema = await service.getSchemaForResource('', yamlDock.documents[0]);
+            expect(requestServiceMock).calledTwice;
+            if (process.platform === 'win32') {
+                const driveLetter = path.parse(__dirname).root.split(':')[0].toLowerCase();
+                expect(requestServiceMock).calledWithExactly(`file:///${driveLetter}%3A/schema.json`);
+                expect(requestServiceMock).calledWithExactly(`file:///${driveLetter}%3A/schema.json#/definitions/schemaArray`);
+            }
+            else {
+                expect(requestServiceMock).calledWithExactly('file:///schema.json');
+                expect(requestServiceMock).calledWithExactly('file:///schema.json#/definitions/schemaArray');
+            }
+            expect(schema.schema.type).eqls('array');
+        });
+        it('should use local sibling schema path before remote $id ref', async () => {
+            const content = `# yaml-language-server: $schema=file:///schemas/primary.json\nmode: stage`;
+            const yamlDock = (0, yamlParser07_1.parse)(content);
+            const primarySchema = {
+                $id: 'https://example.com/schemas/primary.json',
+                type: 'object',
+                properties: {
+                    mode: { $ref: 'secondary.json' },
+                },
+                required: ['mode'],
+            };
+            const secondarySchema = {
+                $id: 'https://example.com/schemas/secondary.json',
+                type: 'string',
+                enum: ['dev', 'prod'],
+            };
+            requestServiceMock = sandbox.fake((uri) => {
+                if (uri === 'file:///schemas/primary.json') {
+                    return Promise.resolve(JSON.stringify(primarySchema));
+                }
+                if (uri === 'file:///schemas/secondary.json') {
+                    return Promise.resolve(JSON.stringify(secondarySchema));
+                }
+                return Promise.reject(`Resource ${uri} not found.`);
+            });
+            const service = new SchemaService.YAMLSchemaService(requestServiceMock, workspaceContext);
+            await service.getSchemaForResource('', yamlDock.documents[0]);
+            const requestedUris = requestServiceMock.getCalls().map((call) => call.args[0]);
+            expect(requestedUris).to.include('file:///schemas/primary.json');
+            expect(requestedUris).to.include('file:///schemas/secondary.json');
+            expect(requestedUris).to.not.include('https://example.com/schemas/secondary.json');
+        });
+        it('should resolve absolute $ref via remote base and mapped local sibling path', async () => {
+            const content = `# yaml-language-server: $schema=file:///dir/primary.json\nname: John\nage: -1`;
+            const yamlDock = (0, yamlParser07_1.parse)(content);
+            const primarySchema = {
+                $id: 'https://example.com/schemas/primary.json',
+                $ref: '/schemas/secondary.json',
+            };
+            const secondarySchema = {
+                $id: 'https://example.com/schemas/secondary.json',
+                type: 'object',
+                properties: {
+                    name: { type: 'string' },
+                    age: { type: 'integer', minimum: 0 },
+                },
+                required: ['name', 'age'],
+            };
+            requestServiceMock = sandbox.fake((uri) => {
+                if (uri === 'file:///dir/primary.json') {
+                    return Promise.resolve(JSON.stringify(primarySchema));
+                }
+                if (uri === 'file:///dir/secondary.json') {
+                    return Promise.resolve(JSON.stringify(secondarySchema));
+                }
+                return Promise.reject(`Resource ${uri} not found.`);
+            });
+            const service = new SchemaService.YAMLSchemaService(requestServiceMock, workspaceContext);
+            await service.getSchemaForResource('', yamlDock.documents[0]);
+            const requestedUris = requestServiceMock.getCalls().map((call) => call.args[0]);
+            expect(requestedUris).to.include('file:///dir/primary.json');
+            expect(requestedUris).to.include('file:///dir/secondary.json');
+            expect(requestedUris).to.not.include('file:///schemas/secondary.json');
+            expect(requestedUris).to.not.include('https://example.com/schemas/secondary.json');
+        });
+        it('should fallback to remote $id target for absolute $ref when mapped local target is missing', async () => {
+            const content = `# yaml-language-server: $schema=file:///dir/primary.json\nname: John\nage: -1`;
+            const yamlDock = (0, yamlParser07_1.parse)(content);
+            const primarySchema = {
+                $id: 'https://example.com/schemas/primary.json',
+                $ref: '/schemas/secondary.json',
+            };
+            const secondarySchema = {
+                $id: 'https://example.com/schemas/secondary.json',
+                type: 'object',
+                properties: {
+                    name: { type: 'string' },
+                    age: { type: 'integer', minimum: 0 },
+                },
+                required: ['name', 'age'],
+            };
+            requestServiceMock = sandbox.fake((uri) => {
+                if (uri === 'file:///dir/primary.json') {
+                    return Promise.resolve(JSON.stringify(primarySchema));
+                }
+                if (uri === 'https://example.com/schemas/secondary.json') {
+                    return Promise.resolve(JSON.stringify(secondarySchema));
+                }
+                return Promise.reject(`Resource ${uri} not found.`);
+            });
+            const service = new SchemaService.YAMLSchemaService(requestServiceMock, workspaceContext);
+            await service.getSchemaForResource('', yamlDock.documents[0]);
+            const requestedUris = requestServiceMock.getCalls().map((call) => call.args[0]);
+            expect(requestedUris).to.include('file:///dir/primary.json');
+            expect(requestedUris).to.include('file:///dir/secondary.json');
+            expect(requestedUris).to.include('https://example.com/schemas/secondary.json');
+            expect(requestedUris).to.not.include('file:///schemas/secondary.json');
+            expect(requestedUris.indexOf('file:///dir/secondary.json')).to.be.lessThan(requestedUris.indexOf('https://example.com/schemas/secondary.json'));
+        });
+        it('should reload local schema after local file change when resolving via local sibling path instead of remote $id', async () => {
+            const content = `# yaml-language-server: $schema=file:///schemas/primary.json\nmode: stage`;
+            const yamlDock = (0, yamlParser07_1.parse)(content);
+            const primarySchema = {
+                $id: 'https://example.com/schemas/primary.json',
+                type: 'object',
+                properties: {
+                    mode: { $ref: 'secondary.json' },
+                },
+                required: ['mode'],
+            };
+            let secondarySchema = {
+                $id: 'https://example.com/schemas/secondary.json',
+                type: 'string',
+                enum: ['dev', 'prod'],
+            };
+            requestServiceMock = sandbox.fake((uri) => {
+                if (uri === 'file:///schemas/primary.json') {
+                    return Promise.resolve(JSON.stringify(primarySchema));
+                }
+                if (uri === 'file:///schemas/secondary.json') {
+                    return Promise.resolve(JSON.stringify(secondarySchema));
+                }
+                return Promise.reject(`Resource ${uri} not found.`);
+            });
+            const service = new SchemaService.YAMLSchemaService(requestServiceMock, workspaceContext);
+            await service.getSchemaForResource('', yamlDock.documents[0]);
+            const requestedSecondaryUrisAfterFirstLoad = requestServiceMock
+                .getCalls()
+                .map((call) => call.args[0])
+                .filter((uri) => uri === 'file:///schemas/secondary.json');
+            expect(requestedSecondaryUrisAfterFirstLoad).to.have.length(1);
+            secondarySchema = { ...secondarySchema, enum: ['dev', 'prod', 'stage'] };
+            service.onResourceChange('file:///schemas/secondary.json');
+            await service.getSchemaForResource('', yamlDock.documents[0]);
+            const requestedSecondaryUrisAfterChange = requestServiceMock
+                .getCalls()
+                .map((call) => call.args[0])
+                .filter((uri) => uri === 'file:///schemas/secondary.json');
+            expect(requestedSecondaryUrisAfterChange).to.have.length(2);
+        });
+        it('should handle modeline schema comment in the middle of file', () => {
+            const documentContent = `foo:\n  bar\n# yaml-language-server: $schema=https://json-schema.org/draft-07/schema#\naa:bbb\n`;
+            const content = `${documentContent}`;
+            const yamlDock = (0, yamlParser07_1.parse)(content);
+            const service = new SchemaService.YAMLSchemaService(requestServiceMock);
+            service.getSchemaForResource('', yamlDock.documents[0]);
+            expect(requestServiceMock).calledOnceWith('https://json-schema.org/draft-07/schema#');
+        });
+        it('should handle modeline schema comment in multiline comments', () => {
+            const documentContent = `foo:\n  bar\n#first comment\n# yaml-language-server: $schema=https://json-schema.org/draft-07/schema#\naa:bbb\n`;
+            const content = `${documentContent}`;
+            const yamlDock = (0, yamlParser07_1.parse)(content);
+            const service = new SchemaService.YAMLSchemaService(requestServiceMock);
+            service.getSchemaForResource('', yamlDock.documents[0]);
+            expect(requestServiceMock).calledOnceWith('https://json-schema.org/draft-07/schema#');
+        });
+        it('should handle crd catalog for crd', async () => {
+            const documentContent = 'apiVersion: argoproj.io/v1alpha1\nkind: Application';
+            const content = `${documentContent}`;
+            const yamlDock = (0, yamlParser07_1.parse)(content);
+            const settings = new yamlSettings_1.SettingsState();
+            settings.schemaAssociations = {
+                kubernetes: ['*.yaml'],
+            };
+            settings.kubernetesCRDStoreEnabled = true;
+            requestServiceMock = sandbox.fake.resolves(`
+        {
+          "oneOf": [ {
+              "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.MutatingWebhook"
+            }
+          ]
+        }
+        `);
+            const service = new SchemaService.YAMLSchemaService(requestServiceMock, undefined, undefined, settings);
+            service.registerExternalSchema(schemaUrls_1.KUBERNETES_SCHEMA_URL, ['*.yaml']);
+            const resolvedeSchema = await service.getSchemaForResource('test.yaml', yamlDock.documents[0]);
+            expect(resolvedeSchema.schema.url).eqls('https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/argoproj.io/application_v1alpha1.json');
+            expect(requestServiceMock).calledWithExactly(schemaUrls_1.KUBERNETES_SCHEMA_URL);
+            expect(requestServiceMock).calledWithExactly('file:///_definitions.json');
+            expect(requestServiceMock).calledWithExactly('https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/argoproj.io/application_v1alpha1.json');
+            expect(requestServiceMock).calledThrice;
+        });
+        it('should handle nonstandard location for OpenShift crd', async () => {
+            const documentContent = `apiVersion: route.openshift.io/v1
+kind: Route
+spec:
+  to:
+    kind: Service
+    name: MyFirstService
+    weight: 100`;
+            const content = `${documentContent}`;
+            const yamlDock = (0, yamlParser07_1.parse)(content);
+            const settings = new yamlSettings_1.SettingsState();
+            settings.schemaAssociations = {
+                kubernetes: ['*.yaml'],
+            };
+            settings.kubernetesCRDStoreEnabled = true;
+            requestServiceMock = sandbox.fake.resolves(`
+        {
+          "oneOf": [ {
+              "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.MutatingWebhook"
+            }
+          ]
+        }
+        `);
+            const service = new SchemaService.YAMLSchemaService(requestServiceMock, undefined, undefined, settings);
+            service.registerExternalSchema(schemaUrls_1.KUBERNETES_SCHEMA_URL, ['*.yaml']);
+            const resolvedeSchema = await service.getSchemaForResource('test.yaml', yamlDock.documents[0]);
+            expect(resolvedeSchema.schema.url).eqls('https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/openshift/v4.15-strict/route_route.openshift.io_v1.json');
+            expect(requestServiceMock).calledWithExactly(schemaUrls_1.KUBERNETES_SCHEMA_URL);
+            expect(requestServiceMock).calledWithExactly('file:///_definitions.json');
+            expect(requestServiceMock).calledWithExactly('https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/openshift/v4.15-strict/route_route.openshift.io_v1.json');
+            expect(requestServiceMock).calledThrice;
+        });
+        it('should not get schema from crd catalog if definition in kubernetes schema', async () => {
+            const documentContent = 'apiVersion: admissionregistration.k8s.io/v1\nkind: MutatingWebhook';
+            const content = `${documentContent}`;
+            const yamlDock = (0, yamlParser07_1.parse)(content);
+            const settings = new yamlSettings_1.SettingsState();
+            settings.schemaAssociations = {
+                kubernetes: ['*.yaml'],
+            };
+            settings.kubernetesCRDStoreEnabled = true;
+            requestServiceMock = sandbox.fake.resolves(`
+        {
+          "oneOf": [ {
+              "$ref": "_definitions.json#/definitions/io.k8s.api.admissionregistration.v1.MutatingWebhook"
+            }
+          ]
+        }
+        `);
+            const service = new SchemaService.YAMLSchemaService(requestServiceMock, undefined, undefined, settings);
+            service.registerExternalSchema(schemaUrls_1.KUBERNETES_SCHEMA_URL, ['*.yaml']);
+            const resolvedSchema = await service.getSchemaForResource('test.yaml', yamlDock.documents[0]);
+            expect(resolvedSchema.schema.url).eqls(schemaUrls_1.KUBERNETES_SCHEMA_URL);
+            expect(requestServiceMock).calledWithExactly(schemaUrls_1.KUBERNETES_SCHEMA_URL);
+            expect(requestServiceMock).calledWithExactly('file:///_definitions.json');
+            expect(requestServiceMock).calledTwice;
+        });
+        it('should not get schema from crd catalog if definition in kubernetes schema (multiple oneOf)', async () => {
+            const documentContent = 'apiVersion: apps/v1\nkind: Deployment';
+            const content = `${documentContent}`;
+            const yamlDock = (0, yamlParser07_1.parse)(content);
+            const settings = new yamlSettings_1.SettingsState();
+            settings.schemaAssociations = {
+                kubernetes: ['*.yaml'],
+            };
+            settings.kubernetesCRDStoreEnabled = true;
+            requestServiceMock = sandbox.fake.resolves(`
+        {
+          "oneOf": [
+            {
+              "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.Deployment"
+            },
+            {
+              "$ref": "_definitions.json#/definitions/io.k8s.api.apps.v1.DeploymentCondition"
+            }
+          ]
+        }
+        `);
+            const service = new SchemaService.YAMLSchemaService(requestServiceMock, undefined, undefined, settings);
+            service.registerExternalSchema(schemaUrls_1.KUBERNETES_SCHEMA_URL, ['*.yaml']);
+            const resolvedSchema = await service.getSchemaForResource('test.yaml', yamlDock.documents[0]);
+            expect(resolvedSchema.schema.url).eqls(schemaUrls_1.KUBERNETES_SCHEMA_URL);
+            expect(requestServiceMock).calledWithExactly(schemaUrls_1.KUBERNETES_SCHEMA_URL);
+            expect(requestServiceMock).calledWithExactly('file:///_definitions.json');
+            expect(requestServiceMock).calledTwice;
+        });
+    });
+});
+//# sourceMappingURL=yamlSchemaService.test.js.map

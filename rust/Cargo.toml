@@ -1,0 +1,11 @@
+[package]
+name = "gvibu"
+version = "0.1.0"
+edition = "2021"
+description = "Unix-style multicall utility suite"
+
+[[bin]]
+name = "gvibu"
+path = "src/main.rs"
+
+[dependencies]
