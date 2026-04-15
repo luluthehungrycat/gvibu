@@ -1,0 +1,11 @@
+services:
+  gvibu_python:
+    build:
+      context: .
+      dockerfile: gvibu-python/Dockerfile
+    container_name: gvibu_python_vish
+  gvibu_rust:
+    build:
+      context: .
+      dockerfile: gvibu-rust/Dockerfile
+    container_name: gvibu_rust_vish

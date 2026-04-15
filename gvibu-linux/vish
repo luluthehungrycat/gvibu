@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+usage() { echo "Usage: ./gvibu-linux/vish <gvibu-command> [args...]" ; echo "Example: ./gvibu-linux/vish help" ; }
+if [[ $# -lt 1 ]]; then usage; exit 1; fi
+cmd=$1
+shift || true
+case "$cmd" in
+  help)
+     echo "GVIBU minimal shell (vish) - routes commands to GVIBU surface"
+     echo "Available commands: help, init, status, gvibu"
+     ;;
+  init)
+     echo "GVIBU init: placeholder for initializing userland integration";;
+  status)
+     echo "GVIBU status: MVP skeleton, no real state yet";;
+  gvibu)
+     subcmd="${1-}"; shift || true
+     if command -v python3 >/dev/null 2>&1; then
+        ROOT_DIR=$(cd "$(dirname "$0")/.." && pwd)
+        VISH_PY="$ROOT_DIR/gvibu-python/vish.py"
+        if [[ -f "$VISH_PY" ]]; then
+          python3 "$VISH_PY" gvibu "$subcmd" "$@" || true
+        elif [[ -f "$ROOT_DIR/gvibu-python/vish.py" ]]; then
+          python3 "$ROOT_DIR/gvibu-python/vish.py" gvibu "$subcmd" "$@" || true
+        else
+          echo "GVIBU Python backend not found" >&2
+          exit 0
+        fi
+     else
+        echo "GVIBU Python backend not available"
+     fi
+     ;;
+  *)
+     echo "Unknown command: $cmd"; usage; exit 1; ;;
+esac
+exit 0

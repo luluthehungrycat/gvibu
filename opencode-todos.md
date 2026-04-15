@@ -1,9 +1,7 @@
+# OpenCode Vanilla ToDo - GVIBU
 # Ralph Tasks
-
-Add your tasks below using: `ralph --add-task "description"`
-
-- [/] GVIBU/Linux MVP scaffolding: add vish shell, qemu/run script, and docker container blueprint
-- [/] Wire vish to GVIBU command surface (placeholder)
+- [ ] GVIBU/Linux MVP scaffolding: add vish shell, qemu/run script, and docker container blueprint
+- [ ] Wire vish to GVIBU command surface (placeholder)
 - [ ] Implement Python GVIBU + vish scaffolding
 - [ ] Implement Rust GVIBU + vish scaffolding
 - [ ] Add tests for the vish CLI (Python & Rust)
