@@ -6,14 +6,13 @@ import os
 
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-    COMMANDS = {
-        "true": None,
-        "false": None,
-        "echo": None,
-        "pwd": None,
-        "basename": None,
-    }
+COMMANDS = {
+    "true": None,
+    "false": None,
+    "echo": None,
+    "pwd": None,
+    "basename": None,
+}
 
 
 def get_command_name() -> str:
@@ -32,16 +31,16 @@ def dispatch():
         from gvibu_ref.commands import true, false, echo, pwd, basename
     except ModuleNotFoundError:
         from commands import true, false, echo, pwd, basename
-    
+
     COMMANDS["true"] = true
     COMMANDS["false"] = false
     COMMANDS["echo"] = echo
     COMMANDS["pwd"] = pwd
     COMMANDS["basename"] = basename
-    
+
     cmd_name = get_command_name()
     argv0 = os.path.basename(sys.argv[0])
-    
+
     if cmd_name in COMMANDS:
         if argv0 == cmd_name:
             args = sys.argv[1:]
@@ -49,7 +48,7 @@ def dispatch():
             args = sys.argv[2:]
         else:
             args = sys.argv[1:]
-        
+
         try:
             result = COMMANDS[cmd_name].run(args)
             sys.exit(result)
