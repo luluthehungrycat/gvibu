@@ -2,8 +2,8 @@
 
 - GVIBU/Linux MVP scaffolding
   - [/] GVIBU/Linux MVP scaffolding: add vish shell, qemu/run script, and docker container blueprint
-  - [/] Wire vish to GVIBU command surface (placeholder)
-  - [ ] Implement Python GVIBU + vish scaffolding
+  - [/] Wire vish to GVIBU command surface (implementation)
+  - [x] Implement Python GVIBU + vish scaffolding
   - [ ] Implement Rust GVIBU + vish scaffolding
   - [ ] Add tests for the vish CLI (Python & Rust)
   - [ ] Provide kernel defconfig snippet for GVIBU build
