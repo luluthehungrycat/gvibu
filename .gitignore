@@ -2,3 +2,7 @@
 ./.claude/*
 ./.docker-state/
 ./.docker-state/*
+.ralph/
+.ruff_cache/
+.pytest_cache/
+.sisyphus/
