@@ -1,9 +1,11 @@
 """dirname: strip last component from a file path."""
 
+import sys
+
 
 def run(args: list[str]) -> int:
     if not args:
-        print("dirname: usage: dirname NAME", file=__import__("sys").stderr)
+        print("dirname: usage: dirname NAME", file=sys.stderr)
         return 2
 
     path = args[0]
