@@ -13,14 +13,19 @@ The goal is not full GNU replacement, but clean CLI design, deterministic behavi
 
 ## Implemented Commands (MVP)
 
-| Command  | Spec | Python | Rust | Notes |
-|----------|------|--------|------|-------|
-| true     | ✓    | ✓      | ✓    | Returns 0 |
-| false    | ✓    | ✓      | ✓    | Returns 1 |
-| echo     | ✓    | ✓      | ✓    | Supports `-n` flag |
-| pwd      | ✓    | ✓      | ✓    | Prints working directory |
-| basename | ✓    | ✓      | ✓    | Path extraction with suffix removal |
-| dirname  | ✓    | ✓      | ✓    | Directory portion of a file path |
+| Command  | Spec | Python | Rust | Rust Tests | Notes |
+|----------|------|--------|------|------------|-------|
+| true     | ✓    | ✓      | ✓    | ✓          | Returns 0 |
+| false    | ✓    | ✓      | ✓    | ✓          | Returns 1 |
+| echo     | ✓    | ✓      | ✓    | ✓          | Supports `-n` flag |
+| pwd      | ✓    | ✓      | ✓    | ✓          | Prints working directory |
+| basename | ✓    | ✓      | ✓    | ✓          | Path extraction with suffix removal |
+| dirname  | ✓    | ✓      | ✓    | ✓          | Directory portion of a file path |
+| cat      | ✓    | ✓      | ✓    | ✓          | Concatenate files, stdin support |
+| wc       | ✓    | ✓      | ✓    | ✓          | Line/word/byte counts, combined flags |
+| head     | ✓    | ✓      | ✓    | ✓          | First N lines, stdin support, multi-file |
+
+**Total: 9 commands — 9 specs, 9 Python impls, 9 Rust impls, 35 Rust integration tests, 60 Python tests, 50+ parity tests**
 
 ## Quick Start
 
@@ -46,16 +51,17 @@ cd rust && cargo test
 
 ```
 gvibu-ai-lab/
-├── docs/                  # Architecture, plans, command status
 ├── specs/commands/       # Human-readable command specifications
 ├── shared-tests/cases/   # JSON test cases shared across implementations
 ├── python-ref/           # Python reference implementation
 │   └── gvibu_ref/
 │       └── commands/     # Individual command modules
 ├── rust/                 # Rust production implementation
-│   └── src/commands/     # Individual command modules
+│   ├── src/commands/     # Individual command modules
+│   └── tests/            # Rust integration tests
 ├── tooling/              # Build, comparison, and status scripts
-└── tests/                # Python and Rust test suites
+├── tests/                # Python unit tests
+└── gvibu-linux/          # Linux initramfs/QEMU end-to-end scaffolding
 ```
 
 ## Design Principles
