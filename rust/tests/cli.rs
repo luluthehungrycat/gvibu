@@ -21,6 +21,24 @@ fn run(args: &[&str]) -> (i32, String, String) {
     )
 }
 
+fn run_with_timeout(args: &[&str], timeout_ms: u64) -> (Option<i32>, String, String) {
+    let mut cmd = Command::new(gvibu_bin());
+    cmd.args(args);
+    cmd.stdout(std::process::Stdio::piped());
+    cmd.stderr(std::process::Stdio::piped());
+    let mut child = cmd.spawn().expect("failed to spawn gvibu");
+
+    std::thread::sleep(std::time::Duration::from_millis(timeout_ms));
+    let _ = child.kill();
+
+    let output = child.wait_with_output().expect("failed to wait");
+    (
+        output.status.code(),
+        String::from_utf8_lossy(&output.stdout).to_string(),
+        String::from_utf8_lossy(&output.stderr).to_string(),
+    )
+}
+
 fn run_with_stdin(args: &[&str], stdin: &str) -> (i32, String, String) {
     let mut cmd = Command::new(gvibu_bin());
     cmd.args(args);
@@ -350,4 +368,87 @@ fn head_multi_file_dev_null() {
     assert_eq!(code, 0);
     assert!(out.contains("==>"), "multi-file output should have headers");
     assert_eq!(err, "");
+}
+
+// ---------------------------------------------------------------------------
+// yes
+// ---------------------------------------------------------------------------
+#[test]
+fn yes_default_first_line() {
+    let (code, out, err) = run_with_timeout(&["yes"], 100);
+    assert_eq!(code, None, "yes should be killed, not exit on its own");
+    assert!(out.starts_with("y\n"), "first line should be 'y'");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn yes_with_args_first_line() {
+    let (code, out, err) = run_with_timeout(&["yes", "hello", "world"], 100);
+    assert_eq!(code, None, "yes should be killed, not exit on its own");
+    assert!(out.starts_with("hello world\n"), "first line should be 'hello world'");
+    assert_eq!(err, "");
+}
+
+// ---------------------------------------------------------------------------
+// printenv
+// ---------------------------------------------------------------------------
+#[test]
+fn printenv_known_var() {
+    let (code, out, err) = run(&["printenv", "PATH"]);
+    assert_eq!(code, 0);
+    assert!(!out.is_empty(), "PATH should be set");
+    assert!(out.ends_with('\n'));
+    assert_eq!(err, "");
+}
+
+#[test]
+fn printenv_unknown_var() {
+    let (code, out, err) = run(&["printenv", "__GVIBU_NONEXISTENT_VAR_XYZ__"]);
+    assert_eq!(code, 0);
+    assert_eq!(out, "\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn printenv_all() {
+    let (code, out, err) = run(&["printenv"]);
+    assert_eq!(code, 0);
+    assert!(!out.is_empty(), "should print environment");
+    assert!(out.contains("PATH="), "PATH should be in output");
+    assert_eq!(err, "");
+}
+
+// ---------------------------------------------------------------------------
+// sleep
+// ---------------------------------------------------------------------------
+#[test]
+fn sleep_zero() {
+    let (code, out, err) = run(&["sleep", "0"]);
+    assert_eq!(code, 0);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn sleep_no_args() {
+    let (code, out, err) = run(&["sleep"]);
+    assert_eq!(code, 2);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print usage");
+}
+
+#[test]
+fn sleep_invalid_number() {
+    let (code, out, err) = run(&["sleep", "abc"]);
+    assert_eq!(code, 2);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn sleep_negative() {
+    let (code, out, err) = run(&["sleep", "-5"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
 }

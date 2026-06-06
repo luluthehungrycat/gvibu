@@ -1,0 +1,18 @@
+{
+  "cases": [
+    {
+      "name": "known_var",
+      "args": ["PATH"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "unknown_var",
+      "args": ["__GVIBU_NONEXISTENT_VAR_XYZ__"],
+      "stdout": "\n",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}

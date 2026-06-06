@@ -62,12 +62,12 @@ def run_tests_for_command(
         rust_code, rust_out, rust_err = run_command(rust_full_cmd, stdin=stdin_input)
 
         py_match = (
-            py_out == expected_stdout
+            (expected_stdout == "*" or py_out == expected_stdout)
             and (expected_stderr == "*" or py_err == expected_stderr)
             and py_code == expected_exit
         )
         rust_match = (
-            rust_out == expected_stdout
+            (expected_stdout == "*" or rust_out == expected_stdout)
             and (expected_stderr == "*" or rust_err == expected_stderr)
             and rust_code == expected_exit
         )
@@ -113,7 +113,7 @@ def main():
     python_cmd = ["python3", "python-ref/gvibu_ref/main.py"]
     rust_cmd = ["rust/target/debug/gvibu"]
 
-    commands = ["true", "false", "echo", "pwd", "basename", "dirname", "cat", "wc", "head"]
+    commands = ["true", "false", "echo", "pwd", "basename", "dirname", "cat", "wc", "head", "printenv", "sleep"]
 
     all_results = []
 

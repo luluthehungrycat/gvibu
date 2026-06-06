@@ -7,6 +7,9 @@ pub mod echo_cmd;
 pub mod false_cmd;
 pub mod pwd_cmd;
 pub mod true_cmd;
+pub mod yes;
+pub mod printenv;
+pub mod sleep;
 
 pub const BINARY_NAMES: &[&str] = &["gvibu", "gvibu-ref"];
 
@@ -25,6 +28,9 @@ pub const COMMANDS: &[Command] = &[
     Command { names: &["cat"], run: cat::run },
     Command { names: &["wc"], run: wc::run },
     Command { names: &["head"], run: head::run },
+    Command { names: &["yes"], run: yes::run },
+    Command { names: &["printenv"], run: printenv::run },
+    Command { names: &["sleep"], run: sleep::run },
 ];
 
 pub fn lookup(name: &str) -> Option<&'static Command> {

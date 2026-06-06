@@ -1,0 +1,25 @@
+{
+  "cases": [
+    {
+      "name": "zero_seconds",
+      "args": ["0"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "no_args",
+      "args": [],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 2
+    },
+    {
+      "name": "invalid_number",
+      "args": ["abc"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 2
+    }
+  ]
+}
