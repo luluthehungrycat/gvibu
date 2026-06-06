@@ -30,9 +30,11 @@ jobs:
       - name: Build Rust parity binary
         run: (cd rust && cargo build --manifest-path Cargo.toml)
 
+      - name: Run Rust unit tests
+        run: (cd rust && cargo test)
+
       - name: Run parity checks
         run: (python3 tooling/compare_impls.py)
 
-      - name: Run Python unit tests (pwd/echo/true/basename)
-        run: |
-          pytest -q tests/test_pwd.py tests/test_echo.py tests/test_true.py tests/test_basename.py
+      - name: Run Python unit tests
+        run: pytest -q tests/
