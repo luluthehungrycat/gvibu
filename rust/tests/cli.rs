@@ -452,3 +452,236 @@ fn sleep_negative() {
     assert_eq!(out, "");
     assert!(!err.is_empty(), "should print error");
 }
+
+// ── touch ──
+
+#[test]
+fn touch_no_args() {
+    let (code, out, err) = run(&["touch"]);
+    assert_eq!(code, 2);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print usage");
+}
+
+#[test]
+fn touch_creates_file() {
+    let dir = std::env::temp_dir().join(format!("gvibu_test_{}", std::process::id()));
+    let _ = std::fs::create_dir_all(&dir);
+    let path = dir.join("touch_test");
+    let path_str = path.to_str().unwrap();
+
+    // Ensure clean
+    let _ = std::fs::remove_file(&path);
+    assert!(!path.exists());
+
+    let (code, _out, err) = run(&["touch", path_str]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(path.exists(), "file should be created");
+
+    let _ = std::fs::remove_file(&path);
+    let _ = std::fs::remove_dir(&dir);
+}
+
+#[test]
+fn touch_nonexistent_directory() {
+    let (code, out, err) = run(&["touch", "/nonexistent_dir/file"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ── seq ──
+
+#[test]
+fn seq_basic() {
+    let (code, out, err) = run(&["seq", "5"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "1\n2\n3\n4\n5\n");
+}
+
+#[test]
+fn seq_first_last() {
+    let (code, out, err) = run(&["seq", "3", "7"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "3\n4\n5\n6\n7\n");
+}
+
+#[test]
+fn seq_first_step_last() {
+    let (code, out, err) = run(&["seq", "2", "3", "14"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "2\n5\n8\n11\n14\n");
+}
+
+#[test]
+fn seq_first_greater_than_last() {
+    let (code, out, err) = run(&["seq", "10", "5"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "");
+}
+
+#[test]
+fn seq_negative_step() {
+    let (code, out, err) = run(&["seq", "10", "-2", "4"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "10\n8\n6\n4\n");
+}
+
+#[test]
+fn seq_step_zero() {
+    let (code, out, err) = run(&["seq", "1", "0", "5"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn seq_no_args() {
+    let (code, out, err) = run(&["seq"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print usage");
+}
+
+#[test]
+fn seq_invalid_arg() {
+    let (code, out, err) = run(&["seq", "abc"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ── which ──
+
+#[test]
+fn which_found() {
+    let (code, out, err) = run(&["which", "sh"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(out.trim().ends_with("/sh"), "out: {:?}", out);
+}
+
+#[test]
+fn which_not_found() {
+    let (code, out, err) = run(&["which", "nonexistent_cmd_xyz"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn which_no_args() {
+    let (code, out, err) = run(&["which"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+// ── uname ──
+
+#[test]
+fn uname_default() {
+    let (code, out, err) = run(&["uname"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.trim().is_empty(), "should output kernel name");
+}
+
+#[test]
+fn uname_s() {
+    let (code, out, err) = run(&["uname", "-s"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out.trim(), "Linux");
+}
+
+#[test]
+fn uname_n() {
+    let (code, out, err) = run(&["uname", "-n"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.trim().is_empty(), "should output nodename");
+}
+
+#[test]
+fn uname_r() {
+    let (code, out, err) = run(&["uname", "-r"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.trim().is_empty(), "should output kernel release");
+}
+
+#[test]
+fn uname_m() {
+    let (code, out, err) = run(&["uname", "-m"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.trim().is_empty(), "should output machine hardware");
+}
+
+#[test]
+fn uname_all() {
+    let (code, out, err) = run(&["uname", "-a"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    let parts: Vec<&str> = out.trim().split_whitespace().collect();
+    assert!(parts.len() >= 4, "should have 4+ parts, got {:?}", parts);
+}
+
+#[test]
+fn uname_invalid_option() {
+    let (code, out, err) = run(&["uname", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ── env ──
+
+#[test]
+fn env_print() {
+    let (code, out, err) = run(&["env"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.is_empty(), "should print environment");
+    assert!(out.contains('='), "should contain key=value pairs");
+}
+
+#[test]
+fn env_var_assign() {
+    let (code, out, err) = run(&["env", "TEST_GVIBU=hello"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(out.contains("TEST_GVIBU=hello"), "out: {:?}", out);
+}
+
+#[test]
+fn env_unset() {
+    let (code, out, err) = run(&["env", "-u", "PATH"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(
+        !out.lines().any(|l| l.starts_with("PATH=")),
+        "PATH should be unset, got line with 'PATH=' in: {:?}",
+        out.lines().find(|l| l.contains("PATH="))
+    );
+}
+
+#[test]
+fn env_ignore() {
+    let (code, out, err) = run(&["env", "-i"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "");
+}
+
+#[test]
+fn env_run_command() {
+    let (code, out, err) = run(&["env", "echo", "hello"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "hello\n");
+}
+
+#[test]
+fn env_run_command_with_var() {
+    let (code, out, err) = run(&["env", "TEST_GVIBU=hello", "sh", "-c", "echo $TEST_GVIBU"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out.trim(), "hello");
+}
+
+#[test]
+fn env_command_not_found() {
+    let (code, out, err) = run(&["env", "nonexistent_cmd_xyz"]);
+    assert_eq!(code, 127);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}

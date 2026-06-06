@@ -19,6 +19,11 @@ COMMANDS = {
     "yes": None,
     "printenv": None,
     "sleep": None,
+    "touch": None,
+    "seq": None,
+    "which": None,
+    "uname": None,
+    "env": None,
 }
 
 
@@ -35,9 +40,15 @@ def get_command_name() -> str:
 def dispatch():
     """Dispatch to the appropriate command."""
     try:
-        from gvibu_ref.commands import true, false, echo, pwd, basename, dirname, cat, wc, head, yes, printenv, sleep
+        from gvibu_ref.commands import (
+            true, false, echo, pwd, basename, dirname, cat, wc, head,
+            yes, printenv, sleep, touch, seq, which_cmd, uname, env_cmd,
+        )
     except ModuleNotFoundError:
-        from commands import true, false, echo, pwd, basename, dirname, cat, wc, head, yes, printenv, sleep
+        from commands import (
+            true, false, echo, pwd, basename, dirname, cat, wc, head,
+            yes, printenv, sleep, touch, seq, which_cmd, uname, env_cmd,
+        )
 
     COMMANDS["true"] = true
     COMMANDS["false"] = false
@@ -51,6 +62,11 @@ def dispatch():
     COMMANDS["yes"] = yes
     COMMANDS["printenv"] = printenv
     COMMANDS["sleep"] = sleep
+    COMMANDS["touch"] = touch
+    COMMANDS["seq"] = seq
+    COMMANDS["which"] = which_cmd
+    COMMANDS["uname"] = uname
+    COMMANDS["env"] = env_cmd
 
     cmd_name = get_command_name()
     argv0 = os.path.basename(sys.argv[0])
