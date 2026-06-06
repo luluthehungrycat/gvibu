@@ -39,3 +39,19 @@ def test_echo_no_newline_multiple_args(capfd):
     out, err = capfd.readouterr()
     assert out == "hello world"
     assert err == ""
+
+
+def test_echo_dash_n_not_first(capfd):
+    code = echo_run(["hello", "-n", "world"])
+    assert code == 0
+    out, err = capfd.readouterr()
+    assert out == "hello -n world\n"
+    assert err == ""
+
+
+def test_echo_single_arg(capfd):
+    code = echo_run(["hello"])
+    assert code == 0
+    out, err = capfd.readouterr()
+    assert out == "hello\n"
+    assert err == ""

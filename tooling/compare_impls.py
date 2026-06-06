@@ -112,7 +112,7 @@ def main():
     python_cmd = ["python3", "python-ref/gvibu_ref/main.py"]
     rust_cmd = ["rust/target/debug/gvibu"]
 
-    commands = ["true", "false", "echo", "pwd", "basename"]
+    commands = ["true", "false", "echo", "pwd", "basename", "dirname"]
 
     all_results = []
 

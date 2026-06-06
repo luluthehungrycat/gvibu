@@ -9,7 +9,7 @@
 | echo     | Done | Done | Done | Complete. Supports `-n` flag (no trailing newline). |
 | basename | Done | Done | Done | Complete. Extracts filename, optional suffix removal. |
 | pwd      | Done | Done | Done | Complete. Prints working directory path. |
-| dirname  | -    | -    | -    | Scaffolded — not yet implemented |
+| dirname  | Done | Done | Done | Complete. Strips last component from file path. |
 | cat      | -    | -    | -    | Scaffolded — not yet implemented |
 | head     | -    | -    | -    | Scaffolded — not yet implemented |
 | wc       | -    | -    | -    | Scaffolded — not yet implemented |
@@ -23,7 +23,7 @@
 
 ## Current Focus
 
-All 5 MVP commands are fully implemented and parity-verified. Next: implement dirname, cat, head, and wc.
+All 6 MVP commands are fully implemented and parity-verified. Next: implement cat, head, and wc.
 
 ## Generating This Table
 

@@ -25,6 +25,12 @@ fn get_command_name() -> String {
     if commands::PWD.contains(&argv0_basename.as_str()) {
         return argv0_basename;
     }
+    if commands::BASENAME.contains(&argv0_basename.as_str()) {
+        return argv0_basename;
+    }
+    if commands::DIRNAME.contains(&argv0_basename.as_str()) {
+        return argv0_basename;
+    }
 
     if args.len() > 1 {
         let cmd = &args[1];
@@ -41,6 +47,9 @@ fn get_command_name() -> String {
             return cmd.clone();
         }
         if commands::BASENAME.contains(&cmd.as_str()) {
+            return cmd.clone();
+        }
+        if commands::DIRNAME.contains(&cmd.as_str()) {
             return cmd.clone();
         }
     }
@@ -63,6 +72,7 @@ fn main() {
         || commands::ECHO.contains(&argv0_basename.as_str())
         || commands::PWD.contains(&argv0_basename.as_str())
         || commands::BASENAME.contains(&argv0_basename.as_str())
+        || commands::DIRNAME.contains(&argv0_basename.as_str())
     {
         args[1..].to_vec()
     } else if commands::TRUE.contains(&cmd_name.as_str())
@@ -70,6 +80,7 @@ fn main() {
         || commands::ECHO.contains(&cmd_name.as_str())
         || commands::PWD.contains(&cmd_name.as_str())
         || commands::BASENAME.contains(&cmd_name.as_str())
+        || commands::DIRNAME.contains(&cmd_name.as_str())
     {
         args[2..].to_vec()
     } else {
@@ -86,6 +97,8 @@ fn main() {
         commands::pwd_cmd::run(&run_args)
     } else if commands::BASENAME.contains(&cmd_name.as_str()) {
         commands::basename::run(&run_args)
+    } else if commands::DIRNAME.contains(&cmd_name.as_str()) {
+        commands::dirname::run(&run_args)
     } else {
         eprintln!("gvibu: {}: command not found", cmd_name);
         1

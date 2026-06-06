@@ -1,0 +1,81 @@
+{
+  "cases": [
+    {
+      "name": "no_args",
+      "args": [],
+      "stdout": "",
+      "stderr": "dirname: usage: dirname NAME\n",
+      "exit_code": 2
+    },
+    {
+      "name": "normal_path",
+      "args": ["/usr/local/bin"],
+      "stdout": "/usr/local\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "deep_path",
+      "args": ["/a/b/c/file.txt"],
+      "stdout": "/a/b/c\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "root_parent",
+      "args": ["/a"],
+      "stdout": "/\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "root_itself",
+      "args": ["/"],
+      "stdout": "/\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "relative_path",
+      "args": ["a/b/c"],
+      "stdout": "a/b\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "simple_name",
+      "args": ["a"],
+      "stdout": ".\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "trailing_slash",
+      "args": ["/a/b/c/"],
+      "stdout": "/a/b\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "multiple_trailing_slashes",
+      "args": ["/a/b/c///"],
+      "stdout": "/a/b\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "empty_string",
+      "args": [""],
+      "stdout": ".\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "double_slash_root",
+      "args": ["//"],
+      "stdout": "/\n",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}

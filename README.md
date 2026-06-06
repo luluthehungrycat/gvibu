@@ -20,6 +20,7 @@ The goal is not full GNU replacement, but clean CLI design, deterministic behavi
 | echo     | ✓    | ✓      | ✓    | Supports `-n` flag |
 | pwd      | ✓    | ✓      | ✓    | Prints working directory |
 | basename | ✓    | ✓      | ✓    | Path extraction with suffix removal |
+| dirname  | ✓    | ✓      | ✓    | Directory portion of a file path |
 
 ## Quick Start
 

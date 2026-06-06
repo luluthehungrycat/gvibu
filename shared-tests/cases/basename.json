@@ -13,6 +13,48 @@
       "stdout": "testfile\n",
       "stderr": "",
       "exit_code": 0
+    },
+    {
+      "name": "no_suffix",
+      "args": ["/usr/local/bin/testfile.txt"],
+      "stdout": "testfile.txt\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "suffix_no_match",
+      "args": ["/a/b/file.txt", ".md"],
+      "stdout": "file.txt\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "trailing_slash",
+      "args": ["/a/b/c/"],
+      "stdout": "c\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "just_name_suffix",
+      "args": ["foo.txt", ".txt"],
+      "stdout": "foo\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "suffix_equals_basename",
+      "args": ["foo", "foo"],
+      "stdout": "\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "root_path",
+      "args": ["/"],
+      "stdout": "\n",
+      "stderr": "",
+      "exit_code": 0
     }
   ]
 }

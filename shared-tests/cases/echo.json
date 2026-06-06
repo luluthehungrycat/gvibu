@@ -34,6 +34,20 @@
       "stdout": "hello world",
       "stderr": "",
       "exit_code": 0
+    },
+    {
+      "name": "dash_n_not_first",
+      "args": ["hello", "-n", "world"],
+      "stdout": "hello -n world\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "single_arg",
+      "args": ["hello"],
+      "stdout": "hello\n",
+      "stderr": "",
+      "exit_code": 0
     }
   ]
 }

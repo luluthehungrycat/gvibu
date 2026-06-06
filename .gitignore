@@ -6,3 +6,6 @@
 .ruff_cache/
 .pytest_cache/
 .sisyphus/
+__pycache__/
+rust/target/
+.gvibu/
