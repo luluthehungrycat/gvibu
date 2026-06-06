@@ -8,12 +8,25 @@ pub mod false_cmd;
 pub mod pwd_cmd;
 pub mod true_cmd;
 
-pub const TRUE: &[&str] = &["true", "gvibu-ref"];
-pub const FALSE: &[&str] = &["false", "gvibu-ref"];
-pub const ECHO: &[&str] = &["echo", "gvibu-ref"];
-pub const PWD: &[&str] = &["pwd", "gvibu-ref"];
-pub const BASENAME: &[&str] = &["basename", "gvibu-ref"];
-pub const DIRNAME: &[&str] = &["dirname", "gvibu-ref"];
-pub const CAT: &[&str] = &["cat", "gvibu-ref"];
-pub const WC: &[&str] = &["wc", "gvibu-ref"];
-pub const HEAD: &[&str] = &["head", "gvibu-ref"];
+pub const BINARY_NAMES: &[&str] = &["gvibu", "gvibu-ref"];
+
+pub struct Command {
+    pub names: &'static [&'static str],
+    pub run: fn(&[String]) -> i32,
+}
+
+pub const COMMANDS: &[Command] = &[
+    Command { names: &["true"], run: true_cmd::run },
+    Command { names: &["false"], run: false_cmd::run },
+    Command { names: &["echo"], run: echo_cmd::run },
+    Command { names: &["pwd"], run: pwd_cmd::run },
+    Command { names: &["basename"], run: basename::run },
+    Command { names: &["dirname"], run: dirname::run },
+    Command { names: &["cat"], run: cat::run },
+    Command { names: &["wc"], run: wc::run },
+    Command { names: &["head"], run: head::run },
+];
+
+pub fn lookup(name: &str) -> Option<&'static Command> {
+    COMMANDS.iter().find(|cmd| cmd.names.contains(&name))
+}

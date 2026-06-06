@@ -3,136 +3,45 @@ mod commands;
 use std::env;
 use std::process;
 
-fn get_command_name() -> String {
-    let argv0 = env::args().next().unwrap_or_default();
-    let argv0_basename = std::path::Path::new(&argv0)
-        .file_name()
-        .and_then(|n| n.to_str())
-        .unwrap_or("")
-        .to_string();
-
-    let args: Vec<String> = env::args().collect();
-
-    if commands::TRUE.contains(&argv0_basename.as_str()) {
-        return argv0_basename;
-    }
-    if commands::FALSE.contains(&argv0_basename.as_str()) {
-        return argv0_basename;
-    }
-    if commands::ECHO.contains(&argv0_basename.as_str()) {
-        return argv0_basename;
-    }
-    if commands::PWD.contains(&argv0_basename.as_str()) {
-        return argv0_basename;
-    }
-    if commands::BASENAME.contains(&argv0_basename.as_str()) {
-        return argv0_basename;
-    }
-    if commands::DIRNAME.contains(&argv0_basename.as_str()) {
-        return argv0_basename;
-    }
-    if commands::CAT.contains(&argv0_basename.as_str()) {
-        return argv0_basename;
-    }
-    if commands::WC.contains(&argv0_basename.as_str()) {
-        return argv0_basename;
-    }
-    if commands::HEAD.contains(&argv0_basename.as_str()) {
-        return argv0_basename;
+fn resolve_command<'a>(argv0_basename: &str, args: &'a [String]) -> Option<(&'a String, &'a [String])> {
+    // Symlink mode: argv0 is the command name
+    if commands::lookup(argv0_basename).is_some() {
+        return Some((&args[0], &args[1..]));
     }
 
-    if args.len() > 1 {
-        let cmd = &args[1];
-        if commands::TRUE.contains(&cmd.as_str()) {
-            return cmd.clone();
-        }
-        if commands::FALSE.contains(&cmd.as_str()) {
-            return cmd.clone();
-        }
-        if commands::ECHO.contains(&cmd.as_str()) {
-            return cmd.clone();
-        }
-        if commands::PWD.contains(&cmd.as_str()) {
-            return cmd.clone();
-        }
-        if commands::BASENAME.contains(&cmd.as_str()) {
-            return cmd.clone();
-        }
-        if commands::DIRNAME.contains(&cmd.as_str()) {
-            return cmd.clone();
-        }
-        if commands::CAT.contains(&cmd.as_str()) {
-            return cmd.clone();
-        }
-        if commands::WC.contains(&cmd.as_str()) {
-            return cmd.clone();
-        }
-        if commands::HEAD.contains(&cmd.as_str()) {
-            return cmd.clone();
+    // Subcommand mode: argv0 is the binary name, args[1] is the command
+    if commands::BINARY_NAMES.contains(&argv0_basename.as_ref()) && args.len() > 1 {
+        let cmd_name = &args[1];
+        if commands::lookup(cmd_name).is_some() {
+            return Some((cmd_name, &args[2..]));
         }
     }
 
-    argv0_basename
+    None
 }
 
 fn main() {
-    let cmd_name = get_command_name();
     let args: Vec<String> = env::args().collect();
-    let argv0 = env::args().next().unwrap_or_default();
-    let argv0_basename = std::path::Path::new(&argv0)
+    let argv0 = &args[0];
+    let argv0_basename = std::path::Path::new(argv0)
         .file_name()
         .and_then(|n| n.to_str())
         .unwrap_or("")
         .to_string();
 
-    let run_args: Vec<String> = if commands::TRUE.contains(&argv0_basename.as_str())
-        || commands::FALSE.contains(&argv0_basename.as_str())
-        || commands::ECHO.contains(&argv0_basename.as_str())
-        || commands::PWD.contains(&argv0_basename.as_str())
-        || commands::BASENAME.contains(&argv0_basename.as_str())
-        || commands::DIRNAME.contains(&argv0_basename.as_str())
-        || commands::CAT.contains(&argv0_basename.as_str())
-        || commands::WC.contains(&argv0_basename.as_str())
-        || commands::HEAD.contains(&argv0_basename.as_str())
-    {
-        args[1..].to_vec()
-    } else if commands::TRUE.contains(&cmd_name.as_str())
-        || commands::FALSE.contains(&cmd_name.as_str())
-        || commands::ECHO.contains(&cmd_name.as_str())
-        || commands::PWD.contains(&cmd_name.as_str())
-        || commands::BASENAME.contains(&cmd_name.as_str())
-        || commands::DIRNAME.contains(&cmd_name.as_str())
-        || commands::CAT.contains(&cmd_name.as_str())
-        || commands::WC.contains(&cmd_name.as_str())
-        || commands::HEAD.contains(&cmd_name.as_str())
-    {
-        args[2..].to_vec()
-    } else {
-        args[1..].to_vec()
+    let (cmd_name, run_args) = match resolve_command(&argv0_basename, &args) {
+        Some(result) => result,
+        None => {
+            eprintln!("gvibu: {}: command not found", argv0_basename);
+            process::exit(1);
+        }
     };
 
-    let exit_code = if commands::TRUE.contains(&cmd_name.as_str()) {
-        commands::true_cmd::run(&run_args)
-    } else if commands::FALSE.contains(&cmd_name.as_str()) {
-        commands::false_cmd::run(&run_args)
-    } else if commands::ECHO.contains(&cmd_name.as_str()) {
-        commands::echo_cmd::run(&run_args)
-    } else if commands::PWD.contains(&cmd_name.as_str()) {
-        commands::pwd_cmd::run(&run_args)
-    } else if commands::BASENAME.contains(&cmd_name.as_str()) {
-        commands::basename::run(&run_args)
-    } else if commands::DIRNAME.contains(&cmd_name.as_str()) {
-        commands::dirname::run(&run_args)
-    } else if commands::CAT.contains(&cmd_name.as_str()) {
-        commands::cat::run(&run_args)
-    } else if commands::WC.contains(&cmd_name.as_str()) {
-        commands::wc::run(&run_args)
-    } else if commands::HEAD.contains(&cmd_name.as_str()) {
-        commands::head::run(&run_args)
+    if let Some(cmd) = commands::lookup(cmd_name) {
+        let exit_code = (cmd.run)(run_args);
+        process::exit(exit_code);
     } else {
         eprintln!("gvibu: {}: command not found", cmd_name);
-        1
-    };
-
-    process::exit(exit_code);
+        process::exit(1);
+    }
 }
