@@ -13,6 +13,27 @@
       "stdout": "hello world\n",
       "stderr": "",
       "exit_code": 0
+    },
+    {
+      "name": "no_newline",
+      "args": ["-n", "hello"],
+      "stdout": "hello",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "no_newline_no_args",
+      "args": ["-n"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "no_newline_multiple_args",
+      "args": ["-n", "hello", "world"],
+      "stdout": "hello world",
+      "stderr": "",
+      "exit_code": 0
     }
   ]
 }
