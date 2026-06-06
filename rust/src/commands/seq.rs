@@ -67,3 +67,48 @@ pub fn run(args: &[String]) -> i32 {
 
     0
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_seq_no_args() {
+        assert_eq!(run(&[]), 1);
+    }
+
+    #[test]
+    fn test_seq_single() {
+        assert_eq!(run(&["5".into()]), 0);
+    }
+
+    #[test]
+    fn test_seq_first_last() {
+        assert_eq!(run(&["3".into(), "7".into()]), 0);
+    }
+
+    #[test]
+    fn test_seq_full() {
+        assert_eq!(run(&["2".into(), "3".into(), "14".into()]), 0);
+    }
+
+    #[test]
+    fn test_seq_first_greater() {
+        assert_eq!(run(&["10".into(), "5".into()]), 0);
+    }
+
+    #[test]
+    fn test_seq_negative_step() {
+        assert_eq!(run(&["10".into(), "-2".into(), "4".into()]), 0);
+    }
+
+    #[test]
+    fn test_seq_step_zero() {
+        assert_eq!(run(&["1".into(), "0".into(), "5".into()]), 1);
+    }
+
+    #[test]
+    fn test_seq_invalid() {
+        assert_eq!(run(&["abc".into()]), 1);
+    }
+}

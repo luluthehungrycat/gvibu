@@ -1,0 +1,22 @@
+{
+  "command": "tee",
+  "description": "Read from stdin and write to stdout and files",
+  "cases": [
+    {
+      "name": "stdin_to_stdout",
+      "args": [],
+      "stdin": "hello\nworld\n",
+      "stdout": "hello\nworld\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    }
+  ]
+}

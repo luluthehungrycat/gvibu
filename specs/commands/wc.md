@@ -10,8 +10,9 @@ Behavior
   - `-l`: print only the newline count
   - `-w`: print only the word count
   - `-c`: print only the byte count
-- When multiple options are given, output is in the order: lines, words, bytes.
-- If no options are given, default to `-lwc` (all three counts).
+  - `-m`: print only the character count (UTF-8 aware)
+- When multiple options are given, output is in the order: lines, words, bytes, chars.
+- If no options are given, default to `-lwcm` (all four counts).
 - A word is a maximal non-whitespace sequence; whitespace is space, tab, and newline.
 - If no FILE is given, read from standard input (displayed as no filename or as `-`).
 - If multiple FILEs are given, print per-file counts followed by a total line.
@@ -27,4 +28,5 @@ Output Conventions
 Implementation Notes
 - Python and Rust implementations should mirror this spec exactly for parity.
 - Count bytes (not characters) for `-c`.
+- Count Unicode code points (characters) for `-m` via `data.chars().count()` in Rust and `len(data)` in Python.
 - The last line without a trailing newline still counts as one line if it contains data.

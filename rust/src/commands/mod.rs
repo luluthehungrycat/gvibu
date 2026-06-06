@@ -15,6 +15,10 @@ pub mod seq;
 pub mod which_cmd;
 pub mod uname;
 pub mod env_cmd;
+pub mod whoami;
+pub mod link;
+pub mod unlink;
+pub mod tee;
 
 pub const BINARY_NAMES: &[&str] = &["gvibu", "gvibu-ref"];
 
@@ -41,6 +45,10 @@ pub const COMMANDS: &[Command] = &[
     Command { names: &["which"], run: which_cmd::run },
     Command { names: &["uname"], run: uname::run },
     Command { names: &["env"], run: env_cmd::run },
+    Command { names: &["whoami"], run: whoami::run },
+    Command { names: &["link"], run: link::run },
+    Command { names: &["unlink"], run: unlink::run },
+    Command { names: &["tee"], run: tee::run },
 ];
 
 pub fn lookup(name: &str) -> Option<&'static Command> {

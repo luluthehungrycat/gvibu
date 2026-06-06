@@ -5,7 +5,7 @@ def test_wc_dev_null_default(capfd):
     code = wc_run(["/dev/null"])
     assert code == 0
     out, err = capfd.readouterr()
-    assert out == "      0       0       0 /dev/null\n"
+    assert out == "      0       0       0       0 /dev/null\n"
     assert err == ""
 
 
@@ -55,4 +55,20 @@ def test_wc_combined_flags(capfd):
     out, err = capfd.readouterr()
     # Only lines and words, no bytes
     assert "      0       0 /dev/null\n" == out
+    assert err == ""
+
+
+def test_wc_chars_only(capfd):
+    code = wc_run(["-m", "/dev/null"])
+    assert code == 0
+    out, err = capfd.readouterr()
+    assert out == "      0 /dev/null\n"
+    assert err == ""
+
+
+def test_wc_all_flags(capfd):
+    code = wc_run(["-lwcm", "/dev/null"])
+    assert code == 0
+    out, err = capfd.readouterr()
+    assert out == "      0       0       0       0 /dev/null\n"
     assert err == ""

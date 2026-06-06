@@ -22,3 +22,28 @@ pub fn run(args: &[String]) -> i32 {
 
     0
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_echo_no_args() {
+        assert_eq!(run(&[]), 0);
+    }
+
+    #[test]
+    fn test_echo_hello() {
+        assert_eq!(run(&["hello".into()]), 0);
+    }
+
+    #[test]
+    fn test_echo_multiple_args() {
+        assert_eq!(run(&["hello".into(), "world".into()]), 0);
+    }
+
+    #[test]
+    fn test_echo_n_flag() {
+        assert_eq!(run(&["-n".into(), "hello".into()]), 0);
+    }
+}

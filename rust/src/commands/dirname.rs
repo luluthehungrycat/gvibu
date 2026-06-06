@@ -41,3 +41,38 @@ pub fn run(args: &[String]) -> i32 {
 
     0
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_dirname_no_args() {
+        assert_eq!(run(&[]), 2);
+    }
+
+    #[test]
+    fn test_dirname_normal() {
+        assert_eq!(run(&["/usr/local/bin".into()]), 0);
+    }
+
+    #[test]
+    fn test_dirname_root_parent() {
+        assert_eq!(run(&["/usr".into()]), 0);
+    }
+
+    #[test]
+    fn test_dirname_root() {
+        assert_eq!(run(&["/".into()]), 0);
+    }
+
+    #[test]
+    fn test_dirname_simple() {
+        assert_eq!(run(&["foo".into()]), 0);
+    }
+
+    #[test]
+    fn test_dirname_relative() {
+        assert_eq!(run(&["a/b".into()]), 0);
+    }
+}

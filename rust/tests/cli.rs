@@ -300,7 +300,7 @@ fn cat_nonexistent_file() {
 fn wc_dev_null() {
     let (code, out, err) = run(&["wc", "/dev/null"]);
     assert_eq!(code, 0);
-    assert_eq!(out, "      0       0       0 /dev/null\n");
+    assert_eq!(out, "      0       0       0       0 /dev/null\n");
     assert_eq!(err, "");
 }
 
@@ -308,7 +308,7 @@ fn wc_dev_null() {
 fn wc_stdin() {
     let (code, out, err) = run_with_stdin(&["wc"], "hello world\n");
     assert_eq!(code, 0);
-    assert_eq!(out, "      1       2      12\n");
+    assert_eq!(out, "      1       2      12      12\n");
     assert_eq!(err, "");
 }
 
@@ -333,6 +333,30 @@ fn wc_multi_file() {
     let (code, out, _err) = run(&["wc", "/dev/null", "/dev/null"]);
     assert_eq!(code, 0);
     assert!(out.contains("total"), "should include total line");
+}
+
+#[test]
+fn wc_chars_only() {
+    let (code, out, err) = run(&["wc", "-m", "/dev/null"]);
+    assert_eq!(code, 0);
+    assert_eq!(out, "      0 /dev/null\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn wc_chars_stdin_utf8() {
+    let (code, out, err) = run_with_stdin(&["wc", "-m"], "héllo wörld\n");
+    assert_eq!(code, 0);
+    assert_eq!(out, "     12\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn wc_all_flags() {
+    let (code, out, err) = run(&["wc", "-lwcm", "/dev/null"]);
+    assert_eq!(code, 0);
+    assert_eq!(out, "      0       0       0       0 /dev/null\n");
+    assert_eq!(err, "");
 }
 
 // ---------------------------------------------------------------------------
@@ -682,6 +706,107 @@ fn env_run_command_with_var() {
 fn env_command_not_found() {
     let (code, out, err) = run(&["env", "nonexistent_cmd_xyz"]);
     assert_eq!(code, 127);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// whoami
+// ---------------------------------------------------------------------------
+#[test]
+fn whoami_no_args() {
+    let (code, out, err) = run(&["whoami"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.is_empty(), "should output username");
+    assert!(out.ends_with('\n'), "should end with newline");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn whoami_with_args() {
+    let (code, out, err) = run(&["whoami", "extra"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// link
+// ---------------------------------------------------------------------------
+#[test]
+fn link_no_args() {
+    let (code, out, err) = run(&["link"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn link_one_arg() {
+    let (code, out, err) = run(&["link", "/dev/null"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn link_too_many_args() {
+    let (code, out, err) = run(&["link", "a", "b", "c"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn link_nonexistent_source() {
+    let (code, out, err) = run(&["link", "/nonexistent_link_src", "/tmp/link_dst"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// unlink
+// ---------------------------------------------------------------------------
+#[test]
+fn unlink_no_args() {
+    let (code, out, err) = run(&["unlink"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn unlink_too_many_args() {
+    let (code, out, err) = run(&["unlink", "a", "b"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn unlink_nonexistent() {
+    let (code, out, err) = run(&["unlink", "/nonexistent_unlink_test_xyz"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// tee
+// ---------------------------------------------------------------------------
+#[test]
+fn tee_stdin_to_stdout() {
+    let (code, out, err) = run_with_stdin(&["tee"], "hello\nworld\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "hello\nworld\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn tee_invalid_option() {
+    let (code, out, err) = run(&["tee", "-x"]);
+    assert_eq!(code, 1);
     assert_eq!(out, "");
     assert!(!err.is_empty(), "should print error");
 }

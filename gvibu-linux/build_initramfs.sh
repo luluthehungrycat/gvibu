@@ -33,7 +33,7 @@ else
 fi
 
 # Create gvibu command symlinks (overrides busybox for these commands)
-for cmd in true false echo pwd basename dirname cat wc head yes printenv sleep touch seq which uname env; do
+for cmd in true false echo pwd basename dirname cat wc head yes printenv sleep touch seq which uname env whoami link unlink tee; do
     ln -sf gvibu "$ROOT/bin/$cmd"
 done
 
@@ -95,7 +95,7 @@ check_output 'yes output'        'y'           sh -c '/bin/yes 2>/dev/null | /bi
 
 echo ''
 echo '=== Counting and filtering ==='
-check_output 'wc /dev/null'      '      0       0       0 /dev/null'  /bin/wc /dev/null
+check_output 'wc /dev/null'      '      0       0       0       0 /dev/null'  /bin/wc /dev/null
 check_output 'head -n 0'         ''            /bin/head -n 0 /dev/null
 
 echo ''

@@ -1,0 +1,30 @@
+{
+  "command": "unlink",
+  "description": "Remove a file",
+  "cases": [
+    {
+      "name": "no_args",
+      "args": [],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "too_many_args",
+      "args": ["a", "b"],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "nonexistent_file",
+      "args": ["/nonexistent_test_file_xyz_unlink"],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    }
+  ]
+}

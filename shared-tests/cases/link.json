@@ -1,0 +1,30 @@
+{
+  "command": "link",
+  "description": "Create a hard link",
+  "cases": [
+    {
+      "name": "no_args",
+      "args": [],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "one_arg",
+      "args": ["/dev/null"],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "too_many_args",
+      "args": ["a", "b", "c"],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    }
+  ]
+}

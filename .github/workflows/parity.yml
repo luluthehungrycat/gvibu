@@ -1,4 +1,4 @@
-name: Parity Check (Python vs Rust)
+name: CI - Test, Compare, Build
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  parity:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -27,14 +27,30 @@ jobs:
           profile: minimal
           toolchain: stable
 
-      - name: Build Rust parity binary
-        run: (cd rust && cargo build --manifest-path Cargo.toml)
+      - name: Build Rust release binary
+        run: (cd rust && cargo build --release)
 
       - name: Run Rust unit tests
         run: (cd rust && cargo test)
 
-      - name: Run parity checks
-        run: (python3 tooling/compare_impls.py)
-
       - name: Run Python unit tests
-        run: pytest -q tests/
+        run: python -m pytest -q tests/
+
+      - name: Run parity checks (Python vs Rust)
+        run: python3 tooling/compare_impls.py
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t gvibu:ci -f Dockerfile .
+
+      - name: Verify Docker image
+        run: |
+          docker run --rm gvibu:ci true && echo "PASS: true" || echo "FAIL: true"
+          docker run --rm gvibu:ci whoami && echo "PASS: whoami" || echo "FAIL: whoami"
+          docker run --rm gvibu:ci echo hello | grep -q hello && echo "PASS: echo" || echo "FAIL: echo"

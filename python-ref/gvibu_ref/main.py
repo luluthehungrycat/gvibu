@@ -24,6 +24,10 @@ COMMANDS = {
     "which": None,
     "uname": None,
     "env": None,
+    "whoami": None,
+    "link": None,
+    "unlink": None,
+    "tee": None,
 }
 
 
@@ -42,12 +46,13 @@ def dispatch():
     try:
         from gvibu_ref.commands import (
             true, false, echo, pwd, basename, dirname, cat, wc, head,
-            yes, printenv, sleep, touch, seq, which_cmd, uname, env_cmd,
+            yes, printenv, sleep, touch, seq, which_cmd, uname, env_cmd, whoami,
+            link, unlink, tee,
         )
     except ModuleNotFoundError:
         from commands import (
-            true, false, echo, pwd, basename, dirname, cat, wc, head,
-            yes, printenv, sleep, touch, seq, which_cmd, uname, env_cmd,
+            yes, printenv, sleep, touch, seq, which_cmd, uname, env_cmd, whoami,
+            link, unlink, tee,
         )
 
     COMMANDS["true"] = true
@@ -67,6 +72,10 @@ def dispatch():
     COMMANDS["which"] = which_cmd
     COMMANDS["uname"] = uname
     COMMANDS["env"] = env_cmd
+    COMMANDS["whoami"] = whoami
+    COMMANDS["link"] = link
+    COMMANDS["unlink"] = unlink
+    COMMANDS["tee"] = tee
 
     cmd_name = get_command_name()
     argv0 = os.path.basename(sys.argv[0])

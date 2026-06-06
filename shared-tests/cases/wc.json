@@ -1,11 +1,11 @@
 {
   "command": "wc",
-  "description": "Print newline, word, and byte counts",
+  "description": "Print newline, word, byte, and character counts",
   "cases": [
     {
       "name": "dev_null_default",
       "args": ["/dev/null"],
-      "stdout": "      0       0       0 /dev/null\n",
+      "stdout": "      0       0       0       0 /dev/null\n",
       "stderr": "",
       "exit_code": 0
     },
@@ -31,17 +31,24 @@
       "exit_code": 0
     },
     {
+      "name": "dev_null_chars_only",
+      "args": ["-m", "/dev/null"],
+      "stdout": "      0 /dev/null\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
       "name": "stdin_default",
       "stdin": "hello world\n",
       "args": [],
-      "stdout": "      1       2      12\n",
+      "stdout": "      1       2      12      12\n",
       "stderr": "",
       "exit_code": 0
     },
     {
       "name": "multi_file",
       "args": ["/dev/null", "/dev/null"],
-      "stdout": "      0       0       0 /dev/null\n      0       0       0 /dev/null\n      0       0       0 total\n",
+      "stdout": "      0       0       0       0 /dev/null\n      0       0       0       0 /dev/null\n      0       0       0       0 total\n",
       "stderr": "",
       "exit_code": 0
     },
@@ -63,6 +70,21 @@
       "name": "combined_flags_lc",
       "args": ["-lc", "/dev/null"],
       "stdout": "      0       0 /dev/null\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "all_flags_no_stdin",
+      "args": ["-lwcm", "/dev/null"],
+      "stdout": "      0       0       0       0 /dev/null\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "chars_stdin_utf8",
+      "stdin": "h\u00e9llo w\u00f6rld\n",
+      "args": ["-m"],
+      "stdout": "     12\n",
       "stderr": "",
       "exit_code": 0
     }

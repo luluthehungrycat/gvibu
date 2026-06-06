@@ -20,3 +20,33 @@ pub fn run(args: &[String]) -> i32 {
     println!("{}", name);
     0
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_basename_no_args() {
+        assert_eq!(run(&[]), 1);
+    }
+
+    #[test]
+    fn test_basename_simple() {
+        assert_eq!(run(&["/usr/local/bin/test.txt".into()]), 0);
+    }
+
+    #[test]
+    fn test_basename_with_suffix() {
+        assert_eq!(run(&["/usr/local/bin/test.txt".into(), ".txt".into()]), 0);
+    }
+
+    #[test]
+    fn test_basename_root() {
+        assert_eq!(run(&["/".into()]), 0);
+    }
+
+    #[test]
+    fn test_basename_trailing_slash() {
+        assert_eq!(run(&["/a/b/c/".into()]), 0);
+    }
+}
