@@ -1,12 +1,7 @@
-import pytest
-import os
-import sys
+from gvibu_ref.commands.echo import run as echo_run
 
 
 def test_echo_no_args(capfd):
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "python-ref"))
-    from gvibu_ref.commands.echo import run as echo_run
-
     code = echo_run([])
     assert code == 0
     out, err = capfd.readouterr()
@@ -15,11 +10,32 @@ def test_echo_no_args(capfd):
 
 
 def test_echo_args(capfd):
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "python-ref"))
-    from gvibu_ref.commands.echo import run as echo_run
-
     code = echo_run(["hello", "world"])
     assert code == 0
     out, err = capfd.readouterr()
     assert out == "hello world\n"
+    assert err == ""
+
+
+def test_echo_no_newline(capfd):
+    code = echo_run(["-n", "hello"])
+    assert code == 0
+    out, err = capfd.readouterr()
+    assert out == "hello"
+    assert err == ""
+
+
+def test_echo_no_newline_no_args(capfd):
+    code = echo_run(["-n"])
+    assert code == 0
+    out, err = capfd.readouterr()
+    assert out == ""
+    assert err == ""
+
+
+def test_echo_no_newline_multiple_args(capfd):
+    code = echo_run(["-n", "hello", "world"])
+    assert code == 0
+    out, err = capfd.readouterr()
+    assert out == "hello world"
     assert err == ""

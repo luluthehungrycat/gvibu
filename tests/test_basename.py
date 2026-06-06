@@ -1,11 +1,7 @@
-import os
-import sys
+from gvibu_ref.commands.basename import run as basename_run
 
 
 def test_basename_no_args(capfd):
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "python-ref"))
-    from gvibu_ref.commands.basename import run as basename_run
-
     code = basename_run([])
     assert code == 1
     out, err = capfd.readouterr()
@@ -14,11 +10,8 @@ def test_basename_no_args(capfd):
 
 
 def test_basename_args(capfd):
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "python-ref"))
-    from gvibu_ref.commands.basename import run as basename_run
-
     code = basename_run(["/usr/local/bin/testfile.txt", ".txt"])
-    assert code == 1
+    assert code == 0
     out, err = capfd.readouterr()
     assert out.strip() == "testfile"
     assert err == ""
