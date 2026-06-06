@@ -15,6 +15,22 @@
       "stdout": "",
       "stderr": "",
       "exit_code": 0
+    },
+    {
+      "name": "stdin_empty",
+      "stdin": "",
+      "args": [],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "stdin_n1",
+      "stdin": "line1\nline2\n",
+      "args": ["-n", "1"],
+      "stdout": "line1\n",
+      "stderr": "",
+      "exit_code": 0
     }
   ]
 }

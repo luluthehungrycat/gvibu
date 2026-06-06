@@ -50,6 +50,7 @@ def run_tests_for_command(
     for case in cases:
         name = case.get("name", "unnamed")
         args = case.get("args", [])
+        stdin_input = case.get("stdin", "")
         expected_stdout = case.get("stdout", "")
         expected_stderr = case.get("stderr", "")
         expected_exit = case.get("exit_code", 0)
@@ -57,8 +58,8 @@ def run_tests_for_command(
         python_full_cmd = python_cmd + [command] + args
         rust_full_cmd = rust_cmd + [command] + args
 
-        py_code, py_out, py_err = run_command(python_full_cmd)
-        rust_code, rust_out, rust_err = run_command(rust_full_cmd)
+        py_code, py_out, py_err = run_command(python_full_cmd, stdin=stdin_input)
+        rust_code, rust_out, rust_err = run_command(rust_full_cmd, stdin=stdin_input)
 
         py_match = (
             py_out == expected_stdout

@@ -29,6 +29,21 @@
       "stdout": "      0 /dev/null\n",
       "stderr": "",
       "exit_code": 0
+    },
+    {
+      "name": "stdin_default",
+      "stdin": "hello world\n",
+      "args": [],
+      "stdout": "      1       2      12\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "multi_file",
+      "args": ["/dev/null", "/dev/null"],
+      "stdout": "      0       0       0 /dev/null\n      0       0       0 /dev/null\n      0       0       0 total\n",
+      "stderr": "",
+      "exit_code": 0
     }
   ]
 }
