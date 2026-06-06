@@ -63,12 +63,12 @@ def run_tests_for_command(
 
         py_match = (
             py_out == expected_stdout
-            and py_err == expected_stderr
+            and (expected_stderr == "*" or py_err == expected_stderr)
             and py_code == expected_exit
         )
         rust_match = (
             rust_out == expected_stdout
-            and rust_err == expected_stderr
+            and (expected_stderr == "*" or rust_err == expected_stderr)
             and rust_code == expected_exit
         )
 

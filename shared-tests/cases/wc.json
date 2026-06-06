@@ -44,6 +44,27 @@
       "stdout": "      0       0       0 /dev/null\n      0       0       0 /dev/null\n      0       0       0 total\n",
       "stderr": "",
       "exit_code": 0
+    },
+    {
+      "name": "combined_flags_lw",
+      "args": ["-lw", "/dev/null"],
+      "stdout": "      0       0 /dev/null\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "combined_flags_wc",
+      "args": ["-wc", "/dev/null"],
+      "stdout": "      0       0 /dev/null\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "combined_flags_lc",
+      "args": ["-lc", "/dev/null"],
+      "stdout": "      0       0 /dev/null\n",
+      "stderr": "",
+      "exit_code": 0
     }
   ]
 }
