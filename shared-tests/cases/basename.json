@@ -12,7 +12,7 @@
       "args": ["/usr/local/bin/testfile.txt", ".txt"],
       "stdout": "testfile\n",
       "stderr": "",
-      "exit_code": 1
+      "exit_code": 0
     }
   ]
 }

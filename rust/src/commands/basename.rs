@@ -18,5 +18,5 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
     println!("{}", name);
-    return if args.len() > 1 { 1 } else { 0 };
+    0
 }

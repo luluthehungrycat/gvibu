@@ -17,5 +17,4 @@ def run(args: list[str]) -> int:
         if suffix and basename.endswith(suffix):
             basename = basename[: -len(suffix)]
     print(basename)
-    # Parity mode: mismatch with multi-arg usage should still print output but return 1
-    return 1 if len(args) > 1 else 0
+    return 0
