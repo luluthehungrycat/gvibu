@@ -1,5 +1,8 @@
 pub mod basename;
+pub mod cat;
 pub mod dirname;
+pub mod head;
+pub mod wc;
 pub mod echo_cmd;
 pub mod false_cmd;
 pub mod pwd_cmd;
@@ -11,3 +14,6 @@ pub const ECHO: &[&str] = &["echo", "gvibu-ref"];
 pub const PWD: &[&str] = &["pwd", "gvibu-ref"];
 pub const BASENAME: &[&str] = &["basename", "gvibu-ref"];
 pub const DIRNAME: &[&str] = &["dirname", "gvibu-ref"];
+pub const CAT: &[&str] = &["cat", "gvibu-ref"];
+pub const WC: &[&str] = &["wc", "gvibu-ref"];
+pub const HEAD: &[&str] = &["head", "gvibu-ref"];

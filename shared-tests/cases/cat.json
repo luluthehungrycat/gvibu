@@ -1,0 +1,20 @@
+{
+  "command": "cat",
+  "description": "Concatenate files and print to stdout",
+  "cases": [
+    {
+      "name": "dev_null",
+      "args": ["/dev/null"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "dev_null_twice",
+      "args": ["/dev/null", "/dev/null"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}

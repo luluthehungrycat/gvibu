@@ -13,6 +13,9 @@ COMMANDS = {
     "pwd": None,
     "basename": None,
     "dirname": None,
+    "cat": None,
+    "wc": None,
+    "head": None,
 }
 
 
@@ -29,9 +32,9 @@ def get_command_name() -> str:
 def dispatch():
     """Dispatch to the appropriate command."""
     try:
-        from gvibu_ref.commands import true, false, echo, pwd, basename, dirname
+        from gvibu_ref.commands import true, false, echo, pwd, basename, dirname, cat, wc, head
     except ModuleNotFoundError:
-        from commands import true, false, echo, pwd, basename, dirname
+        from commands import true, false, echo, pwd, basename, dirname, cat, wc, head
 
     COMMANDS["true"] = true
     COMMANDS["false"] = false
@@ -39,6 +42,9 @@ def dispatch():
     COMMANDS["pwd"] = pwd
     COMMANDS["basename"] = basename
     COMMANDS["dirname"] = dirname
+    COMMANDS["cat"] = cat
+    COMMANDS["wc"] = wc
+    COMMANDS["head"] = head
 
     cmd_name = get_command_name()
     argv0 = os.path.basename(sys.argv[0])

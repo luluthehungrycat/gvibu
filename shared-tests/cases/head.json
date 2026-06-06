@@ -1,0 +1,20 @@
+{
+  "command": "head",
+  "description": "Output the first part of files",
+  "cases": [
+    {
+      "name": "dev_null",
+      "args": ["/dev/null"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "dev_null_n_0",
+      "args": ["-n", "0", "/dev/null"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}
