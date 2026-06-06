@@ -2,33 +2,28 @@
 
 ## MVP Commands
 
-| Command | Spec | Python (gvibu-ref) | Rust (gvibu) | Notes |
-|---------|------|-------------------|--------------|-------|
-| true    | [specs/commands/true.md](specs/commands/true.md) | - | - | Not started |
-| false   | [specs/commands/false.md](specs/commands/false.md) | - | - | Not started |
-| echo    | [specs/commands/echo.md](specs/commands/echo.md) | Python implementation | Rust implementation in progress | Not started |
-| basename| [specs/commands/basename.md](specs/commands/basename.md) | Python implementation | Rust implementation in progress | Not started |
-| pwd     | [specs/commands/pwd.md](specs/commands/pwd.md) | Python implementation | Rust implementation being developed | Not started |
-| dirname | - | - | - | Scaffolderd |
-| cat     | - | - | - | Scaffolderd |
-| head    | - | - | - | Scaffolderd |
-| wc      | - | - | - | Scaffolderd |
+| Command  | Spec | Python (gvibu-ref) | Rust (gvibu) | Notes |
+|----------|------|-------------------|--------------|-------|
+| true     | Done | Done | Done | Complete. Returns 0 always. |
+| false    | Done | Done | Done | Complete. Returns 1 always. |
+| echo     | Done | Done | Done | Complete. Supports `-n` flag (no trailing newline). |
+| basename | Done | Done | Done | Complete. Extracts filename, optional suffix removal. |
+| pwd      | Done | Done | Done | Complete. Prints working directory path. |
+| dirname  | -    | -    | -    | Scaffolded — not yet implemented |
+| cat      | -    | -    | -    | Scaffolded — not yet implemented |
+| head     | -    | -    | -    | Scaffolded — not yet implemented |
+| wc       | -    | -    | -    | Scaffolded — not yet implemented |
 
 ## Status Legend
 
+- **Done**: Implementation complete and parity-verified
+- **In Progress**: Being actively developed
+- **Scaffolded**: Stub created but not built out
 - **Not started**: No implementation work begun
-- **Spec pending**: Specification being written
-- **Spec complete**: Specification finished, implementation pending
-- **Python implementation**: Python reference being developed
-- **Python tested**: Python implementation passing tests
-- **Rust implementation**: Rust implementation being developed
-- **Rust tested**: Rust implementation passing tests
-- **Complete**: Both implementations passing parity tests
-- **Scaffolderd**: Stub created but not built out
 
 ## Current Focus
 
-Currently implementing: Phase 1 - Skeleton and first commands (true, false, echo, pwd)
+All 5 MVP commands are fully implemented and parity-verified. Next: implement dirname, cat, head, and wc.
 
 ## Generating This Table
 
