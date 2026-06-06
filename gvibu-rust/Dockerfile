@@ -1,7 +1,7 @@
 FROM rust:1.70-slim AS build
 WORKDIR /usr/src/gvibu_rust
-COPY Cargo.toml ./
-COPY src ./src
+COPY gvibu-rust/Cargo.toml ./
+COPY gvibu-rust/src ./src
 RUN cargo build --release
 
 FROM debian:stable-slim
