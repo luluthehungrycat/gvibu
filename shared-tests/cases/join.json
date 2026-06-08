@@ -1,0 +1,20 @@
+{
+  "cases": [
+    {
+      "name": "missing_operand",
+      "args": [],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "join: missing operand\n",
+      "exit_code": 1
+    },
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "join: invalid option: -x\n",
+      "exit_code": 1
+    }
+  ]
+}

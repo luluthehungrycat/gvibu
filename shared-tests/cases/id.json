@@ -1,0 +1,39 @@
+{
+  "cases": [
+    {
+      "name": "no_args",
+      "args": [],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "u_flag",
+      "args": ["-u"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "g_flag",
+      "args": ["-g"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "G_flag",
+      "args": ["-G"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}

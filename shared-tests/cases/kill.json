@@ -1,0 +1,25 @@
+{
+  "cases": [
+    {
+      "name": "no_args",
+      "args": [],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "list_signals",
+      "args": ["-l"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "invalid_pid",
+      "args": ["abc"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    }
+  ]
+}

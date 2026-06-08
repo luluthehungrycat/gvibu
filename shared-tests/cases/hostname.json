@@ -1,0 +1,11 @@
+{
+  "cases": [
+    {
+      "name": "prints_hostname",
+      "args": [],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}
