@@ -1,83 +1,106 @@
-# gvibu Architecture
+# Architecture
 
-## Overview
+## Multicall Binary Pattern
 
-gvibu is an experimental Unix-style multicall utility suite with partial coreutils compatibility. It follows the BusyBox model where a single binary provides multiple commands.
+gvibu uses the **multicall binary** pattern: a single compiled binary serves as all 58 commands. This is the same pattern used by BusyBox and toybox.
 
-## Design Principles
-
-1. **Multicall Binary**: Single binary (`gvibu`) dispatches to different commands based on invocation
-2. **Dual Implementation**: Python reference (`gvibu-ref`) for rapid prototyping, Rust (`gvibu`) for production
-3. **Shared Specifications**: Human-readable specs and machine-readable tests are shared between implementations
-4. **Deterministic Behavior**: Commands produce consistent, testable output
-
-## Dispatch Modes
-
-### Subcommand Mode
-```
-gvibu echo hello
-gvibu pwd
-```
-The command name is the first argument after the program name.
-
-### Symlink Dispatch Mode
-```
-./echo hello
-./pwd
-```
-The binary is invoked via a symlink named after the command. The program name (`argv[0]`) contains the command name.
-
-## Directory Structure
+### Dispatch Flow
 
 ```
-gvibu-ai-lab/
-├── docs/                  # Architecture, plans, policies
-├── specs/                # Human-readable command specifications
-│   └── commands/         # Individual command specs
-├── shared-tests/         # Machine-readable test cases
-│   └── cases/           # JSON test cases per command
-├── python-ref/           # Python reference implementation
-│   └── gvibu_ref/       # Main package
-│       └── commands/    # Individual command modules
-├── rust/                 # Rust implementation
-│   └── src/
-│       └── commands/    # Individual command modules
-├── tooling/             # Build and comparison scripts
-└── Makefile            # Root orchestrator
+argv[0] = "echo"
+         │
+         ▼
+ resolve_command()
+         │
+         ├── Symlink mode: look up argv[0] basename in COMMANDS table
+         │   e.g., symlink "echo" → "echo" → echo::run()
+         │
+         └── Subcommand mode: argv[0] is binary name, argv[1] is command
+             e.g., "gvibu echo hello" → "echo" → echo::run(["hello"])
 ```
 
-## Exit Codes
+### Command Registration
 
-- `0`: Success
-- `1`: Runtime error
-- `2`: Usage error (invalid arguments, missing operands)
+All commands are registered in `rust/src/commands/mod.rs`:
 
-## Output Conventions
-
-- **stdout**: Normal command output
-- **stderr**: Error messages and diagnostics
-
-## Command Interface
-
-Commands are implemented as modules with a standardized interface:
-
-### Python
-```python
-def run(args: list[str]) -> int:
-    """Execute command with args, return exit code."""
-    return 0
-```
-
-### Rust
 ```rust
-fn run(args: &[std::ffi::OsString]) -> i32 {
-    // Execute command with args, return exit code
-    0
+pub const COMMANDS: &[Command] = &[
+    Command { names: &["true"], run: true_cmd::run },
+    Command { names: &["false"], run: false_cmd::run },
+    // ... 49 entries
+];
+```
+
+The `Command` struct:
+```rust
+pub struct Command {
+    pub names: &'static [&'static str],  // Aliases (e.g., test and [)
+    pub run: fn(&mut dyn Write, &[String]) -> i32,
 }
 ```
 
-## Testing Strategy
+## Writer-Pattern Architecture
 
-1. **Shared Test Cases**: JSON files in `shared-tests/cases/` define inputs and expected outputs
-2. **Implementation Tests**: Each implementation runs the same test cases
-3. **Parity Verification**: `tooling/compare_impls.py` runs identical tests against both implementations
+All commands accept a `&mut dyn Write` parameter instead of writing directly to stdout:
+
+```rust
+pub fn run(w: &mut dyn Write, args: &[String]) -> i32
+```
+
+This enables the **same code** to work in two contexts:
+1. **CLI mode** — `main.rs` passes `&mut io::stdout()`
+2. **WASM mode** — the WASM wrapper passes a `Vec<u8>` buffer
+
+### Why This Matters
+
+Without the writer parameter, WASM support would require either:
+- Duplicating all command logic
+- Replacing stdout at the OS level (not possible in WASM)
+
+With the writer parameter, WASM support is a 1-line wrapper:
+
+```rust
+#[wasm_bindgen]
+pub fn run_command(name: &str, args: Vec<String>) -> String {
+    let mut buf = Vec::new();
+    if let Some(cmd) = commands::lookup(name) {
+        (cmd.run)(&mut buf, &args);
+    }
+    String::from_utf8(buf).unwrap_or_default()
+}
+```
+
+## Library Structure
+
+The Rust crate has both a library and a binary target:
+
+```
+Cargo.toml
+  ├── [lib] → src/lib.rs → pub mod commands
+  └── [[bin]] → src/main.rs → use gvibu::commands;
+```
+
+The library target (`lib.rs`) is minimal:
+```rust
+pub mod commands;
+```
+
+This allows `wasm-lib/` to depend on `gvibu` as a library, while the CLI binary is a thin shell that calls into the same code.
+
+## File Layout
+
+```
+rust/
+├── src/
+│   ├── lib.rs              # Library root (re-exports commands)
+│   ├── main.rs             # Binary entry (dispatch + CLI)
+│   └── commands/
+│       ├── mod.rs          # Command table + lookup
+│       ├── echo_cmd.rs     # Individual command modules
+│       ├── cat.rs
+│       └── ... (49 files)
+├── tests/
+│   ├── cli.rs              # Integration tests (subprocess)
+│   └── fuzz.rs             # Property-based tests (proptest)
+└── Cargo.toml
+```
