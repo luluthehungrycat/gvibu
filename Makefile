@@ -1,5 +1,8 @@
-.PHONY: all build python-build rust-build test compare python-test rust-test \
-        docker-build initramfs qemu run install clean status help
+.PHONY: all build python-build rust-build wasm-build wasm-run wasm-test \
+        wasm-browser-build wasm-browser-serve wasm-browser-clean \
+        test compare python-test rust-test benchmark \
+        docker-build initramfs qemu run install clean status help \
+        release release-binary release-wasm release-docker man
 
 PYTHON := python3
 CARGO := $(HOME)/.cargo/bin/cargo
@@ -14,6 +17,58 @@ rust-build:
 
 rust-release:
 	$(CARGO) build --release --manifest-path rust/Cargo.toml
+
+wasm-build:
+	rustup target add wasm32-wasi && \
+	$(CARGO) build --release --target wasm32-wasi --manifest-path rust/Cargo.toml
+
+wasm-run:
+	@echo "Usage: make wasm-run CMD=<command> [ARGS=<args>]"
+	@echo "Example: make wasm-run CMD='echo hello'"
+	@if command -v wasmtime >/dev/null 2>&1; then \
+		wasmtime rust/target/wasm32-wasi/release/gvibu.wasm $(CMD) $(ARGS); \
+	else \
+		echo "wasmtime not found. Install it: curl https://wasmtime.dev/install.sh | bash"; \
+		exit 1; \
+	fi
+
+wasm-test: wasm-build
+	@echo "=== Testing WASM binary via wasmtime ==="
+	@if ! command -v wasmtime >/dev/null 2>&1; then \
+		echo "wasmtime not found. Install it: curl https://wasmtime.dev/install.sh | bash"; \
+		exit 1; \
+	fi
+	wasmtime rust/target/wasm32-wasi/release/gvibu.wasm true && echo "PASS: true" || echo "FAIL: true"
+	wasmtime rust/target/wasm32-wasi/release/gvibu.wasm echo hello | grep -q hello && echo "PASS: echo" || echo "FAIL: echo"
+	wasmtime rust/target/wasm32-wasi/release/gvibu.wasm false && echo "FAIL: false" || echo "PASS: false (exit 1)"
+
+wasm-browser-build:
+	@if ! command -v wasm-pack >/dev/null 2>&1; then \
+		echo "wasm-pack not found. Install it: cargo install wasm-pack"; \
+		exit 1; \
+	fi
+	wasm-pack build wasm-lib --target web --out-dir pkg
+	@echo ""
+	@echo "WASM browser build complete."
+	@echo "Open wasm-lib/demo/index.html in a browser (serve via HTTP, not file://)"
+
+wasm-browser-serve: wasm-browser-build
+	@if command -v python3 >/dev/null 2>&1; then \
+		echo "Serving demo at http://localhost:8080"; \
+		python3 -m http.server 8080 --directory wasm-lib; \
+	elif command -v python >/dev/null 2>&1; then \
+		echo "Serving demo at http://localhost:8080"; \
+		python -m http.server 8080 --directory wasm-lib; \
+	else \
+		echo "No Python available. Run an HTTP server on wasm-lib/"; \
+		exit 1; \
+	fi
+
+wasm-browser-clean:
+	rm -rf wasm-lib/pkg wasm-lib/target
+
+benchmark: rust-release
+	$(PYTHON) tooling/benchmark.py
 
 test: compare
 
@@ -35,19 +90,39 @@ initramfs: rust-release
 qemu: initramfs
 	gvibu-linux/run_qemu.sh
 
+release: rust-release
+	@echo "=== gvibu v$(shell grep '^version' rust/Cargo.toml | head -1 | cut -d'"' -f2) ==="
+	cp rust/target/release/gvibu gvibu-x86_64-linux
+	strip gvibu-x86_64-linux
+	tar czf gvibu-x86_64-linux.tar.gz gvibu-x86_64-linux
+	@echo "Created gvibu-x86_64-linux.tar.gz"
+
+release-wasm: wasm-browser-build
+	cd wasm-lib/pkg && tar czf ../../gvibu-wasm-browser.tar.gz .
+	@echo "Created gvibu-wasm-browser.tar.gz"
+
+release-docker:
+	docker build -t gvibu:latest -f Dockerfile .
+	docker tag gvibu:latest ghcr.io/luluthehungrycat/gvibu-ai-lab:latest
+	@echo "To push: docker push ghcr.io/luluthehungrycat/gvibu-ai-lab:latest"
+
 install: rust-release
 	cp rust/target/release/gvibu /usr/local/bin/gvibu
-	@for cmd in true false echo pwd basename dirname cat wc head yes printenv sleep touch seq which uname env whoami link unlink tee; do \
+		@		for cmd in true false echo pwd basename dirname cat wc head yes printenv sleep touch seq which uname env whoami link unlink tee mkdir rmdir hostname logname readlink realpath uniq uptime id who kill cut tr mv rm ln chmod chown sort grep ls cp printf date expr split tail tac fold comm join nl shuf sum du df test '['; do \
 		ln -sf /usr/local/bin/gvibu "/usr/local/bin/$$cmd"; \
 	done
 	@echo "Installed gvibu and symlinks to /usr/local/bin"
+
+man:
+	$(PYTHON) tooling/generate_manpages.py
+	@echo "Man pages generated in man/"
 
 status:
 	$(PYTHON) tooling/generate_command_status.py
 
 clean:
 	cd rust && $(CARGO) clean
-	rm -rf rust/target
+	rm -rf rust/target wasm-lib/pkg wasm-lib/target
 
 help:
 	@echo "gvibu build system"
@@ -57,13 +132,24 @@ help:
 	@echo "  python-build - Setup Python reference (no build needed)"
 	@echo "  rust-build   - Build Rust implementation (debug)"
 	@echo "  rust-release - Build Rust implementation (release)"
+	@echo "  wasm-build   - Build WASM binary (wasm32-wasi)"
+	@echo "  wasm-run     - Run command via wasmtime: make wasm-run CMD='echo hello'"
+	@echo "  wasm-test    - Build WASM + run basic tests with wasmtime"
+	@echo "  wasm-browser-build - Build browser WASM with wasm-pack (wasm32-unknown-unknown)"
+	@echo "  wasm-browser-serve - Build WASM + serve demo page at http://localhost:8080"
+	@echo "  wasm-browser-clean - Remove browser WASM build artifacts"
 	@echo "  test         - Run comparison tests"
 	@echo "  compare      - Compare Python and Rust implementations"
 	@echo "  python-test  - Run Python unit tests"
 	@echo "  rust-test    - Run Rust unit tests"
+	@echo "  benchmark    - Build release + benchmark Python vs Rust"
 	@echo "  docker-build - Build Docker container image"
+	@echo "  man          - Generate man pages from specs"
 	@echo "  initramfs    - Build QEMU initramfs image"
 	@echo "  qemu         - Build initramfs and run in QEMU"
 	@echo "  install      - Install gvibu binary and symlinks"
+	@echo "  release      - Build release binary and package as tar.gz"
+	@echo "  release-wasm - Build browser WASM and package as tar.gz"
+	@echo "  release-docker - Build and tag Docker image for GHCR"
 	@echo "  status       - Show command implementation status"
 	@echo "  clean        - Clean build artifacts"

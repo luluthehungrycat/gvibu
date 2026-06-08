@@ -8,4 +8,6 @@
 .sisyphus/
 __pycache__/
 rust/target/
+wasm-lib/pkg/
+wasm-lib/target/
 .gvibu/
