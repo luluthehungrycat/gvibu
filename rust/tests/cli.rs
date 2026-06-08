@@ -136,6 +136,46 @@ fn echo_dash_n_not_first() {
     assert_eq!(err, "");
 }
 
+#[test]
+fn echo_e_newline() {
+    let (code, out, err) = run(&["echo", "-e", "hello\\nworld"]);
+    assert_eq!(code, 0);
+    assert_eq!(out, "hello\nworld\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn echo_e_tab() {
+    let (code, out, err) = run(&["echo", "-e", "hello\\tworld"]);
+    assert_eq!(code, 0);
+    assert_eq!(out, "hello\tworld\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn echo_e_no_effect() {
+    let (code, out, err) = run(&["echo", "-e", "hello"]);
+    assert_eq!(code, 0);
+    assert_eq!(out, "hello\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn echo_e_with_n() {
+    let (code, out, err) = run(&["echo", "-n", "-e", "hello\\nworld"]);
+    assert_eq!(code, 0);
+    assert_eq!(out, "hello\nworld");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn echo_E_disables_escapes() {
+    let (code, out, err) = run(&["echo", "-E", "-e", "hello\\nworld"]);
+    assert_eq!(code, 0);
+    assert_eq!(out, "hello\\nworld\n", "stderr: {}", err);
+    assert_eq!(err, "");
+}
+
 // ---------------------------------------------------------------------------
 // pwd
 // ---------------------------------------------------------------------------
@@ -293,6 +333,30 @@ fn cat_nonexistent_file() {
     assert!(err.contains("cat:"), "stderr should mention cat");
 }
 
+#[test]
+fn cat_numbered_lines() {
+    let (code, out, err) = run_with_stdin(&["cat", "-n"], "line1\nline2\nline3\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "     1\tline1\n     2\tline2\n     3\tline3\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn cat_stdin_no_numbering() {
+    let (code, out, err) = run_with_stdin(&["cat"], "hello\n");
+    assert_eq!(code, 0);
+    assert_eq!(out, "hello\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn cat_invalid_option() {
+    let (code, out, err) = run(&["cat", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
 // ---------------------------------------------------------------------------
 // wc
 // ---------------------------------------------------------------------------
@@ -392,6 +456,46 @@ fn head_multi_file_dev_null() {
     assert_eq!(code, 0);
     assert!(out.contains("==>"), "multi-file output should have headers");
     assert_eq!(err, "");
+}
+
+#[test]
+fn head_c_flag_dev_null() {
+    let (code, out, err) = run(&["head", "-c", "5", "/dev/null"]);
+    assert_eq!(code, 0);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn head_c_flag_stdin() {
+    let (code, out, err) = run_with_stdin(&["head", "-c", "5"], "hello world");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "hello");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn head_c_flag_zero() {
+    let (code, out, err) = run_with_stdin(&["head", "-c", "0"], "hello");
+    assert_eq!(code, 0);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn head_c_missing_arg() {
+    let (code, out, err) = run(&["head", "-c"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn head_invalid_c_value() {
+    let (code, out, err) = run(&["head", "-c", "abc", "/dev/null"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
 }
 
 // ---------------------------------------------------------------------------
@@ -514,13 +618,82 @@ fn touch_nonexistent_directory() {
     assert!(!err.is_empty(), "should print error");
 }
 
+#[test]
+fn touch_access_only() {
+    let dir = std::env::temp_dir().join(format!("gvibu_test_{}", std::process::id()));
+    let _ = std::fs::create_dir_all(&dir);
+    let path = dir.join("touch_atime");
+    let path_str = path.to_str().unwrap();
+    let _ = std::fs::remove_file(&path);
+
+    let (code, _out, err) = run(&["touch", "-a", path_str]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(path.exists(), "file should be created");
+
+    let _ = std::fs::remove_file(&path);
+    let _ = std::fs::remove_dir(&dir);
+}
+
+#[test]
+fn touch_mod_only() {
+    let dir = std::env::temp_dir().join(format!("gvibu_test_{}", std::process::id()));
+    let _ = std::fs::create_dir_all(&dir);
+    let path = dir.join("touch_mtime");
+    let path_str = path.to_str().unwrap();
+    let _ = std::fs::remove_file(&path);
+
+    let (code, _out, err) = run(&["touch", "-m", path_str]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(path.exists(), "file should be created");
+
+    let _ = std::fs::remove_file(&path);
+    let _ = std::fs::remove_dir(&dir);
+}
+
+#[test]
+fn touch_both_flags() {
+    let (code, out, err) = run(&["touch", "-am", "/dev/null"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn touch_invalid_option() {
+    let (code, out, err) = run(&["touch", "-x", "/dev/null"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
 // ── seq ──
 
 #[test]
 fn seq_basic() {
-    let (code, out, err) = run(&["seq", "5"]);
-    assert_eq!(code, 0, "stderr: {}", err);
+    let (code, out, _err) = run(&["seq", "5"]);
+    assert_eq!(code, 0);
     assert_eq!(out, "1\n2\n3\n4\n5\n");
+}
+
+#[test]
+fn seq_with_sep() {
+    let (code, out, _err) = run(&["seq", "-s", ",", "3"]);
+    assert_eq!(code, 0);
+    assert_eq!(out, "1,2,3\n");
+}
+
+#[test]
+fn seq_equal_width() {
+    let (code, out, _err) = run(&["seq", "-w", "5", "10"]);
+    assert_eq!(code, 0);
+    assert_eq!(out, "05\n06\n07\n08\n09\n10\n");
+}
+
+#[test]
+fn seq_w_and_s() {
+    let (code, out, _err) = run(&["seq", "-w", "-s", " ", "3"]);
+    assert_eq!(code, 0);
+    assert_eq!(out, "01 02 03\n");
 }
 
 #[test]
@@ -711,6 +884,258 @@ fn env_command_not_found() {
 }
 
 // ---------------------------------------------------------------------------
+// id
+// ---------------------------------------------------------------------------
+#[test]
+fn id_no_args() {
+    let (code, out, err) = run(&["id"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(out.contains("uid="), "should contain uid=, got: {:?}", out);
+    assert_eq!(err, "");
+}
+
+#[test]
+fn id_user_flag() {
+    let (code, out, err) = run(&["id", "-u"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    let val = out.trim().parse::<u32>().unwrap_or(0);
+    assert!(val > 0, "uid should be positive, got: {:?}", out);
+}
+
+#[test]
+fn id_group_flag() {
+    let (code, out, err) = run(&["id", "-g"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    let val = out.trim().parse::<u32>().unwrap_or(0);
+    assert!(val > 0, "gid should be positive, got: {:?}", out);
+}
+
+#[test]
+fn id_name_user() {
+    let (code, out, err) = run(&["id", "-n", "-u"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.trim().is_empty(), "should output username");
+    assert!(!out.trim().chars().any(|c| c.is_ascii_digit() || c == ':'), "username should not look like a uid");
+}
+
+#[test]
+fn id_supp_groups() {
+    let (code, out, err) = run(&["id", "-G"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.trim().is_empty(), "should output group list");
+}
+
+#[test]
+fn id_real_user() {
+    let (code, out, err) = run(&["id", "-r", "-u"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    let val = out.trim().parse::<u32>().unwrap_or(0);
+    assert!(val > 0, "real uid should be positive");
+}
+
+// ---------------------------------------------------------------------------
+// who
+// ---------------------------------------------------------------------------
+#[test]
+fn who_no_args() {
+    let (code, out, err) = run(&["who"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    // In a minimal container, who may have no output — that's fine
+    assert_eq!(err, "");
+}
+
+#[test]
+fn who_invalid_option() {
+    let (code, out, err) = run(&["who", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// kill
+// ---------------------------------------------------------------------------
+#[test]
+fn kill_list_signals() {
+    let (code, out, err) = run(&["kill", "-l"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(out.contains("TERM"), "should list SIGTERM, got: {:?}", out);
+    assert!(out.contains("KILL"), "should list SIGKILL");
+}
+
+#[test]
+fn kill_no_args() {
+    let (code, out, err) = run(&["kill"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print usage");
+}
+
+#[test]
+fn kill_invalid_option() {
+    let (code, out, err) = run(&["kill", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn kill_unknown_signal() {
+    let (code, out, err) = run(&["kill", "-s", "NOSIGNAL", "1"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// cut
+// ---------------------------------------------------------------------------
+#[test]
+fn cut_dev_null() {
+    let (code, out, err) = run(&["cut", "-f1", "/dev/null"]);
+    assert_eq!(code, 0);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn cut_field_stdin() {
+    let (code, out, err) = run_with_stdin(&["cut", "-f1"], "a\tb\nc\td\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "a\nc\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn cut_custom_delimiter() {
+    let (code, out, err) = run_with_stdin(&["cut", "-d,", "-f2"], "x,y,z\n1,2,3\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "y\n2\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn cut_multi_field() {
+    let (code, out, err) = run_with_stdin(&["cut", "-f1,3"], "a\tb\tc\nd\te\tf\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "a\tc\nd\tf\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn cut_invalid_option() {
+    let (code, out, err) = run(&["cut", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// tr
+// ---------------------------------------------------------------------------
+#[test]
+fn tr_basic_translate() {
+    let (code, out, err) = run_with_stdin(&["tr", "a", "z"], "abc\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "zbc\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn tr_delete() {
+    let (code, out, err) = run_with_stdin(&["tr", "-d", "aeiou"], "hello world\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "hll wrld\n");
+}
+
+#[test]
+fn tr_squeeze() {
+    let (code, out, err) = run_with_stdin(&["tr", "-s", " "], "a    b   c\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "a b c\n");
+}
+
+#[test]
+fn tr_invalid_option() {
+    let (code, out, err) = run(&["tr", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// mv
+// ---------------------------------------------------------------------------
+#[test]
+fn mv_no_args() {
+    let (code, out, err) = run(&["mv"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print usage");
+}
+
+#[test]
+fn mv_nonexistent_source() {
+    let (code, out, err) = run(&["mv", "/nonexistent_mv_src_xyz", "/tmp/mv_dst"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// rm
+// ---------------------------------------------------------------------------
+#[test]
+fn rm_no_args() {
+    let (code, out, err) = run(&["rm"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print usage");
+}
+
+#[test]
+fn rm_nonexistent() {
+    let (code, out, err) = run(&["rm", "/nonexistent_rm_xyz"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn rm_force_nonexistent() {
+    let (code, out, err) = run(&["rm", "-f", "/nonexistent_rm_xyz"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "");
+}
+
+// ---------------------------------------------------------------------------
+// ln
+// ---------------------------------------------------------------------------
+#[test]
+fn ln_no_args() {
+    let (code, out, err) = run(&["ln"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print usage");
+}
+
+#[test]
+fn ln_one_arg() {
+    let (code, out, err) = run(&["ln", "/dev/null"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn ln_invalid_option() {
+    let (code, out, err) = run(&["ln", "-x", "a", "b"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
 // whoami
 // ---------------------------------------------------------------------------
 #[test]
@@ -806,6 +1231,1068 @@ fn tee_stdin_to_stdout() {
 #[test]
 fn tee_invalid_option() {
     let (code, out, err) = run(&["tee", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// mkdir
+// ---------------------------------------------------------------------------
+#[test]
+fn mkdir_no_args() {
+    let (code, out, err) = run(&["mkdir"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn mkdir_invalid_option() {
+    let (code, out, err) = run(&["mkdir", "-x", "d"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// rmdir
+// ---------------------------------------------------------------------------
+#[test]
+fn rmdir_no_args() {
+    let (code, out, err) = run(&["rmdir"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn rmdir_nonexistent() {
+    let (code, out, err) = run(&["rmdir", "/tmp/nonexistent_rmdir_xyz"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// logname
+// ---------------------------------------------------------------------------
+#[test]
+fn logname_no_args() {
+    let (code, out, err) = run(&["logname"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.is_empty(), "should output login name");
+    assert!(out.ends_with('\n'), "should end with newline");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn logname_with_args() {
+    let (code, out, err) = run(&["logname", "extra"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// hostname
+// ---------------------------------------------------------------------------
+#[test]
+fn hostname_no_args() {
+    let (code, out, err) = run(&["hostname"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.is_empty(), "should output hostname");
+    assert!(out.ends_with('\n'), "should end with newline");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn hostname_with_args() {
+    let (code, out, err) = run(&["hostname", "extra"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// uptime
+// ---------------------------------------------------------------------------
+#[test]
+fn uptime_no_args() {
+    let (code, out, err) = run(&["uptime"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.is_empty(), "should output uptime string");
+    assert!(out.starts_with("up "), "should start with 'up '");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn uptime_with_args() {
+    let (code, out, err) = run(&["uptime", "extra"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// readlink
+// ---------------------------------------------------------------------------
+#[test]
+fn readlink_no_args() {
+    let (code, out, err) = run(&["readlink"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn readlink_too_many_args() {
+    let (code, out, err) = run(&["readlink", "a", "b"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn readlink_nonexistent() {
+    let (code, out, err) = run(&["readlink", "/nonexistent_readlink_xyz"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// realpath
+// ---------------------------------------------------------------------------
+#[test]
+fn realpath_no_args() {
+    let (code, out, err) = run(&["realpath"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn realpath_too_many_args() {
+    let (code, out, err) = run(&["realpath", "a", "b"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn realpath_nonexistent() {
+    let (code, out, err) = run(&["realpath", "/nonexistent_realpath_xyz"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// uniq
+// ---------------------------------------------------------------------------
+#[test]
+fn uniq_stdin_basic() {
+    let (code, out, err) = run_with_stdin(&["uniq"], "a\na\nb\nb\nc\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "a\nb\nc\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn uniq_invalid_option() {
+    let (code, out, err) = run(&["uniq", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn uniq_count() {
+    let (code, out, err) = run_with_stdin(&["uniq", "-c"], "a\na\nb\nc\nc\nc\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "   2 a\n   1 b\n   3 c\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn uniq_repeated_only() {
+    let (code, out, err) = run_with_stdin(&["uniq", "-d"], "a\na\nb\nc\nc\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "a\nc\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn uniq_unique_only() {
+    let (code, out, err) = run_with_stdin(&["uniq", "-u"], "a\na\nb\nc\nc\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "b\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn uniq_all_unique() {
+    let (code, out, err) = run_with_stdin(&["uniq"], "a\nb\nc\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "a\nb\nc\n");
+    assert_eq!(err, "");
+}
+
+// ---------------------------------------------------------------------------
+// wc -L (max line length)
+// ---------------------------------------------------------------------------
+#[test]
+fn wc_max_line_dev_null() {
+    let (code, out, err) = run(&["wc", "-L", "/dev/null"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "      0 /dev/null\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn wc_max_line_stdin() {
+    let (code, out, err) = run_with_stdin(&["wc", "-L"], "short\nlonger_line\nshort\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "     11\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn wc_all_flags_with_L() {
+    let (code, out, err) = run_with_stdin(&["wc", "-lwcmL"], "a\nbb\nccc\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "      3       3       8       8       3\n");
+    assert_eq!(err, "");
+}
+
+// ---------------------------------------------------------------------------
+// chmod
+// ---------------------------------------------------------------------------
+#[test]
+fn chmod_no_args() {
+    let (code, out, err) = run(&["chmod"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print usage");
+}
+
+#[test]
+fn chmod_invalid_option() {
+    let (code, out, err) = run(&["chmod", "-x", "644", "/dev/null"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn chmod_octal_dev_null() {
+    let (code, out, err) = run(&["chmod", "644", "/dev/null"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(err, "");
+}
+
+#[test]
+fn chmod_nonexistent() {
+    let (code, out, err) = run(&["chmod", "644", "/nonexistent_chmod_xyz"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// chown
+// ---------------------------------------------------------------------------
+#[test]
+fn chown_no_args() {
+    let (code, out, err) = run(&["chown"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print usage");
+}
+
+#[test]
+fn chown_nonexistent() {
+    let (code, out, err) = run(&["chown", "root", "/nonexistent_chown_xyz"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn chown_dev_null() {
+    let (code, out, err) = run(&["chown", "root:root", "/dev/null"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(err, "");
+}
+
+// ---------------------------------------------------------------------------
+// sort
+// ---------------------------------------------------------------------------
+#[test]
+fn sort_stdin() {
+    let (code, out, err) = run_with_stdin(&["sort"], "c\na\nb\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "a\nb\nc\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn sort_reverse() {
+    let (code, out, err) = run_with_stdin(&["sort", "-r"], "a\nb\nc\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "c\nb\na\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn sort_numeric() {
+    let (code, out, err) = run_with_stdin(&["sort", "-n"], "10\n2\n1\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "1\n2\n10\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn sort_unique() {
+    let (code, out, err) = run_with_stdin(&["sort", "-u"], "a\na\nb\nb\nc\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "a\nb\nc\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn sort_invalid_option() {
+    let (code, out, err) = run(&["sort", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn sort_key_numeric() {
+    let (code, out, err) = run_with_stdin(&["sort", "-k2,2n"], "b 2\na 1\nc 3\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "a 1\nb 2\nc 3\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn sort_multi_key() {
+    let (code, out, err) = run_with_stdin(&["sort", "-k1,1", "-k2,2n"], "a 3\na 1\na 2\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "a 1\na 2\na 3\n");
+    assert_eq!(err, "");
+}
+
+// ---------------------------------------------------------------------------
+// test
+// ---------------------------------------------------------------------------
+#[test]
+fn test_true_expr() {
+    let (code, out, err) = run(&["test", "x", "=", "x"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn test_false_expr() {
+    let (code, out, err) = run(&["test", "x", "=", "y"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn test_file_exists() {
+    let (code, out, err) = run(&["test", "-e", "/dev/null"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn test_file_not_exists() {
+    let (code, out, err) = run(&["test", "-e", "/nonexistent_test_xyz"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn test_string_nonempty() {
+    let (code, out, err) = run(&["test", "-n", "hello"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn test_string_empty() {
+    let (code, out, err) = run(&["test", "-z", ""]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn test_not_operator() {
+    let (code, out, err) = run(&["test", "!", "-e", "/nonexistent_test_xyz"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn test_bracket_alias() {
+    let (code, out, err) = run(&["[", "x", "=", "x", "]"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn test_bracket_missing_closing() {
+    let (code, out, err) = run(&["[", "x", "=", "x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error about missing ]");
+}
+
+// ---------------------------------------------------------------------------
+// tail
+// ---------------------------------------------------------------------------
+#[test]
+fn tail_no_args_stdin() {
+    let input = "a\nb\nc\nd\ne\nf\ng\nh\ni\nj\nk\nl\n";
+    let (code, out, err) = run_with_stdin(&["tail"], input);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "c\nd\ne\nf\ng\nh\ni\nj\nk\nl\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn tail_n_flag_3() {
+    let (code, out, err) = run_with_stdin(&["tail", "-n", "3"], "a\nb\nc\nd\ne\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "c\nd\ne\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn tail_c_flag_5() {
+    let (code, out, err) = run_with_stdin(&["tail", "-c", "5"], "hello world");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "world");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn tail_dev_null() {
+    let (code, out, err) = run(&["tail", "/dev/null"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn tail_invalid_option() {
+    let (code, out, err) = run(&["tail", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// tac
+// ---------------------------------------------------------------------------
+#[test]
+fn tac_stdin_basic() {
+    let (code, out, err) = run_with_stdin(&["tac"], "a\nb\nc\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "c\nb\na\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn tac_dev_null() {
+    let (code, out, err) = run(&["tac", "/dev/null"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn tac_invalid_option() {
+    let (code, out, err) = run(&["tac", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// fold
+// ---------------------------------------------------------------------------
+#[test]
+fn fold_width_10() {
+    let (code, out, err) = run_with_stdin(
+        &["fold", "-w", "10"],
+        "hello world this is a long line",
+    );
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "hello worl\nd this is\na long li\nne\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn fold_invalid_option() {
+    let (code, out, err) = run(&["fold", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// comm
+// ---------------------------------------------------------------------------
+#[test]
+fn comm_no_args() {
+    let (code, out, err) = run(&["comm"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print usage");
+}
+
+#[test]
+fn comm_one_arg() {
+    let (code, out, err) = run(&["comm", "/dev/null"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print missing operand");
+}
+
+#[test]
+fn comm_invalid_option() {
+    let (code, out, err) = run(&["comm", "-x", "/dev/null", "/dev/null"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// join
+// ---------------------------------------------------------------------------
+#[test]
+fn join_no_args() {
+    let (code, out, err) = run(&["join"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print usage");
+}
+
+#[test]
+fn join_invalid_option() {
+    let (code, out, err) = run(&["join", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// nl
+// ---------------------------------------------------------------------------
+#[test]
+fn nl_dev_null() {
+    let (code, out, err) = run(&["nl", "/dev/null"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn nl_no_args() {
+    let (code, out, err) = run_with_stdin(&["nl"], "");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(err, "");
+}
+
+#[test]
+fn nl_invalid_option() {
+    let (code, out, err) = run(&["nl", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// shuf
+// ---------------------------------------------------------------------------
+#[test]
+fn shuf_empty_stdin() {
+    let (code, out, err) = run_with_stdin(&["shuf"], "");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(err, "");
+}
+
+#[test]
+fn shuf_too_many_args() {
+    let (code, out, err) = run(&["shuf", "a", "b"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn shuf_nonexistent_file() {
+    let (code, out, err) = run(&["shuf", "/nonexistent_shuf_test_xyz"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// sum
+// ---------------------------------------------------------------------------
+#[test]
+fn sum_no_args() {
+    let (code, out, err) = run(&["sum"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print usage");
+}
+
+#[test]
+fn sum_empty_file() {
+    let (code, out, err) = run(&["sum", "/dev/null"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "0 0\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn sum_nonexistent_file() {
+    let (code, out, err) = run(&["sum", "/nonexistent_sum_test_xyz"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// ls
+// ---------------------------------------------------------------------------
+#[test]
+fn ls_dev_null() {
+    let (code, out, err) = run(&["ls", "/dev/null"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out.trim(), "null");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn ls_current_dir() {
+    let (code, out, err) = run(&["ls"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.is_empty());
+    assert_eq!(err, "");
+}
+
+#[test]
+fn ls_invalid_option() {
+    let (code, out, err) = run(&["ls", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn ls_l_flag() {
+    let (code, out, err) = run(&["ls", "-l", "/dev/null"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(out.starts_with('-'), "expected - prefix for file: {:?}", out);
+    assert_eq!(err, "");
+}
+
+#[test]
+fn ls_bundled_flags() {
+    let (code, out, err) = run(&["ls", "-la", "/dev/null"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(out.starts_with('-'), "expected - prefix for file: {:?}", out);
+    assert_eq!(err, "");
+}
+
+#[test]
+fn ls_nonexistent() {
+    let (code, out, err) = run(&["ls", "/nonexistent_ls_test_xyz"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// grep
+// ---------------------------------------------------------------------------
+#[test]
+fn grep_missing_pattern() {
+    let (code, out, err) = run(&["grep"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn grep_invalid_option() {
+    let (code, out, err) = run(&["grep", "-x", "pattern"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn grep_invalid_pattern() {
+    let (code, out, err) = run(&["grep", "[invalid"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn grep_no_match_stdin() {
+    let (code, out, err) = run(&["grep", "xyz"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn grep_file_match() {
+    let (code, out, err) = run(&["grep", "line", "cli.rs"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(out.contains("line"), "output should contain 'line': {:?}", out);
+    assert_eq!(err, "");
+}
+
+#[test]
+fn grep_ignore_case() {
+    let (code, out, err) = run(&["grep", "-i", "TEST", "cli.rs"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.is_empty());
+    assert_eq!(err, "");
+}
+
+#[test]
+fn grep_count() {
+    let (code, out, err) = run(&["grep", "-c", "fn", "cli.rs"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    let count: usize = out.trim().parse().expect("count should be a number");
+    assert!(count > 0, "should have at least one match");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn grep_line_number() {
+    let (code, out, err) = run(&["grep", "-n", "fn main", "cli.rs"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(out.contains(":"), "output should contain line number: {:?}", out);
+    assert_eq!(err, "");
+}
+
+#[test]
+fn grep_invert() {
+    // Searching for something that appears everywhere should give 0 lines inverted
+    let (code, out, err) = run(&["grep", "-v", "the", "cli.rs"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.is_empty());
+    assert_eq!(err, "");
+}
+
+#[test]
+fn grep_bundled_flags() {
+    let (code, out, err) = run(&["grep", "-iv", "the", "cli.rs"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.is_empty());
+    assert_eq!(err, "");
+}
+
+#[test]
+fn grep_nonexistent_file() {
+    let (code, out, err) = run(&["grep", "pattern", "/nonexistent_grep_test_xyz"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// du
+// ---------------------------------------------------------------------------
+#[test]
+fn du_dev_null() {
+    let (code, out, err) = run(&["du", "/dev/null"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out.trim(), "0\t/dev/null");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn du_human_readable_dev_null() {
+    let (code, out, err) = run(&["du", "-h", "/dev/null"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out.trim(), "0\t/dev/null");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn du_invalid_option() {
+    let (code, out, err) = run(&["du", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn du_nonexistent() {
+    let (code, out, err) = run(&["du", "/nonexistent_du_test_xyz"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn du_bundled_flags() {
+    let (code, out, err) = run(&["du", "-hs", "/dev/null"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out.trim(), "0\t/dev/null");
+    assert_eq!(err, "");
+}
+
+// ---------------------------------------------------------------------------
+// df
+// ---------------------------------------------------------------------------
+#[test]
+fn df_invalid_option() {
+    let (code, out, err) = run(&["df", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn df_no_args() {
+    let (code, out, err) = run(&["df"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(out.contains("Filesystem"), "output should have header: {:?}", out);
+    assert_eq!(err, "");
+}
+
+#[test]
+fn df_human_readable() {
+    let (code, out, err) = run(&["df", "-h"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(out.contains("Filesystem"), "output should have header: {:?}", out);
+    // Should have human-readable sizes
+    assert!(out.contains("K") || out.contains("M") || out.contains("G") || out.contains("T"));
+    assert_eq!(err, "");
+}
+
+#[test]
+fn df_bundled_flags() {
+    let (code, out, err) = run(&["df", "-hT"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(out.contains("Filesystem"), "output should have header: {:?}", out);
+    assert!(out.contains("Type"), "should show type column");
+    assert_eq!(err, "");
+}
+
+// ---------------------------------------------------------------------------
+// cp
+// ---------------------------------------------------------------------------
+#[test]
+fn cp_missing_args() {
+    let (code, out, err) = run(&["cp"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print usage");
+}
+
+#[test]
+fn cp_single_arg() {
+    let (code, out, err) = run(&["cp", "a"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print usage");
+}
+
+#[test]
+fn cp_nonexistent_source() {
+    let (code, out, err) = run(&["cp", "/nonexistent_cp_src_xyz", "/tmp"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn cp_invalid_option() {
+    let (code, out, err) = run(&["cp", "-x", "a", "b"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// printf
+// ---------------------------------------------------------------------------
+#[test]
+fn printf_format_string() {
+    let (code, out, err) = run(&["printf", "hello"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "hello");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn printf_percent_d() {
+    let (code, out, err) = run(&["printf", "%d", "42"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "42");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn printf_percent_s() {
+    let (code, out, err) = run(&["printf", "%s", "world"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "world");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn printf_newline_escape() {
+    let (code, out, err) = run(&["printf", "a\\nb"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "a\nb");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn printf_no_format() {
+    let (code, out, err) = run(&["printf", ""]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+// ---------------------------------------------------------------------------
+// date
+// ---------------------------------------------------------------------------
+#[test]
+fn date_default_format() {
+    let (code, out, err) = run(&["date"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    // output should contain time info
+    assert!(!out.is_empty(), "should produce output");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn date_utc_flag() {
+    let (code, out, err) = run(&["date", "-u"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(!out.is_empty(), "should produce output");
+    assert!(out.contains("UTC") || out.ends_with("\n"), "UTC flag should produce UTC time");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn date_format_string() {
+    let (code, out, err) = run(&["date", "+%Y-%m-%d"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    let trimmed = out.trim();
+    assert_eq!(trimmed.len(), 10, "YYYY-MM-DD should be 10 chars, got: {:?}", trimmed);
+    assert!(trimmed.contains('-'), "should contain dashes");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn date_invalid_option() {
+    let (code, out, err) = run(&["date", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// expr
+// ---------------------------------------------------------------------------
+#[test]
+fn expr_addition() {
+    let (code, out, err) = run(&["expr", "2", "+", "3"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out.trim(), "5");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn expr_subtraction() {
+    let (code, out, err) = run(&["expr", "10", "-", "3"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out.trim(), "7");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn expr_multiplication() {
+    let (code, out, err) = run(&["expr", "4", "*", "3"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out.trim(), "12");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn expr_division() {
+    let (code, out, err) = run(&["expr", "10", "/", "3"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out.trim(), "3");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn expr_comparison() {
+    let (code, out, err) = run(&["expr", "5", "=", "5"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out.trim(), "1");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn expr_string_length() {
+    let (code, out, err) = run(&["expr", "length", "hello"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out.trim(), "5");
+    assert_eq!(err, "");
+}
+
+// ---------------------------------------------------------------------------
+// split
+// ---------------------------------------------------------------------------
+#[test]
+fn split_no_args() {
+    let (code, out, err) = run(&["split"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print usage");
+}
+
+#[test]
+fn split_invalid_option() {
+    let (code, out, err) = run(&["split", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn split_nonexistent_file() {
+    let (code, out, err) = run(&["split", "/nonexistent_split_test_xyz"]);
     assert_eq!(code, 1);
     assert_eq!(out, "");
     assert!(!err.is_empty(), "should print error");
