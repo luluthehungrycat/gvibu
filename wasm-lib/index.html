@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gvibu · browser coreutils</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', Consolas, monospace;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; padding: 20px;
+  }
+  .container {
+    max-width: 800px; width: 100%;
+    background: #16213e;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  h1 {
+    font-size: 20px; font-weight: 600;
+    color: #0f3460; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  h1 span { color: #e94560; }
+  .badge {
+    font-size: 11px; background: #0f3460; color: #a8d8ea;
+    padding: 2px 8px; border-radius: 4px; margin-left: 8px;
+  }
+  .terminal {
+    background: #0d1117;
+    border-radius: 8px; padding: 16px;
+    min-height: 300px; max-height: 500px;
+    overflow-y: auto; margin-bottom: 16px;
+    font-size: 14px; line-height: 1.6;
+  }
+  .terminal::-webkit-scrollbar { width: 6px; }
+  .terminal::-webkit-scrollbar-track { background: #0d1117; }
+  .terminal::-webkit-scrollbar-thumb { background: #0f3460; border-radius: 3px; }
+  .output { white-space: pre-wrap; word-break: break-all; }
+  .output .prompt { color: #e94560; }
+  .output .stdout { color: #e0e0e0; }
+  .output .stderr { color: #ff6b6b; }
+  .output .separator { color: #444; font-size: 10px; margin: 6px 0; }
+  .input-line {
+    display: flex; align-items: center; gap: 8px;
+    background: #0d1117; border-radius: 8px; padding: 8px 12px;
+  }
+  .input-line .prompt-symbol { color: #e94560; font-size: 14px; }
+  .input-line input {
+    flex: 1; background: transparent; border: none;
+    color: #e0e0e0; font-family: inherit; font-size: 14px;
+    outline: none;
+  }
+  .input-line input::placeholder { color: #444; }
+  .controls {
+    display: flex; gap: 8px; margin-top: 12px;
+    flex-wrap: wrap; align-items: center;
+  }
+  .controls button {
+    background: #0f3460; color: #a8d8ea; border: none;
+    padding: 6px 14px; border-radius: 6px;
+    font-family: inherit; font-size: 12px; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .controls button:hover { background: #e94560; color: #fff; }
+  .cmd-list {
+    font-size: 11px; color: #666;
+    margin-top: 4px; line-height: 1.8;
+  }
+  .cmd-list span { cursor: pointer; color: #a8d8ea; }
+  .cmd-list span:hover { color: #e94560; }
+  .loading {
+    color: #666; text-align: center; padding: 40px 0;
+    font-size: 14px;
+  }
+  .loading .spinner {
+    display: inline-block; width: 16px; height: 16px;
+    border: 2px solid #444; border-top-color: #e94560;
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+    margin-right: 8px; vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .version {
+    text-align: right; font-size: 10px; color: #333; margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>
+    <span>⋊></span> gvibu
+    <span class="badge">29 commands</span>
+  </h1>
+
+  <div class="terminal" id="terminal">
+    <div class="loading">
+      <span class="spinner"></span> Loading WASM module...
+    </div>
+  </div>
+
+  <div class="input-line">
+    <span class="prompt-symbol">$</span>
+    <input type="text" id="cmdInput" placeholder="Type a command (e.g. echo hello world)" autofocus>
+  </div>
+
+  <div class="controls">
+    <button id="runBtn">Run</button>
+    <button id="clearBtn">Clear</button>
+    <span style="color:#444;font-size:11px;margin-left:4px">Tab to autocomplete</span>
+  </div>
+
+  <div class="cmd-list" id="cmdList">
+    Loading commands...
+  </div>
+
+  <div class="version">gvibu v0.2.0 · Rust → WASM</div>
+</div>
+
+<script type="module">
+import init, { run_command, list_commands } from './pkg/gvibu_wasm.js';
+
+async function main() {
+  await init();
+
+  const commands = list_commands();
+  const cmdSet = new Set(commands);
+  const terminal = document.getElementById('terminal');
+  const cmdInput = document.getElementById('cmdInput');
+  const runBtn = document.getElementById('runBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const cmdList = document.getElementById('cmdList');
+
+  // Render command list
+  cmdList.innerHTML = 'commands: ' +
+    commands.map(c => `<span data-cmd="${c}">${c}</span>`).join(', ');
+
+  // Click on command name to autocomplete
+  cmdList.querySelectorAll('span[data-cmd]').forEach(el => {
+    el.addEventListener('click', () => {
+      cmdInput.value = el.dataset.cmd + ' ';
+      cmdInput.focus();
+    });
+  });
+
+  // Remove loading message
+  terminal.innerHTML = '<div class="output"><span class="prompt">gvibu WASM ready — type a command</span></div>';
+
+  function parseCommand(input) {
+    const parts = input.trim().match(/(?:[^\s"]+|"[^"]*")+/g) || [];
+    if (parts.length === 0) return null;
+    const name = parts[0];
+    const args = parts.slice(1).map(a => a.replace(/^"(.*)"$/, '$1'));
+    return { name, args };
+  }
+
+  function addOutput(html) {
+    const div = document.createElement('div');
+    div.className = 'output';
+    div.innerHTML = html;
+    terminal.appendChild(div);
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  async function execute(input) {
+    const parsed = parseCommand(input);
+    if (!parsed) return;
+
+    const { name, args } = parsed;
+    addOutput(`<span class="prompt">$ ${input}</span>`);
+
+    if (!cmdSet.has(name)) {
+      addOutput(`<span class="stderr">gvibu: ${name}: command not found</span>`);
+      // Suggest similar commands
+      const similar = commands.filter(c => c.startsWith(name[0]) && c !== name).slice(0, 3);
+      if (similar.length > 0) {
+        addOutput(`<span class="stderr">  Did you mean: ${similar.join(', ')}?</span>`);
+      }
+      return;
+    }
+
+    try {
+      const result = run_command(name, args, null);
+      if (result) {
+        addOutput(`<span class="stdout">${result.replace(/\n/g, '<br>')}</span>`);
+      }
+    } catch (e) {
+      let msg = String(e);
+      // Clean up WASM panic messages
+      if (msg.includes('panicked')) {
+        msg = `Error: command '${name}' cannot run in browser WASM` +
+              ` (needs filesystem or stdin access)`;
+      }
+      addOutput(`<span class="stderr">${msg}</span>`);
+    }
+  }
+
+  // Run button
+  runBtn.addEventListener('click', () => {
+    const input = cmdInput.value.trim();
+    if (input) execute(input);
+    cmdInput.value = '';
+    cmdInput.focus();
+  });
+
+  // Enter key
+  cmdInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      runBtn.click();
+    }
+    // Tab autocomplete
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const partial = cmdInput.value.trim().split(/\s+/)[0];
+      if (partial) {
+        const match = commands.find(c => c.startsWith(partial) && c !== partial);
+        if (match) {
+          const rest = cmdInput.value.trim().slice(partial.length);
+          cmdInput.value = match + rest;
+        }
+      }
+    }
+  });
+
+  // Clear button
+  clearBtn.addEventListener('click', () => {
+    terminal.innerHTML = '';
+  });
+}
+
+main().catch(e => {
+  document.getElementById('terminal').innerHTML =
+    `<span class="stderr">Failed to load WASM: ${e}</span>`;
+});
+</script>
+</body>
+</html>
