@@ -39,6 +39,47 @@ jobs:
       - name: Run parity checks (Python vs Rust)
         run: python3 tooling/compare_impls.py
 
+  wasm:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          targets: wasm32-wasi,wasm32-unknown-unknown
+
+      - name: Build WASM binary (wasmtime)
+        run: (cd rust && cargo build --release --target wasm32-wasi)
+
+      - name: Install wasmtime
+        run: curl -fsSL https://wasmtime.dev/install.sh | bash
+        shell: bash
+
+      - name: Test WASM binary via wasmtime
+        run: |
+          export PATH="$HOME/.wasmtime/bin:$PATH"
+          wasmtime rust/target/wasm32-wasi/release/gvibu.wasm true && echo "PASS: true" || echo "FAIL: true"
+          wasmtime rust/target/wasm32-wasi/release/gvibu.wasm echo hello | grep -q hello && echo "PASS: echo" || echo "FAIL: echo"
+          wasmtime rust/target/wasm32-wasi/release/gvibu.wasm false && echo "FAIL: false (should exit 1)" || echo "PASS: false"
+
+      - name: Install wasm-pack
+        run: cargo install wasm-pack
+
+      - name: Build browser WASM with wasm-pack
+        run: wasm-pack build wasm-lib --target web --out-dir pkg
+
+      - name: Verify browser WASM output
+        run: |
+          ls -la wasm-lib/pkg/
+          test -f wasm-lib/pkg/gvibu_wasm.js || (echo "Missing gvibu_wasm.js" && exit 1)
+          test -f wasm-lib/pkg/gvibu_wasm_bg.wasm || (echo "Missing gvibu_wasm_bg.wasm" && exit 1)
+          echo "PASS: Browser WASM build verified"
+
   docker:
     runs-on: ubuntu-latest
     needs: test

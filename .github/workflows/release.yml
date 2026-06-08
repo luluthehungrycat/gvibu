@@ -1,0 +1,162 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-binary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - name: Build release binary
+        run: (cd rust && cargo build --release --locked)
+
+      - name: Strip and archive binary
+        run: |
+          strip rust/target/release/gvibu
+          cp rust/target/release/gvibu gvibu-x86_64-linux
+          tar czf gvibu-x86_64-linux.tar.gz gvibu-x86_64-linux
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gvibu-x86_64-linux
+          path: gvibu-x86_64-linux.tar.gz
+
+  build-wasm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: cargo install wasm-pack
+
+      - name: Build browser WASM
+        run: wasm-pack build wasm-lib --target web --out-dir pkg
+
+      - name: Create WASM package archive
+        run: |
+          cd wasm-lib/pkg
+          tar czf ../../gvibu-wasm-browser.tar.gz .
+          cd ../..
+
+      - name: Upload WASM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gvibu-wasm-browser
+          path: gvibu-wasm-browser.tar.gz
+
+  publish-wasm:
+    runs-on: ubuntu-latest
+    needs: build-wasm
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: cargo install wasm-pack
+
+      - name: Build browser WASM
+        run: wasm-pack build wasm-lib --target web --out-dir pkg
+
+      - name: Configure package.json for GitHub Packages
+        run: |
+          cd wasm-lib/pkg
+          # Add scope and registry config to the generated package.json
+          node -e "
+            const pkg = require('./package.json');
+            pkg.name = '@${{ github.repository_owner }}/' + pkg.name;
+            pkg.publishConfig = { registry: 'https://npm.pkg.github.com' };
+            require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+          echo "Updated package.json:"
+          cat package.json
+
+      - name: Publish to GitHub Packages
+        run: |
+          cd wasm-lib/pkg
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
+          npm publish
+
+  build-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version from tag
+        id: version
+        run: echo "tag=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ steps.version.outputs.tag }}
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: [build-binary, build-wasm]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download binary artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: gvibu-x86_64-linux
+
+      - name: Download WASM artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: gvibu-wasm-browser
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ github.ref_name }}
+          body_path: CHANGELOG.md
+          files: |
+            gvibu-x86_64-linux.tar.gz
+            gvibu-wasm-browser.tar.gz
+          generate_release_notes: true
