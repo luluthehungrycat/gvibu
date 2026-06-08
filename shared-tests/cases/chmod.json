@@ -1,0 +1,40 @@
+[
+    {
+        "name": "no_args",
+        "args": [],
+        "expected_exit_code": 1,
+        "expected_stderr": "chmod: missing operand"
+    },
+    {
+        "name": "invalid_option",
+        "args": ["-x", "755", "/dev/null"],
+        "expected_exit_code": 1,
+        "expected_stderr": "chmod: invalid option: -x"
+    },
+    {
+        "name": "no_files",
+        "args": ["755"],
+        "expected_exit_code": 1,
+        "expected_stderr": "chmod: missing operand after"
+    },
+    {
+        "name": "dev_null_octal",
+        "args": ["644", "/dev/null"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "dev_null_symbolic",
+        "args": ["u+x", "/dev/null"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "dev_null_recursive",
+        "args": ["-R", "755", "/dev/null"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "dev_null_verbose",
+        "args": ["-v", "644", "/dev/null"],
+        "expected_exit_code": 0
+    }
+]

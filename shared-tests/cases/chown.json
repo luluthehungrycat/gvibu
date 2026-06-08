@@ -1,0 +1,40 @@
+[
+    {
+        "name": "no_args",
+        "args": [],
+        "expected_exit_code": 1,
+        "expected_stderr": "chown: missing operand"
+    },
+    {
+        "name": "invalid_option",
+        "args": ["-x", "root", "/dev/null"],
+        "expected_exit_code": 1,
+        "expected_stderr": "chown: invalid option: -x"
+    },
+    {
+        "name": "no_files",
+        "args": ["root"],
+        "expected_exit_code": 1,
+        "expected_stderr": "chown: missing operand after"
+    },
+    {
+        "name": "dev_null_numeric_owner",
+        "args": ["0", "/dev/null"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "dev_null_numeric_owner_group",
+        "args": ["0:0", "/dev/null"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "dev_null_group_only",
+        "args": [":0", "/dev/null"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "dev_null_recursive",
+        "args": ["-R", "0", "/dev/null"],
+        "expected_exit_code": 0
+    }
+]

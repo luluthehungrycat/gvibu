@@ -1,0 +1,32 @@
+{
+  "cases": [
+    {
+      "name": "no_f_flag",
+      "args": ["-d", ","],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "missing_d_arg",
+      "args": ["-d"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "missing_f_arg",
+      "args": ["-f"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    }
+  ]
+}
