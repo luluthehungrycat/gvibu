@@ -87,6 +87,29 @@
       "stdout": "     12\n",
       "stderr": "",
       "exit_code": 0
+    },
+    {
+      "name": "max_line_only",
+      "args": ["-L", "/dev/null"],
+      "stdout": "      0 /dev/null\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "max_line_with_lines",
+      "stdin": "short\nlonger_line\nshort\n",
+      "args": ["-L"],
+      "stdout": "     12\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "all_flags_with_L",
+      "stdin": "a\nbb\nccc\n",
+      "args": ["-lwcmL"],
+      "stdout": "      3       3       8       8       3\n",
+      "stderr": "",
+      "exit_code": 0
     }
   ]
 }

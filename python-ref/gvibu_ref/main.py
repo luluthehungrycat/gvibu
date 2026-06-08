@@ -28,6 +28,44 @@ COMMANDS = {
     "link": None,
     "unlink": None,
     "tee": None,
+    "mkdir": None,
+    "rmdir": None,
+    "hostname": None,
+    "logname": None,
+    "readlink": None,
+    "realpath": None,
+    "uniq": None,
+    "uptime": None,
+    "id": None,
+    "who": None,
+    "kill": None,
+    "cut": None,
+    "tr": None,
+    "mv": None,
+    "rm": None,
+    "ln": None,
+    "chmod": None,
+    "chown": None,
+    "sort": None,
+    "grep": None,
+    "ls": None,
+    "cp": None,
+    "printf": None,
+    "date": None,
+    "expr": None,
+    "split": None,
+    "tail": None,
+    "tac": None,
+    "fold": None,
+    "comm": None,
+    "join": None,
+    "nl": None,
+    "shuf": None,
+    "sum": None,
+    "du": None,
+    "df": None,
+    "test": None,
+    "[": None,
 }
 
 
@@ -47,12 +85,26 @@ def dispatch():
         from gvibu_ref.commands import (
             true, false, echo, pwd, basename, dirname, cat, wc, head,
             yes, printenv, sleep, touch, seq, which_cmd, uname, env_cmd, whoami,
-            link, unlink, tee,
+            link, unlink, tee, mkdir, rmdir,
+            hostname, logname, readlink, realpath, uniq, uptime,
+            id, who, kill, cut, tr, mv, rm, ln,
+            chmod, chown, sort, test_cmd,
+            grep, ls, cp, printf, date, expr, split,
+            tail, tac, fold, comm,
+            join, nl, shuf, sum,
+            du, df,
         )
     except ModuleNotFoundError:
         from commands import (
             yes, printenv, sleep, touch, seq, which_cmd, uname, env_cmd, whoami,
-            link, unlink, tee,
+            link, unlink, tee, mkdir, rmdir,
+            hostname, logname, readlink, realpath, uniq, uptime,
+            id, who, kill, cut, tr, mv, rm, ln,
+            chmod, chown, sort, test_cmd,
+            grep, ls, cp, printf, date, expr, split,
+            tail, tac, fold, comm,
+            join, nl, shuf, sum,
+            du, df,
         )
 
     COMMANDS["true"] = true
@@ -76,6 +128,44 @@ def dispatch():
     COMMANDS["link"] = link
     COMMANDS["unlink"] = unlink
     COMMANDS["tee"] = tee
+    COMMANDS["mkdir"] = mkdir
+    COMMANDS["rmdir"] = rmdir
+    COMMANDS["hostname"] = hostname
+    COMMANDS["logname"] = logname
+    COMMANDS["readlink"] = readlink
+    COMMANDS["realpath"] = realpath
+    COMMANDS["uniq"] = uniq
+    COMMANDS["uptime"] = uptime
+    COMMANDS["id"] = id
+    COMMANDS["who"] = who
+    COMMANDS["kill"] = kill
+    COMMANDS["cut"] = cut
+    COMMANDS["tr"] = tr
+    COMMANDS["mv"] = mv
+    COMMANDS["rm"] = rm
+    COMMANDS["ln"] = ln
+    COMMANDS["chmod"] = chmod
+    COMMANDS["chown"] = chown
+    COMMANDS["sort"] = sort
+    COMMANDS["grep"] = grep
+    COMMANDS["ls"] = ls
+    COMMANDS["cp"] = cp
+    COMMANDS["printf"] = printf
+    COMMANDS["date"] = date
+    COMMANDS["expr"] = expr
+    COMMANDS["split"] = split
+    COMMANDS["tail"] = tail
+    COMMANDS["tac"] = tac
+    COMMANDS["fold"] = fold
+    COMMANDS["comm"] = comm
+    COMMANDS["join"] = join
+    COMMANDS["nl"] = nl
+    COMMANDS["shuf"] = shuf
+    COMMANDS["sum"] = sum
+    COMMANDS["du"] = du
+    COMMANDS["df"] = df
+    COMMANDS["test"] = test_cmd
+    COMMANDS["["] = test_cmd
 
     cmd_name = get_command_name()
     argv0 = os.path.basename(sys.argv[0])

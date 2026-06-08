@@ -72,3 +72,19 @@ def test_wc_all_flags(capfd):
     out, err = capfd.readouterr()
     assert out == "      0       0       0       0 /dev/null\n"
     assert err == ""
+
+
+def test_wc_max_line_only(capfd):
+    code = wc_run(["-L", "/dev/null"])
+    assert code == 0
+    out, err = capfd.readouterr()
+    assert out == "      0 /dev/null\n"
+    assert err == ""
+
+
+def test_wc_all_flags_with_L(capfd):
+    code = wc_run(["-lwcmL", "/dev/null"])
+    assert code == 0
+    out, err = capfd.readouterr()
+    assert out == "      0       0       0       0       0 /dev/null\n"
+    assert err == ""

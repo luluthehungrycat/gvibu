@@ -1,0 +1,55 @@
+{
+  "command": "touch",
+  "description": "Update file timestamps or create empty files",
+  "cases": [
+    {
+      "name": "no_args",
+      "args": [],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 2
+    },
+    {
+      "name": "invalid_option",
+      "args": ["-x", "/dev/null"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "dev_null",
+      "args": ["/dev/null"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "access_only",
+      "args": ["-a", "/dev/null"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "mod_only",
+      "args": ["-m", "/dev/null"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "both_flags",
+      "args": ["-am", "/dev/null"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "separate_flags",
+      "args": ["-a", "-m", "/dev/null"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}

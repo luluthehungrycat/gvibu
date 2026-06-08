@@ -38,6 +38,20 @@
       "stdout": "",
       "stderr": "*",
       "exit_code": 1
+    },
+    {
+      "name": "n_flag_dev_null",
+      "args": ["-n", "/dev/null"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
     }
   ]
 }

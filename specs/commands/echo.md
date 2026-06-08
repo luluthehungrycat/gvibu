@@ -5,10 +5,19 @@ Overview
 - Minimal, deterministic behavior aligned with project scope.
 
 Behavior
-- Invocation: `gvibu echo [-n] [ARGS...]`
+- Invocation: `gvibu echo [-n] [-e] [-E] [ARGS...]`
 - No long options; only simple positional arguments supported.
 - If the first argument is `-n`, no trailing newline is printed.
-- If called with a mix of quotes or spaces, arguments are passed as-is and joined by spaces in output.
+- `-e`: enable interpretation of backslash escape sequences:
+  - `\\n` — newline
+  - `\\t` — horizontal tab
+  - `\\r` — carriage return
+  - `\\\\` — backslash
+  - `\\'` — single quote
+  - `\\"` — double quote
+  - `\\0NNN` — octal character (up to 3 octal digits)
+- `-E`: disable interpretation of escape sequences (default behavior).
+- Options (`-n`, `-e`, `-E`) must precede all positional arguments.
 - If called with no arguments, prints a blank line (just newline), unless `-n` is the only argument (prints nothing).
 
 Exit Codes
@@ -31,5 +40,10 @@ Examples
     $ gvibu echo -n hello
     hello$
 
+    $ gvibu echo -e "hello\\nworld"
+    hello
+    world
+
 Implementation Notes
 - Implementations (Python and Rust) should mirror this spec exactly for parity.
+- Interpret escape sequences character-by-character, not via regex.

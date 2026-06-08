@@ -48,6 +48,41 @@
       "stdout": "hello\n",
       "stderr": "",
       "exit_code": 0
+    },
+    {
+      "name": "e_flag_newline",
+      "args": ["-e", "hello\\nworld"],
+      "stdout": "hello\nworld\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "e_flag_tab",
+      "args": ["-e", "hello\\tworld"],
+      "stdout": "hello\tworld\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "e_flag_no_effect",
+      "args": ["-e", "hello"],
+      "stdout": "hello\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "e_flag_with_n",
+      "args": ["-n", "-e", "hello\\nworld"],
+      "stdout": "hello\nworld",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "e_uppercase_disables_escapes",
+      "args": ["-E", "-e", "hello\\nworld"],
+      "stdout": "hello\\nworld\n",
+      "stderr": "",
+      "exit_code": 0
     }
   ]
 }

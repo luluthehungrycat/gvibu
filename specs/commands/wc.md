@@ -11,8 +11,9 @@ Behavior
   - `-w`: print only the word count
   - `-c`: print only the byte count
   - `-m`: print only the character count (UTF-8 aware)
-- When multiple options are given, output is in the order: lines, words, bytes, chars.
-- If no options are given, default to `-lwcm` (all four counts).
+  - `-L`: print only the maximum line length (in bytes)
+- When multiple options are given, output is in the order: lines, words, bytes, chars, max-line-length.
+- If no options are given, default to `-lwcm` (all four counts; `-L` is not a default).
 - A word is a maximal non-whitespace sequence; whitespace is space, tab, and newline.
 - If no FILE is given, read from standard input (displayed as no filename or as `-`).
 - If multiple FILEs are given, print per-file counts followed by a total line.

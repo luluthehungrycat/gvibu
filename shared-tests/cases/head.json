@@ -45,6 +45,34 @@
       "stdout": "==> /dev/null <==\n\n==> /dev/null <==\n",
       "stderr": "",
       "exit_code": 0
+    },
+    {
+      "name": "c_flag_dev_null",
+      "args": ["-c", "5", "/dev/null"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "c_flag_missing_arg",
+      "args": ["-c"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "c_flag_zero",
+      "args": ["-c", "0", "/dev/null"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
     }
   ]
 }

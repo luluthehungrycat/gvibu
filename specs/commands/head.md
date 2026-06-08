@@ -2,27 +2,30 @@
 
 Overview
 - Output the first part of files.
-- Minimal, deterministic behavior per project scope.
+- Supports `-n` (line count) and `-c` (byte count) options.
 
 Behavior
 - Invocation: `gvibu head [OPTION]... [FILE]...`
 - Options:
   - `-n N`: print the first N lines (default: 10)
-- `-n` takes a positive integer as its argument. N must be >= 0.
+  - `-c N`: print the first N bytes
+- `-n` and `-c` take a positive integer as their argument. N must be >= 0.
   - If N=0, print nothing.
-  - If the file has fewer than N lines, print all lines.
+  - If the file has fewer than N lines/bytes, print all content.
+- `-n` and `-c` are mutually exclusive; if both are given, `-c` takes precedence.
 - If no FILE is given, read from standard input.
 - If multiple FILEs are given, print a header for each file.
 
 Exit Codes
 - 0: Success
-- 1: Runtime error (file not found, read error, invalid N)
+- 1: Runtime error (file not found, read error, invalid N, missing argument)
 
 Output Conventions
-- stdout: the first N lines of each file
+- stdout: the first N lines or N bytes of each file
 - stderr: error messages for file errors when applicable
 - With multiple files, include a header: `==> FILENAME <==` before each file's content
 
 Implementation Notes
 - Python and Rust implementations should mirror this spec exactly for parity.
-- Read line-by-line and stop after N lines; avoid reading the entire file.
+- For `-c`, read exactly N bytes (don't over-read). Use binary mode for accuracy.
+- For `-n`, read line-by-line and stop after N lines; avoid reading the entire file.

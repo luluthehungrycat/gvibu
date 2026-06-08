@@ -1,0 +1,48 @@
+{
+  "command": "seq",
+  "description": "Print a sequence of numbers",
+  "cases": [
+    {
+      "name": "seq_5",
+      "args": ["5"],
+      "stdout": "1\n2\n3\n4\n5\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "seq_3_7",
+      "args": ["3", "7"],
+      "stdout": "3\n4\n5\n6\n7\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "with_separator",
+      "args": ["-s", ",", "3"],
+      "stdout": "1,2,3\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "equal_width",
+      "args": ["-w", "5", "10"],
+      "stdout": "05\n06\n07\n08\n09\n10\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "no_args",
+      "args": [],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    }
+  ]
+}
