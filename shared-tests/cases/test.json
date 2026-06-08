@@ -1,0 +1,114 @@
+[
+    {
+        "name": "no_args",
+        "args": [],
+        "expected_exit_code": 1,
+        "expected_stderr": "test: missing operand"
+    },
+    {
+        "name": "string_nonempty",
+        "args": ["hello"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "string_empty",
+        "args": ["''"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "n_flag_nonempty",
+        "args": ["-n", "hello"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "z_flag_empty",
+        "args": ["-z", ""],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "eq_true",
+        "args": ["a", "=", "a"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "eq_false",
+        "args": ["a", "=", "b"],
+        "expected_exit_code": 1
+    },
+    {
+        "name": "neq_true",
+        "args": ["a", "!=", "b"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "num_eq_true",
+        "args": ["5", "-eq", "5"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "num_eq_false",
+        "args": ["5", "-eq", "6"],
+        "expected_exit_code": 1
+    },
+    {
+        "name": "num_lt_true",
+        "args": ["3", "-lt", "5"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "num_lt_false",
+        "args": ["5", "-lt", "3"],
+        "expected_exit_code": 1
+    },
+    {
+        "name": "num_gt_true",
+        "args": ["7", "-gt", "2"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "num_le_true",
+        "args": ["3", "-le", "3"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "num_ge_true",
+        "args": ["5", "-ge", "5"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "not_empty",
+        "args": ["!", ""],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "bracket_form_true",
+        "args": ["[", "hello", "]"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "bracket_form_false",
+        "args": ["[", "", "]"],
+        "expected_exit_code": 1
+    },
+    {
+        "name": "bracket_missing_close",
+        "args": ["[", "hello"],
+        "expected_exit_code": 1,
+        "expected_stderr": "test: missing ']'"
+    },
+    {
+        "name": "dev_null_exists",
+        "args": ["-e", "/dev/null"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "dev_null_is_file",
+        "args": ["-f", "/dev/null"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "root_is_dir",
+        "args": ["-d", "/"],
+        "expected_exit_code": 0
+    }
+]

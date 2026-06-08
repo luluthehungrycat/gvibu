@@ -1,0 +1,51 @@
+{
+  "cases": [
+    {
+      "name": "basic_filter",
+      "args": [],
+      "stdin": "a\na\nb\nb\nc\n",
+      "stdout": "a\nb\nc\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "no_duplicates",
+      "args": [],
+      "stdin": "a\nb\nc\n",
+      "stdout": "a\nb\nc\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "count_flag",
+      "args": ["-c"],
+      "stdin": "a\na\nb\n",
+      "stdout": "   2 a\n   1 b\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "repeated_only",
+      "args": ["-d"],
+      "stdin": "a\na\nb\nc\nc\n",
+      "stdout": "a\nc\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "unique_only",
+      "args": ["-u"],
+      "stdin": "a\na\nb\nc\nc\n",
+      "stdout": "b\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    }
+  ]
+}
