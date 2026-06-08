@@ -1,0 +1,60 @@
+{
+  "cases": [
+    {
+      "name": "no_args",
+      "args": [],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "string_format",
+      "args": ["hello\n"],
+      "stdout": "hello\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "s_specifier",
+      "args": ["%s\n", "hello"],
+      "stdout": "hello\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "d_specifier",
+      "args": ["%d\n", "42"],
+      "stdout": "42\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "x_specifier",
+      "args": ["%x\n", "255"],
+      "stdout": "ff\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "percent_sign",
+      "args": ["%%\n"],
+      "stdout": "%\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "tab_escape",
+      "args": ["a\\tb"],
+      "stdout": "a\tb",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "newline_escape",
+      "args": ["a\\nb"],
+      "stdout": "a\nb",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}

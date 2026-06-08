@@ -1,0 +1,28 @@
+{
+  "cases": [
+    {
+      "name": "dev_null",
+      "args": ["/dev/null"],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "no_args",
+      "args": [],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "nl: invalid option: -x\n",
+      "exit_code": 1
+    }
+  ]
+}
