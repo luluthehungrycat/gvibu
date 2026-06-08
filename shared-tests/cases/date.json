@@ -1,0 +1,46 @@
+{
+  "cases": [
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "extra_operand",
+      "args": ["foo"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "custom_format",
+      "args": ["+%Y-%m-%d"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "rfc2822",
+      "args": ["-R"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "iso8601",
+      "args": ["-I"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "epoch_seconds",
+      "args": ["+%s"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}

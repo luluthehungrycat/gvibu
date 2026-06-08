@@ -1,0 +1,46 @@
+{
+  "cases": [
+    {
+      "name": "dev_null",
+      "args": ["/dev/null"],
+      "stdout": "0\t/dev/null\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "human_readable_dev_null",
+      "args": ["-h", "/dev/null"],
+      "stdout": "0\t/dev/null\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "summary_dev_null",
+      "args": ["-s", "/dev/null"],
+      "stdout": "0\t/dev/null\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "nonexistent",
+      "args": ["/nonexistent_du_test_xyz"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "bundled_flags",
+      "args": ["-hs", "/dev/null"],
+      "stdout": "0\t/dev/null\n",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}

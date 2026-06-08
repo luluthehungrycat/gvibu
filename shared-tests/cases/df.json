@@ -1,0 +1,25 @@
+{
+  "cases": [
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "bundled_flags",
+      "args": ["-hT"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "no_args",
+      "args": [],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}
