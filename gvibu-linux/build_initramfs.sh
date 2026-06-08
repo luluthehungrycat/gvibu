@@ -33,7 +33,7 @@ else
 fi
 
 # Create gvibu command symlinks (overrides busybox for these commands)
-for cmd in true false echo pwd basename dirname cat wc head yes printenv sleep touch seq which uname env whoami link unlink tee; do
+for cmd in true false echo pwd basename dirname cat wc head yes printenv sleep touch seq which uname env whoami link unlink tee mkdir rmdir hostname logname readlink realpath uniq uptime id who kill cut tr mv rm ln chmod chown sort grep ls cp printf date expr split tail tac fold comm join nl shuf sum du df test '['; do
     ln -sf gvibu "$ROOT/bin/$cmd"
 done
 
