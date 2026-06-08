@@ -1,0 +1,81 @@
+{
+  "cases": [
+    {
+      "name": "no_args",
+      "args": [],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "number",
+      "args": ["42"],
+      "stdout": "42\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "addition",
+      "args": ["1", "+", "2"],
+      "stdout": "3\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "subtraction",
+      "args": ["10", "-", "3"],
+      "stdout": "7\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "multiplication",
+      "args": ["3", "*", "4"],
+      "stdout": "12\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "division",
+      "args": ["10", "/", "3"],
+      "stdout": "3\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "modulo",
+      "args": ["10", "%", "3"],
+      "stdout": "1\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "equality",
+      "args": ["5", "=", "5"],
+      "stdout": "1\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "inequality",
+      "args": ["5", "=", "6"],
+      "stdout": "0\n",
+      "stderr": "",
+      "exit_code": 1
+    },
+    {
+      "name": "length",
+      "args": ["length", "hello"],
+      "stdout": "5\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "logical_or",
+      "args": ["0", "|", "5"],
+      "stdout": "5\n",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}

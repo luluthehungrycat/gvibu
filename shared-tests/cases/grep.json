@@ -1,0 +1,32 @@
+{
+  "cases": [
+    {
+      "name": "missing_pattern",
+      "args": [],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "invalid_option",
+      "args": ["-x", "pattern"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "invalid_pattern",
+      "args": ["[invalid"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "no_match_stdin",
+      "args": ["xyz"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 1
+    }
+  ]
+}

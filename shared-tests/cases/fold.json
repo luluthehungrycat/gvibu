@@ -1,0 +1,42 @@
+{
+  "cases": [
+    {
+      "name": "no_args_stdin_empty",
+      "args": ["fold"],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "width_10",
+      "args": ["fold", "-w", "10"],
+      "stdin": "hello world this is a long line",
+      "stdout": "hello worl\nd this is\na long li\nne\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "break_spaces_width_10",
+      "args": ["fold", "-s", "-w", "10"],
+      "stdin": "hello world this is a long line",
+      "stdout": "hello\nworld this\nis a long\nline\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "invalid_width",
+      "args": ["fold", "-w", "abc"],
+      "stdout": "",
+      "stderr": "fold: invalid width: abc\n",
+      "exit_code": 1
+    },
+    {
+      "name": "invalid_option",
+      "args": ["fold", "-x"],
+      "stdout": "",
+      "stderr": "fold: invalid option: -x\n",
+      "exit_code": 1
+    }
+  ]
+}
