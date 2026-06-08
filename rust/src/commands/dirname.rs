@@ -1,5 +1,7 @@
 /// dirname: strip last component from a file path.
-pub fn run(args: &[String]) -> i32 {
+use std::io::Write;
+
+pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     if args.is_empty() {
         eprintln!("dirname: usage: dirname NAME");
         return 2;
@@ -9,7 +11,7 @@ pub fn run(args: &[String]) -> i32 {
 
     // Empty string -> current directory
     if path.is_empty() {
-        println!(".");
+        writeln!(stdout, ".").ok();
         return 0;
     }
 
@@ -18,7 +20,7 @@ pub fn run(args: &[String]) -> i32 {
 
     // If entirely slashes -> root
     if stripped.is_empty() {
-        println!("/");
+        writeln!(stdout, "/").ok();
         return 0;
     }
 
@@ -26,15 +28,15 @@ pub fn run(args: &[String]) -> i32 {
     match stripped.rfind('/') {
         None => {
             // No slash: return current directory
-            println!(".");
+            writeln!(stdout, ".").ok();
         }
         Some(pos) => {
             if pos == 0 {
                 // Slash at start: root
-                println!("/");
+                writeln!(stdout, "/").ok();
             } else {
                 // Everything before the last slash
-                println!("{}", &stripped[..pos]);
+                writeln!(stdout, "{}", &stripped[..pos]).ok();
             }
         }
     }
@@ -48,31 +50,31 @@ mod tests {
 
     #[test]
     fn test_dirname_no_args() {
-        assert_eq!(run(&[]), 2);
+        assert_eq!(run(&mut std::io::sink(), &[]), 2);
     }
 
     #[test]
     fn test_dirname_normal() {
-        assert_eq!(run(&["/usr/local/bin".into()]), 0);
+        assert_eq!(run(&mut std::io::sink(), &["/usr/local/bin".into()]), 0);
     }
 
     #[test]
     fn test_dirname_root_parent() {
-        assert_eq!(run(&["/usr".into()]), 0);
+        assert_eq!(run(&mut std::io::sink(), &["/usr".into()]), 0);
     }
 
     #[test]
     fn test_dirname_root() {
-        assert_eq!(run(&["/".into()]), 0);
+        assert_eq!(run(&mut std::io::sink(), &["/".into()]), 0);
     }
 
     #[test]
     fn test_dirname_simple() {
-        assert_eq!(run(&["foo".into()]), 0);
+        assert_eq!(run(&mut std::io::sink(), &["foo".into()]), 0);
     }
 
     #[test]
     fn test_dirname_relative() {
-        assert_eq!(run(&["a/b".into()]), 0);
+        assert_eq!(run(&mut std::io::sink(), &["a/b".into()]), 0);
     }
 }

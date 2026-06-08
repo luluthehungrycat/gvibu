@@ -1,7 +1,9 @@
 /// sleep: delay for a specified number of seconds.
+use std::io::Write;
 use std::time::Duration;
 
-pub fn run(args: &[String]) -> i32 {
+pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
+    let _ = stdout;
     if args.is_empty() {
         eprintln!("sleep: usage: sleep NUMBER");
         return 2;

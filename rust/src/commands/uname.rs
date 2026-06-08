@@ -1,18 +1,46 @@
 /// uname: print system information.
-/// Reads from /proc/sys/kernel/* instead of running subprocess uname.
-use std::fs;
+/// Linux: reads from /proc/sys/kernel/*
+/// macOS/other: uses POSIX libc::uname()
+use std::io::Write;
 
-fn read_proc(path: &str) -> String {
-    fs::read_to_string(path)
-        .map(|s| s.trim().to_string())
-        .unwrap_or_default()
+#[cfg(target_os = "linux")]
+fn get_kernel_info() -> (String, String, String, &'static str) {
+    fn read_proc(path: &str) -> String {
+        std::fs::read_to_string(path)
+            .map(|s| s.trim().to_string())
+            .unwrap_or_default()
+    }
+    let sysname = read_proc("/proc/sys/kernel/ostype");
+    let nodename = read_proc("/proc/sys/kernel/hostname");
+    let release = read_proc("/proc/sys/kernel/osrelease");
+    let machine = std::env::consts::ARCH;
+    (sysname, nodename, release, machine)
 }
 
-pub fn run(args: &[String]) -> i32 {
+#[cfg(not(target_os = "linux"))]
+fn get_kernel_info() -> (String, String, String, &'static str) {
+    let mut uts: libc::utsname = unsafe { std::mem::zeroed() };
+    let ret = unsafe { libc::uname(&mut uts) };
+    if ret != 0 {
+        return ("Unknown".into(), "Unknown".into(), "Unknown".into(), std::env::consts::ARCH);
+    }
+    fn from_cstr(arr: &[i8]) -> String {
+        let bytes: Vec<u8> = arr.iter().take_while(|&&b| b != 0).map(|&b| b as u8).collect();
+        String::from_utf8_lossy(&bytes).to_string()
+    }
+    let sysname = from_cstr(&uts.sysname);
+    let nodename = from_cstr(&uts.nodename);
+    let release = from_cstr(&uts.release);
+    let machine = std::env::consts::ARCH;
+    (sysname, nodename, release, machine)
+}
+
+pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let mut flags = String::new();
     let mut all_flag = false;
 
     for arg in args {
+        if arg == "--" { break; }
         if let Some(chars) = arg.strip_prefix('-') {
             for ch in chars.chars() {
                 match ch {
@@ -38,15 +66,13 @@ pub fn run(args: &[String]) -> i32 {
         flags = String::from("snrm");
     }
 
-    let sysname = read_proc("/proc/sys/kernel/ostype");
-    let nodename = read_proc("/proc/sys/kernel/hostname");
-    let release = read_proc("/proc/sys/kernel/osrelease");
-    let machine = std::env::consts::ARCH;
+    let (sysname, nodename, release, machine) = get_kernel_info();
+    let sysname = if sysname.is_empty() { "Linux" } else { &sysname };
 
     let mut parts = Vec::new();
     for flag in flags.chars() {
         match flag {
-            's' => parts.push(if sysname.is_empty() { "Linux" } else { &sysname }),
+            's' => parts.push(sysname),
             'n' => parts.push(if nodename.is_empty() { "(none)" } else { &nodename }),
             'r' => parts.push(if release.is_empty() { "(unknown)" } else { &release }),
             'm' => parts.push(machine),
@@ -54,6 +80,6 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
-    println!("{}", parts.join(" "));
+    let _ = writeln!(stdout, "{}", parts.join(" "));
     0
 }

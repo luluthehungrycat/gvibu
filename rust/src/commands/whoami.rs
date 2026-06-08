@@ -1,4 +1,6 @@
-pub fn run(args: &[String]) -> i32 {
+use std::io::Write;
+
+pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     if !args.is_empty() {
         eprintln!("whoami: too many arguments");
         return 1;
@@ -13,7 +15,7 @@ pub fn run(args: &[String]) -> i32 {
         return 1;
     }
 
-    println!("{}", user);
+    writeln!(stdout, "{}", user).ok();
     0
 }
 
@@ -23,13 +25,13 @@ mod tests {
 
     #[test]
     fn test_whoami_rejects_args() {
-        assert_eq!(run(&["extra".into()]), 1);
+        assert_eq!(run(&mut std::io::sink(), &["extra".into()]), 1);
     }
 
     #[test]
     fn test_whoami_with_env() {
         // Set USER and verify it's used
         std::env::set_var("USER", "testuser");
-        assert_eq!(run(&[]), 0);
+        assert_eq!(run(&mut std::io::sink(), &[]), 0);
     }
 }

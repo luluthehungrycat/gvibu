@@ -1,6 +1,7 @@
+use std::io::Write;
 use std::string::ToString;
 
-pub fn run(args: &[String]) -> i32 {
+pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     if args.is_empty() || (args.len() == 1 && args[0].is_empty()) {
         eprintln!("basename: usage: basename NAME [SUFFIX]");
         return 1;
@@ -17,7 +18,7 @@ pub fn run(args: &[String]) -> i32 {
             name.truncate(name.len() - suffix.len());
         }
     }
-    println!("{}", name);
+    writeln!(stdout, "{}", name).ok();
     0
 }
 
@@ -27,26 +28,26 @@ mod tests {
 
     #[test]
     fn test_basename_no_args() {
-        assert_eq!(run(&[]), 1);
+        assert_eq!(run(&mut std::io::sink(), &[]), 1);
     }
 
     #[test]
     fn test_basename_simple() {
-        assert_eq!(run(&["/usr/local/bin/test.txt".into()]), 0);
+        assert_eq!(run(&mut std::io::sink(), &["/usr/local/bin/test.txt".into()]), 0);
     }
 
     #[test]
     fn test_basename_with_suffix() {
-        assert_eq!(run(&["/usr/local/bin/test.txt".into(), ".txt".into()]), 0);
+        assert_eq!(run(&mut std::io::sink(), &["/usr/local/bin/test.txt".into(), ".txt".into()]), 0);
     }
 
     #[test]
     fn test_basename_root() {
-        assert_eq!(run(&["/".into()]), 0);
+        assert_eq!(run(&mut std::io::sink(), &["/".into()]), 0);
     }
 
     #[test]
     fn test_basename_trailing_slash() {
-        assert_eq!(run(&["/a/b/c/".into()]), 0);
+        assert_eq!(run(&mut std::io::sink(), &["/a/b/c/".into()]), 0);
     }
 }

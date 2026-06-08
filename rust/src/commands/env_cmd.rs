@@ -1,9 +1,10 @@
 /// env: print or set environment variables.
 use std::collections::BTreeMap;
 use std::env;
+use std::io::Write;
 use std::process;
 
-pub fn run(args: &[String]) -> i32 {
+pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let mut ignore_env = false;
     let mut unset_vars: Vec<String> = Vec::new();
     let mut set_vars: BTreeMap<String, String> = BTreeMap::new();
@@ -12,7 +13,10 @@ pub fn run(args: &[String]) -> i32 {
 
     while i < args.len() {
         let arg = &args[i];
-        if arg == "-i" || arg == "--ignore-environment" {
+        if arg == "--" {
+            i += 1;
+            break;
+        } else if arg == "-i" || arg == "--ignore-environment" {
             ignore_env = true;
         } else if arg == "-u" || arg == "--unset" {
             i += 1;
@@ -59,7 +63,7 @@ pub fn run(args: &[String]) -> i32 {
 
     if cmd_and_args.is_empty() {
         for (key, value) in &final_env {
-            println!("{}={}", key, value);
+            writeln!(stdout, "{}={}", key, value).ok();
         }
         return 0;
     }
