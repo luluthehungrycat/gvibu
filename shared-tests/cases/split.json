@@ -1,0 +1,39 @@
+{
+  "cases": [
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "missing_a_arg",
+      "args": ["-a"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "invalid_a_value",
+      "args": ["-a", "0"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "missing_l_arg",
+      "args": ["-l"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "invalid_lines",
+      "args": ["-l", "0"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    }
+  ]
+}

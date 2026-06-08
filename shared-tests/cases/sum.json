@@ -1,0 +1,25 @@
+{
+  "cases": [
+    {
+      "name": "no_args",
+      "args": [],
+      "stdout": "",
+      "stderr": "sum: missing operand\n",
+      "exit_code": 1
+    },
+    {
+      "name": "empty_file",
+      "args": ["/dev/null"],
+      "stdout": "0 0\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "nonexistent_file",
+      "args": ["/nonexistent_sum_test_xyz"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    }
+  ]
+}

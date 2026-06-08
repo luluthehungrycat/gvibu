@@ -1,0 +1,38 @@
+[
+    {
+        "name": "no_args",
+        "args": [],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "dev_null",
+        "args": ["/dev/null"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "invalid_option",
+        "args": ["-x"],
+        "expected_exit_code": 1,
+        "expected_stderr": "sort: invalid option: -x"
+    },
+    {
+        "name": "combined_flags",
+        "args": ["-rn", "/dev/null"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "key_flag_basic",
+        "args": ["-k2,2n", "/dev/null"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "key_flag_multi",
+        "args": ["-k1,1", "-k2,2n", "/dev/null"],
+        "expected_exit_code": 0
+    },
+    {
+        "name": "key_flag_reverse",
+        "args": ["-k1,1r", "/dev/null"],
+        "expected_exit_code": 0
+    }
+]

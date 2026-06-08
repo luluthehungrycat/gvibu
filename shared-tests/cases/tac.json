@@ -1,0 +1,26 @@
+{
+  "cases": [
+    {
+      "name": "stdin_basic",
+      "args": [],
+      "stdin": "a\nb\nc\n",
+      "stdout": "c\nb\na\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "dev_null",
+      "args": ["/dev/null"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 1
+    }
+  ]
+}
