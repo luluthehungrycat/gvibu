@@ -1,0 +1,20 @@
+{
+  "command": "rmdir",
+  "description": "Remove empty directories",
+  "cases": [
+    {
+      "name": "no_args",
+      "args": [],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "nonexistent",
+      "args": ["/tmp/nonexistent_rmdir_xyz"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    }
+  ]
+}

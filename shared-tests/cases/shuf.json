@@ -1,0 +1,34 @@
+{
+  "cases": [
+    {
+      "name": "empty_stdin",
+      "args": [],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "one_line",
+      "args": [],
+      "stdin": "hello\n",
+      "stdout": "hello\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "too_many_args",
+      "args": ["a", "b"],
+      "stdout": "",
+      "stderr": "shuf: too many arguments\n",
+      "exit_code": 1
+    },
+    {
+      "name": "nonexistent_file",
+      "args": ["/nonexistent_shuf_test_xyz"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    }
+  ]
+}
