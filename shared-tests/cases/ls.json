@@ -1,0 +1,39 @@
+{
+  "cases": [
+    {
+      "name": "dev_null",
+      "args": ["/dev/null"],
+      "stdout": "null",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "current_dir",
+      "args": ["."],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "l_flag",
+      "args": ["-l", "/dev/null"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "nonexistent",
+      "args": ["/nonexistent_ls_test_xyz"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    }
+  ]
+}

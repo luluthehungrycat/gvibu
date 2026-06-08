@@ -1,0 +1,11 @@
+{
+  "cases": [
+    {
+      "name": "prints_loginname",
+      "args": [],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}
