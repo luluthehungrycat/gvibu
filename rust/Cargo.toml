@@ -1,11 +1,26 @@
 [package]
 name = "gvibu"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
-description = "Unix-style multicall utility suite"
+description = "Unix-style multicall utility suite (58 commands)"
+keywords = ["coreutils", "unix", "multicall", "busybox", "wasi"]
+categories = ["command-line-utilities"]
+repository = "https://github.com/luluthehungrycat/gvibu-ai-lab"
+license = "MIT"
 
 [[bin]]
 name = "gvibu"
 path = "src/main.rs"
 
+[lib]
+name = "gvibu"
+path = "src/lib.rs"
+
 [dependencies]
+libc = "0.2"
+rand = "0.8"
+regex = "1"
+chrono = "0.4"
+
+[dev-dependencies]
+proptest = "1"

@@ -1,19 +1,19 @@
-mod commands;
-
+use gvibu::commands;
 use std::env;
+use std::io;
 use std::process;
 
-fn resolve_command<'a>(argv0_basename: &str, args: &'a [String]) -> Option<(&'a String, &'a [String])> {
-    // Symlink mode: argv0 is the command name
+fn resolve_command<'a>(argv0_basename: &'a str, args: &'a [String]) -> Option<(&'a str, &'a [String])> {
+    // Symlink mode: argv0 basename is the command name
     if commands::lookup(argv0_basename).is_some() {
-        return Some((&args[0], &args[1..]));
+        return Some((argv0_basename, &args[1..]));
     }
 
     // Subcommand mode: argv0 is the binary name, args[1] is the command
     if commands::BINARY_NAMES.contains(&argv0_basename.as_ref()) && args.len() > 1 {
         let cmd_name = &args[1];
         if commands::lookup(cmd_name).is_some() {
-            return Some((cmd_name, &args[2..]));
+            return Some((cmd_name.as_str(), &args[2..]));
         }
     }
 
@@ -38,7 +38,7 @@ fn main() {
     };
 
     if let Some(cmd) = commands::lookup(cmd_name) {
-        let exit_code = (cmd.run)(run_args);
+        let exit_code = (cmd.run)(&mut io::stdout(), run_args);
         process::exit(exit_code);
     } else {
         eprintln!("gvibu: {}: command not found", cmd_name);
