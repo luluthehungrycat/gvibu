@@ -1,6 +1,6 @@
 .PHONY: build test clean
 
-CARGO := $(HOME)/.cargo/bin/cargo
+CARGO := $(shell which cargo 2>/dev/null || echo $(HOME)/.cargo/bin/cargo)
 
 build:
 	$(CARGO) build

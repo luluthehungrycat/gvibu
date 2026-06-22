@@ -8,8 +8,8 @@
         vibix-printenv vibix-cat
 
 PYTHON   := python3
-CARGO    := $(HOME)/.cargo/bin/cargo
-WASM_PACK := $(HOME)/.cargo/bin/wasm-pack
+CARGO    := $(shell which cargo 2>/dev/null || echo $(HOME)/.cargo/bin/cargo)
+WASM_PACK := $(shell which wasm-pack 2>/dev/null || echo $(HOME)/.cargo/bin/wasm-pack)
 NASM     := nasm
 
 all: python-build rust-build
