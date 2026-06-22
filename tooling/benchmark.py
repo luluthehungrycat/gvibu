@@ -60,19 +60,8 @@ def find_rust_binary():
     return None
 
 
-def time_impl(cmd_base: str, args: list[str], stdin_data: bytes | None, repeat: int) -> float:
-    """Run a command `repeat` times and return total wall time in seconds."""
-    total = 0.0
-    for _ in range(repeat):
-        proc = subprocess.run(
-            [cmd_base] + args,
-            input=stdin_data,
-            capture_output=True,
-            timeout=30,
-        )
-        total += proc.time or 0.0
-
-    # Use manual timing for more precision
+def time_impl(cmd_base: str, args: list[str], stdin_data: bytes | None, repeat: int) -> tuple[float, int]:
+    """Run a command `repeat` times and return (elapsed_seconds, successful_runs)."""
     start = time.perf_counter()
     repeat_actual = 0
     for _ in range(repeat):
@@ -85,7 +74,7 @@ def time_impl(cmd_base: str, args: list[str], stdin_data: bytes | None, repeat: 
         if proc.returncode == 0:
             repeat_actual += 1
         if _ == 0:
-            # Warmup - don't count first run
+            # Warmup — don't count first run
             start = time.perf_counter()
     elapsed = time.perf_counter() - start
     return elapsed, repeat_actual
