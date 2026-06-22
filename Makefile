@@ -7,9 +7,10 @@
         vibix-echo vibix-echocmd vibix-true vibix-false vibix-yes vibix-clear \
         vibix-printenv vibix-cat
 
-PYTHON := python3
-CARGO := $(HOME)/.cargo/bin/cargo
-NASM  := nasm
+PYTHON   := python3
+CARGO    := $(HOME)/.cargo/bin/cargo
+WASM_PACK := $(HOME)/.cargo/bin/wasm-pack
+NASM     := nasm
 
 all: python-build rust-build
 
@@ -47,11 +48,11 @@ wasm-test: wasm-build
 	wasmtime rust/target/wasm32-wasi/release/gvibu.wasm false && echo "FAIL: false" || echo "PASS: false (exit 1)"
 
 wasm-browser-build:
-	@if ! command -v wasm-pack >/dev/null 2>&1; then \
-		echo "wasm-pack not found. Install it: cargo install wasm-pack"; \
+	@if ! test -x $(WASM_PACK); then \
+		echo "wasm-pack not found at $(WASM_PACK). Install it: cargo install wasm-pack"; \
 		exit 1; \
 	fi
-	wasm-pack build wasm-lib --target web --out-dir pkg
+	$(WASM_PACK) build wasm-lib --target web --out-dir pkg
 	@echo ""
 	@echo "WASM browser build complete."
 	@echo "Open wasm-lib/demo/index.html in a browser (serve via HTTP, not file://)"
