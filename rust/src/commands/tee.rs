@@ -1,7 +1,7 @@
 use std::fs::{File, OpenOptions};
 use std::io::{self, BufRead, Write};
 
-pub fn run(args: &[String]) -> i32 {
+pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut append = false;
     let mut files: Vec<String> = Vec::new();
 
@@ -20,9 +20,6 @@ pub fn run(args: &[String]) -> i32 {
     }
 
     let mut outputs: Vec<Box<dyn Write>> = Vec::new();
-
-    // Always write to stdout
-    outputs.push(Box::new(io::stdout()));
 
     // Open output files
     let mut exit_code = 0;
@@ -57,6 +54,9 @@ pub fn run(args: &[String]) -> i32 {
                         exit_code = 1;
                     }
                 }
+                if let Err(_e) = writeln!(w, "{}", l) {
+                    return 1;
+                }
             }
             Err(e) => {
                 eprintln!("tee: read error: {}", e);
@@ -69,6 +69,7 @@ pub fn run(args: &[String]) -> i32 {
     for out in outputs.iter_mut() {
         let _ = out.flush();
     }
+    let _ = w.flush();
 
     exit_code
 }
@@ -79,11 +80,11 @@ mod tests {
 
     #[test]
     fn test_tee_invalid_option() {
-        assert_eq!(run(&["-x".into()]), 1);
+        assert_eq!(run(&mut std::io::sink(), &["-x".into()]), 1);
     }
 
     #[test]
     fn test_tee_append_flag() {
-        assert_eq!(run(&["-a".into()]), 0);
+        assert_eq!(run(&mut std::io::sink(), &["-a".into()]), 0);
     }
 }

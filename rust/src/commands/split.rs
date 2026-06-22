@@ -1,9 +1,8 @@
 /// split: split a file into pieces.
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
-use std::path::Path;
 
-pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
+pub fn run(_w: &mut dyn Write, args: &[String]) -> i32 {
     let mut lines: i64 = -1; // default 1000 lines
     let mut bytes: i64 = -1;
     let mut numeric = false;
@@ -13,7 +12,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = args[i].as_str();
-        if arg == "--" { i += 1; break; }
+        if arg == "--" { break; }
         if arg == "-d" {
             numeric = true;
         } else if arg == "-a" {

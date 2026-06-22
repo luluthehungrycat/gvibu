@@ -1,6 +1,8 @@
 /// join: join lines of two files on a common field.
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
+use crate::pwrite;
+use crate::pwriteln;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut field: usize = 1;
@@ -9,7 +11,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { i += 1; break; }
+        if arg == "--" { break; }
         if arg == "-j" {
             i += 1;
             if i >= args.len() {
@@ -115,6 +117,6 @@ mod tests {
 
     #[test]
     fn test_join_one_arg() {
-        assert_eq!(run(&mut sink(), &["file1"]), 1);
+        assert_eq!(run(&mut sink(), &["file1".into()]), 1);
     }
 }

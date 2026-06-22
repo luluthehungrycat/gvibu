@@ -1,5 +1,7 @@
 /// id: print user identity.
 use std::io::Write;
+use crate::pwrite;
+use crate::pwriteln;
 
 fn get_uid() -> u32 {
     unsafe { libc::getuid() }
@@ -168,7 +170,7 @@ mod tests {
     }
 
     #[test]
-    fn test_id_G_flag() {
+    fn test_id_cap_g_flag() {
         assert_eq!(run(&mut std::io::sink(), &["-G".into()]), 0);
     }
 
@@ -178,7 +180,7 @@ mod tests {
     }
 
     #[test]
-    fn test_id_n_without_ugG() {
+    fn test_id_n_without_ug_g() {
         assert_eq!(run(&mut std::io::sink(), &["-n".into()]), 1);
     }
 }

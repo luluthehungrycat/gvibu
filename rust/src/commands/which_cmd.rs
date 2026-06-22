@@ -1,9 +1,10 @@
 /// which: locate a command by searching PATH.
 use std::env;
 use std::fs;
+use std::io::Write;
 use std::os::unix::fs::PermissionsExt;
 
-pub fn run(args: &[String]) -> i32 {
+pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     if args.is_empty() {
         return 1;
     }
@@ -21,7 +22,7 @@ pub fn run(args: &[String]) -> i32 {
                     let perms = metadata.permissions();
                     // Check if executable by owner
                     if perms.mode() & 0o111 != 0 {
-                        println!("{}", full_path);
+                        if let Err(_e) = writeln!(w, "{}", full_path) { return 1; }
                         found = true;
                         break;
                     }

@@ -1,6 +1,7 @@
 /// nl: number lines of files.
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
+use crate::pwriteln;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut files: Vec<String> = Vec::new();
@@ -9,7 +10,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { i += 1; break; }
+        if arg == "--" { break; }
         if arg == "-v" {
             i += 1;
             if i >= args.len() {

@@ -10,4 +10,3 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 gvibu = { path = "../rust" }
 wasm-bindgen = "0.2"
-libc = "0.2"

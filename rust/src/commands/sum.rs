@@ -1,6 +1,7 @@
 /// sum: compute BSD 16-bit checksum and block count.
 use std::fs;
 use std::io::Write;
+use crate::pwriteln;
 
 const BLOCK_SIZE: usize = 1024;
 

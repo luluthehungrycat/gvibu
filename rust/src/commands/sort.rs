@@ -3,6 +3,7 @@
 /// -k POS1[,POS2] (key sort with optional n/r modifiers)
 use std::fs;
 use std::io::{self, BufRead, Write};
+use crate::pwriteln;
 
 fn read_lines(files: &[String]) -> Vec<String> {
     let mut lines = Vec::new();
@@ -170,11 +171,11 @@ fn extract_key(line: &str, spec: &KeySpec) -> String {
     }
 
     // Single field case
-    if end_field.map_or(true, |ef| ef == start_field) {
+    if end_field.map_or(false, |ef| ef == start_field) {
         let field = fields[start_field];
         let start_char = (spec.char1.saturating_sub(1)).min(field.len());
         let limit = match spec.char2 {
-            Some(c) if end_field.is_some() => c.saturating_sub(1).min(field.len()),
+            Some(c) if end_field.is_some() => c.min(field.len()),
             _ => field.len(),
         };
         if start_char >= limit {
@@ -195,7 +196,7 @@ fn extract_key(line: &str, spec: &KeySpec) -> String {
             out.push_str(&f[start_char..]);
         } else if idx == end {
             let limit = match spec.char2 {
-                Some(c) => c.saturating_sub(1).min(f.len()),
+                Some(c) => c.min(f.len()),
                 None => f.len(),
             };
             out.push_str(&f[..limit]);
@@ -217,7 +218,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { i += 1; break; }
+        if arg == "--" { break; }
         if arg == "-r" {
             reverse = true;
         } else if arg == "-n" {
@@ -248,7 +249,8 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                     'f' => fold_case = true,
                     'k' => {
                         // Combined like -k2 (no space before value)
-                        let spec = &arg[arg.find('k').unwrap() + 1..];
+                        // safe: arg contains 'k' because we matched on it at the 'k' arm
+                        let spec = &arg[arg.find('k').expect("sort -k: 'k' not found in arg") + 1..];
                         if spec.is_empty() {
                             eprintln!("sort: option requires an argument: -k");
                             return 1;
@@ -334,7 +336,22 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         }
 
         // Fall back to whole line comparison
-        let cmp = if fold_case {
+        let cmp = if numeric {
+            let an = numeric_prefix(&a.1);
+            let bn = numeric_prefix(&b.1);
+            match (an, bn) {
+                (Some(na), Some(nb)) => na.partial_cmp(&nb).unwrap_or(std::cmp::Ordering::Equal),
+                (Some(_), None) => std::cmp::Ordering::Less,
+                (None, Some(_)) => std::cmp::Ordering::Greater,
+                (None, None) => {
+                    if fold_case {
+                        a.1.to_lowercase().cmp(&b.1.to_lowercase())
+                    } else {
+                        a.1.cmp(&b.1)
+                    }
+                }
+            }
+        } else if fold_case {
             a.1.to_lowercase().cmp(&b.1.to_lowercase())
         } else {
             a.1.cmp(&b.1)
@@ -482,16 +499,16 @@ mod tests {
 
     #[test]
     fn test_sort_key_flag() {
-        assert_eq!(run(&mut std::io::sink(), &["-k", "2", "/dev/null".into()]), 0);
+        assert_eq!(run(&mut std::io::sink(), &["-k".into(), "2".into(), "/dev/null".into()]), 0);
     }
 
     #[test]
     fn test_sort_key_invalid() {
-        assert_eq!(run(&mut std::io::sink(), &["-k", "abc"]), 1);
+        assert_eq!(run(&mut std::io::sink(), &["-k".into(), "abc".into()]), 1);
     }
 
     #[test]
     fn test_sort_key_missing_arg() {
-        assert_eq!(run(&mut std::io::sink(), &["-k"]), 1);
+        assert_eq!(run(&mut std::io::sink(), &["-k".into()]), 1);
     }
 }

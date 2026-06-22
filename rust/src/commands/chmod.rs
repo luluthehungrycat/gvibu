@@ -19,43 +19,67 @@ fn parse_symbolic(s: &str) -> Option<(char, char, u32)> {
     // Returns (who, op, perm_bits)
     // who: u/g/o/a, op: +=-, perm_bits: r=4 w=2 x=1
     let mut chars = s.chars().peekable();
-    let who = match chars.next()? {
-        'u' | 'g' | 'o' | 'a' => chars.next()?,
-        _ => return None,
-    };
-    let op = who;
-    let who_actual = s.chars().next()?;
 
-    let mut perm_str = String::new();
-    for ch in chars {
-        if ch == 'r' || ch == 'w' || ch == 'x' || ch == 'X' || ch == 's' || ch == 't' {
-            perm_str.push(ch);
-        } else {
-            return None;
+    // Collect who characters (can be multiple like "go", "ugo")
+    let mut who_str = String::new();
+    while let Some(&ch) = chars.peek() {
+        match ch {
+            'u' | 'g' | 'o' | 'a' => {
+                who_str.push(ch);
+                chars.next();
+            }
+            _ => break,
         }
     }
 
+    if who_str.is_empty() {
+        return None;
+    }
+
+    let op = chars.next()?;
+    if op != '+' && op != '-' && op != '=' {
+        return None;
+    }
+
     let mut perm_bits = 0u32;
-    for ch in perm_str.chars() {
+    for ch in chars {
         match ch {
             'r' => perm_bits |= 0b100,
             'w' => perm_bits |= 0b010,
             'x' => perm_bits |= 0b001,
-            _ => {} // X, s, t — ignore for simplicity
+            'X' | 's' | 't' => {} // ignore for simplicity
+            _ => return None,
         }
     }
 
     // Expand who to the appropriate bits
-    let expanded = match who_actual {
-        'u' => perm_bits << 6, // owner
-        'g' => perm_bits << 3, // group
-        'o' => perm_bits,       // other
-        'a' => (perm_bits << 6) | (perm_bits << 3) | perm_bits, // all
-        _ => return None,
+    let (who_char, expanded_bits) = if who_str == "a" || who_str.len() > 1 {
+        let mut bits = 0u32;
+        for wch in who_str.chars() {
+            match wch {
+                'u' => bits |= perm_bits << 6,
+                'g' => bits |= perm_bits << 3,
+                'o' => bits |= perm_bits,
+                'a' => bits |= (perm_bits << 6) | (perm_bits << 3) | perm_bits,
+                _ => {}
+            }
+        }
+        ('a', bits)
+    } else {
+        let ch = who_str.chars().next().unwrap();
+        let bits = match ch {
+            'u' => perm_bits << 6,
+            'g' => perm_bits << 3,
+            'o' => perm_bits,
+            'a' => (perm_bits << 6) | (perm_bits << 3) | perm_bits,
+            _ => unreachable!(),
+        };
+        (ch, bits)
     };
 
-    Some((who_actual, op, expanded))
+    Some((who_char, op, expanded_bits))
 }
+
 
 fn apply_mode_change(current: u32, who: char, op: char, bits: u32) -> u32 {
     let who_bits = match who {
@@ -105,7 +129,7 @@ fn chmod_recursive(path: &str, mode: u32, verbose: bool) -> i32 {
     exit_code
 }
 
-pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
+pub fn run(_w: &mut dyn Write, args: &[String]) -> i32 {
     if args.is_empty() {
         eprintln!("chmod: missing operand");
         return 1;
@@ -119,7 +143,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { i += 1; break; }
+        if arg == "--" { break; }
         if arg == "-R" {
             recursive = true;
         } else if arg == "-v" {
@@ -196,9 +220,9 @@ mod tests {
         assert_eq!(bits, 0o100);
 
         let (who, op, bits) = parse_symbolic("go-w").unwrap();
-        assert_eq!(who, 'g');
+        assert_eq!(who, 'a');
         assert_eq!(op, '-');
-        assert_eq!(bits, 0o010);
+        assert_eq!(bits, 0o022);
 
         let (who, op, bits) = parse_symbolic("a+r").unwrap();
         assert_eq!(who, 'a');

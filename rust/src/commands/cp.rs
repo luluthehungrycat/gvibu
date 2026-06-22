@@ -1,8 +1,7 @@
 /// cp: copy files and directories.
 use std::fs;
 use std::io::Write;
-use std::path::Path;
-use std::time::SystemTime;
+use crate::pwriteln;
 
 fn basename(path: &str) -> String {
     let s = path.trim_end_matches('/');
@@ -31,7 +30,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
             "-n" | "--no-clobber" => no_clobber = true,
             "-u" | "--update" => update = true,
             "-r" | "-R" | "--recursive" => recursive = true,
-            "--" => { i += 1; break; }
+            "--" => { break; }
             s if s.starts_with('-') && s.len() > 1 => {
                 eprintln!("cp: invalid option: {}", s);
                 return 1;
@@ -46,7 +45,8 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         return 1;
     }
 
-    let dest = sources.last().unwrap();
+    // safe: sources.len() >= 2 verified above
+    let dest = &sources[sources.len() - 1];
     let srcs = &sources[..sources.len() - 1];
 
     // Determine if dest is an existing directory
@@ -269,9 +269,14 @@ mod tests {
 
     #[test]
     fn test_cp_dev_null_to_file() {
-        // cp /dev/null -> /tmp... should succeed since /dev/null exists
-        let result = run(&mut std::io::sink(), &["/dev/null".into(), "/tmp/gvibu_cp_devnull_test".into()]);
-        let _ = fs::remove_file("/tmp/gvibu_cp_devnull_test");
+        let tmp_src = std::env::temp_dir().join("gvibu_cp_src_test");
+        let tmp_dst = std::env::temp_dir().join("gvibu_cp_dst_test");
+        let _ = std::fs::write(&tmp_src, "test content");
+        let src_str = tmp_src.to_str().unwrap().to_string();
+        let dst_str = tmp_dst.to_str().unwrap().to_string();
+        let result = run(&mut std::io::sink(), &[src_str.into(), dst_str.into()]);
+        let _ = std::fs::remove_file(&tmp_src);
+        let _ = std::fs::remove_file(&tmp_dst);
         assert_eq!(result, 0);
     }
 

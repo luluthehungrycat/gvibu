@@ -1,7 +1,6 @@
 /// chown: change file owner and group.
 use std::fs;
 use std::io::Write;
-use std::os::unix::fs::MetadataExt;
 
 fn parse_owner(s: &str) -> (Option<u32>, Option<u32>) {
     // Format: [USER][:][GROUP]
@@ -105,7 +104,7 @@ fn chown_recursive(path: &str, uid: Option<u32>, gid: Option<u32>, verbose: bool
     exit_code
 }
 
-pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
+pub fn run(_w: &mut dyn Write, args: &[String]) -> i32 {
     if args.is_empty() {
         eprintln!("chown: missing operand");
         return 1;
@@ -119,7 +118,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { i += 1; break; }
+        if arg == "--" { break; }
         if arg == "-R" {
             recursive = true;
         } else if arg == "-v" {

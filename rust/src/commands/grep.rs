@@ -3,6 +3,7 @@ use regex::Regex;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
 use std::path::Path;
+use crate::pwriteln;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut ignore_case = false;
@@ -23,7 +24,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
             "-c" | "--count" => count = true,
             "-n" | "--line-number" => line_numbers = true,
             "-l" | "--files-with-matches" => files_with_matches = true,
-            "--" => { i += 1; break; }
+            "--" => { break; }
             s if s.starts_with('-') && s.len() > 1 => {
                 // Handle bundled flags like -iv
                 for c in s[1..].chars() {
@@ -44,9 +45,9 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
             }
             p => {
                 if pattern_str.is_none() && !p.starts_with('-') {
-                    pattern_str = Some(p.clone());
+                    pattern_str = Some(p.to_string());
                 } else {
-                    paths.push(p.clone());
+                    paths.push(p.to_string());
                 }
             }
         }
@@ -143,10 +144,10 @@ fn grep_dir(
                 if path.is_dir() {
                     exit_code |= grep_dir(w, re, invert, count, line_numbers, files_with_matches, &path, show_filename);
                 } else if path.is_file() {
-                    let filename = if show_filename { Some(path.to_string_lossy().as_ref()) } else { None };
+                    let filename = if show_filename { Some(path.to_string_lossy().into_owned()) } else { None };
                     match File::open(&path) {
                         Ok(f) => {
-                            let result = grep_reader(w, re, invert, count, line_numbers, files_with_matches, filename, BufReader::new(f));
+                            let result = grep_reader(w, re, invert, count, line_numbers, files_with_matches, filename.as_deref(), BufReader::new(f));
                             if result == 0 {
                                 exit_code = 0;
                             }
@@ -239,19 +240,19 @@ mod tests {
     #[test]
     fn test_grep_no_match_stdin() {
         // With no stdin, pattern won't match
-        let result = run(&mut std::io::sink(), &["xyz"]);
+        let result = run(&mut std::io::sink(), &["xyz".into()]);
         assert_eq!(result, 1);
     }
 
     #[test]
     fn test_grep_invalid_option() {
-        let result = run(&mut std::io::sink(), &["-x", "pattern"]);
+        let result = run(&mut std::io::sink(), &["-x".into(), "pattern".into()]);
         assert_eq!(result, 1);
     }
 
     #[test]
     fn test_grep_invalid_pattern() {
-        let result = run(&mut std::io::sink(), &["[invalid"]);
+        let result = run(&mut std::io::sink(), &["[invalid".into()]);
         assert_eq!(result, 1);
     }
 }

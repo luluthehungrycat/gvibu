@@ -37,7 +37,7 @@ fn get_uptime_seconds() -> u64 {
     now_secs.saturating_sub(boot_secs)
 }
 
-pub fn run(stdout: &mut dyn Write, _args: &[String]) -> i32 {
+pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let seconds = get_uptime_seconds();
     let days = seconds / 86400;
     let hours = (seconds % 86400) / 3600;

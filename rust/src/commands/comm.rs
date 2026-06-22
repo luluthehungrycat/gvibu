@@ -3,6 +3,7 @@
 ///         column 3 = lines common to both.
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
+use crate::pwriteln;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut flag1 = true; // suppress col 1
@@ -93,7 +94,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                 if flag1 {
                     pwriteln!(w, "{}", l1);
                 }
-                line2 = None; // keep consuming l1
+                // keep consuming l1
                 // Continue reading remaining lines1
                 for line in &mut lines1 {
                     match line {
@@ -111,7 +112,6 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                 if flag2 {
                     pwriteln!(w, "\t{}", l2);
                 }
-                line1 = None;
                 for line in &mut lines2 {
                     match line {
                         Ok(l) => {
@@ -169,14 +169,14 @@ mod tests {
     #[test]
     fn test_comm_one_arg() {
         let mut buf = Vec::new();
-        let code = run(&mut buf, &["/dev/null"]);
+        let code = run(&mut buf, &["/dev/null".into()]);
         assert_eq!(code, 1);
     }
 
     #[test]
     fn test_comm_invalid_option() {
         let mut buf = Vec::new();
-        let code = run(&mut buf, &["-x", "/dev/null", "/dev/null"]);
+        let code = run(&mut buf, &["-x".into(), "/dev/null".into(), "/dev/null".into()]);
         assert_eq!(code, 1);
     }
 }

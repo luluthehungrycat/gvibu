@@ -272,7 +272,7 @@ proptest! {
 proptest! {
     #[test]
     fn fuzz_seq_three_args(a in -10i32..=10, step in -5i32..=5, b in -10i32..=10) {
-        if step == 0 { return (); } // skip zero step, handled separately
+        if step == 0 { return Ok(()); } // skip zero step, handled separately
         let (code, _, _) = run(&["seq", &a.to_string(), &step.to_string(), &b.to_string()]);
         assert!(code == 0 || code == 1,
             "seq should only exit 0 or 1, got {} for seq {} {} {}", code, a, step, b);
@@ -331,7 +331,7 @@ proptest! {
         // Reading stdin and immediately outputting should preserve content
         let (code, out, _) = run_with_stdin(&["cat"], content);
         assert_eq!(code, 0, "cat should not crash");
-        assert_eq!(out, content, "cat stdin should preserve content exactly");
+        assert_eq!(&out, content, "cat stdin should preserve content exactly");
     }
 }
 
@@ -388,7 +388,7 @@ proptest! {
 proptest! {
     #[test]
     fn fuzz_date_flag_no_crash(flag in proptest::prop_oneof!["-u", "-R", "-I"]) {
-        let (code, _, _) = run(&["date", flag]);
+        let (code, _, _) = run(&["date", &*flag]);
         assert_eq!(code, 0, "date {} should succeed", flag);
     }
 }
@@ -472,7 +472,7 @@ proptest! {
     fn fuzz_split_concat_roundtrip(ref content in ".{0,200}") {
         // Only test non-empty content with a trailing newline (typical file)
         if content.is_empty() || !content.ends_with('\n') {
-            return ();
+            return Ok(());
         }
         let dir = std::env::temp_dir().join(format!("gvibu_fuzz_split_{}", std::process::id()));
         let _ = std::fs::create_dir_all(&dir);

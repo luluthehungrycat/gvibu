@@ -12,7 +12,7 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { i += 1; break; }
+        if arg == "--" { break; }
         if arg == "-s" {
             symbolic = true;
         } else if arg == "-f" {

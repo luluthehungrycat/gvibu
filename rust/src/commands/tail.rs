@@ -10,7 +10,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
 
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { i += 1; break; }
+        if arg == "--" { break; }
         if arg == "-n" {
             i += 1;
             if i >= args.len() {

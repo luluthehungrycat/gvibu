@@ -127,7 +127,7 @@ mod platform {
                     remaining -= md;
                 }
                 let d = remaining + 1;
-                let months_short = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                let _months_short = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
                 let _ = writeln!(stdout, "{:<8} {:<12} {}-{:02}-{:02} {:02}:{:02}:{:02} ({})",
                     user, line, y, m + 1, d, hours, minutes, seconds, host);
             } else {
@@ -215,7 +215,7 @@ mod platform {
                         remaining -= md;
                     }
                     let d = remaining + 1;
-                    let months_short = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                    let _months_short = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
                     let _ = writeln!(stdout, "{:<8} {:<12} {}-{:02}-{:02} {:02}:{:02}:{:02} ({})",
                         user, line, y, m + 1, d, hours, minutes, seconds, host);
                 } else {

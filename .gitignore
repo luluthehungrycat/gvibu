@@ -11,3 +11,4 @@ rust/target/
 wasm-lib/pkg/
 wasm-lib/target/
 .gvibu/
+.claude/

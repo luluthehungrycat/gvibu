@@ -1,6 +1,7 @@
 /// tac: concatenate and write files in reverse.
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
+use crate::pwriteln;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut files: Vec<String> = Vec::new();

@@ -8,7 +8,7 @@ fn parse_args(args: &[String]) -> Result<(i64, i64, i64, String, bool), i32> {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { i += 1; break; }
+        if arg == "--" { break; }
         if arg == "-w" {
             equal_width = true;
             i += 1;
@@ -21,6 +21,12 @@ fn parse_args(args: &[String]) -> Result<(i64, i64, i64, String, bool), i32> {
             separator = args[i].clone();
             i += 1;
         } else if arg.starts_with('-') && arg.len() > 1 {
+            // Check if it is a negative number (all remaining chars are digits)
+            if arg[1..].chars().all(|c| c.is_ascii_digit()) {
+                pos_args.push(arg);
+                i += 1;
+                continue;
+            }
             // Combined flags like -ws
             for (j, ch) in arg[1..].chars().enumerate() {
                 match ch {

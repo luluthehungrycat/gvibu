@@ -1,5 +1,6 @@
 /// yes: output a string repeatedly.
-use std::io::{self, Write};
+use std::io::Write;
+use crate::pwriteln;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let text = if args.is_empty() {
@@ -12,5 +13,5 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         pwriteln!(w, "{}", text);
     }
 
-    0
+    
 }

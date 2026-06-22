@@ -53,8 +53,8 @@ fn parse_num(s: &str) -> Option<i64> {
 }
 
 enum Token {
-    Unary(&'static str, String),
-    Binary(String, &'static str, String),
+    Unary(String, String),
+    Binary(String, String, String),
     Not,
 }
 
@@ -72,7 +72,7 @@ fn tokenize(args: &[String]) -> Result<Vec<Token>, String> {
                 if i + 1 >= args.len() {
                     return Err(format!("test: missing argument after '{}'", arg));
                 }
-                tokens.push(Token::Unary(arg.as_str(), args[i + 1].clone()));
+                tokens.push(Token::Unary(arg.to_string(), args[i + 1].clone()));
                 i += 2;
             }
             "=" | "!=" | "-eq" | "-ne" | "-lt" | "-le" | "-gt" | "-ge" => {
@@ -86,7 +86,7 @@ fn tokenize(args: &[String]) -> Result<Vec<Token>, String> {
                             return Err(format!("test: missing argument after '{}'", arg));
                         }
                         let right = args[i + 1].clone();
-                        tokens.push(Token::Binary(val, arg.as_str(), right));
+                        tokens.push(Token::Binary(val, arg.to_string(), right));
                         i += 2;
                     }
                     Some(Token::Not) => {
@@ -99,7 +99,7 @@ fn tokenize(args: &[String]) -> Result<Vec<Token>, String> {
             }
             _ => {
                 // Plain string — treat as unary -n
-                tokens.push(Token::Unary("-n", arg.clone()));
+                tokens.push(Token::Unary("-n".to_string(), arg.clone()));
                 i += 1;
             }
         }
@@ -167,7 +167,7 @@ fn eval_tokens(tokens: &[Token]) -> Result<bool, String> {
     Ok(result)
 }
 
-pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
+pub fn run(_w: &mut dyn Write, args: &[String]) -> i32 {
     if args.is_empty() {
         eprintln!("test: missing operand");
         return 1;
@@ -252,7 +252,7 @@ mod tests {
         assert_eq!(tokens.len(), 1);
         match &tokens[0] {
             Token::Unary(op, val) => {
-                assert_eq!(*op, "-n");
+                assert_eq!(op.as_str(), "-n");
                 assert_eq!(val, "hello");
             }
             _ => panic!("expected Unary"),
@@ -267,7 +267,7 @@ mod tests {
         match &tokens[0] {
             Token::Binary(left, op, right) => {
                 assert_eq!(left, "a");
-                assert_eq!(*op, "=");
+                assert_eq!(op.as_str(), "=");
                 assert_eq!(right, "b");
             }
             _ => panic!("expected Binary"),

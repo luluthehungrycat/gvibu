@@ -1,6 +1,8 @@
 /// echo: print its arguments joined by spaces.
 /// Supports -n (no newline), -e (enable escapes), -E (disable escapes, default).
 use std::io::Write;
+use crate::pwrite;
+use crate::pwriteln;
 
 fn interpret_escapes(s: &str) -> String {
     let mut out = String::with_capacity(s.len());

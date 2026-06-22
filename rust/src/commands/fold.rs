@@ -1,5 +1,6 @@
 /// fold: wrap each input line to fit in specified width.
 use std::io::{self, BufRead, Write};
+use crate::pwriteln;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut width: usize = 80;
@@ -8,7 +9,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { i += 1; break; }
+        if arg == "--" { break; }
         if arg == "-w" {
             i += 1;
             if i >= args.len() {
@@ -90,17 +91,11 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_fold_no_args_stdin() {
         // Should read stdin successfully
-        let mut buf = Vec::new();
-        let result = {
-            // Can't actually test stdin in unit tests without mocking,
-            // but we can verify the function compiles and handles errors.
-            0
-        };
+        let result = 0;
         assert_eq!(result, 0);
     }
 }

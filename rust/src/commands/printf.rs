@@ -1,5 +1,6 @@
 /// printf: format and print data.
 use std::io::Write;
+use crate::pwrite;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     if args.is_empty() {
@@ -17,7 +18,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let len = format_bytes.len();
     let mut i = 0;
     let mut arg_idx = 0;
-    let mut exit_code = 0;
+    let exit_code = 0;
 
     while i < len {
         if format_bytes[i] == b'\\' {
@@ -96,7 +97,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                 }
                 b's' => {
                     if width > 0 && arg.len() < width {
-                        print_padded(w, arg, width);
+                        let _ = print_padded(w, arg, width);
                     } else {
                         pwrite!(w, "{}", arg);
                     }
@@ -176,8 +177,9 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     exit_code
 }
 
-fn print_padded(w: &mut dyn Write, s: &str, width: usize) {
+fn print_padded(w: &mut dyn Write, s: &str, width: usize) -> i32 {
     pwrite!(w, "{:>width$}", s, width = width);
+    0
 }
 
 fn interpret_escapes(s: &str) -> String {

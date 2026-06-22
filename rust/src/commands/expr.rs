@@ -1,14 +1,15 @@
 /// expr: evaluate expressions.
 use std::io::Write;
+use crate::pwriteln;
 
 #[derive(Debug, Clone)]
 enum Token {
     Number(i64),
     String(String),
-    Op(&'static str),
+    Op(String),
     LParen,
     RParen,
-    Keyword(&'static str), // length, substr, index, match
+    Keyword(String), // length, substr, index, match
 }
 
 struct Parser {
@@ -48,7 +49,7 @@ impl Parser {
     // | operator (lowest precedence)
     fn parse_or(&mut self) -> Result<String, String> {
         let mut left = self.parse_and()?;
-        while let Some(Token::Op("|")) = self.peek() {
+        while self.peek().map_or(false, |t| matches!(t, Token::Op(s) if s == "|")) {
             self.next();
             let right = self.parse_and()?;
             // | returns left if non-zero/non-null, else right
@@ -64,7 +65,7 @@ impl Parser {
     // & operator
     fn parse_and(&mut self) -> Result<String, String> {
         let mut left = self.parse_cmp()?;
-        while let Some(Token::Op("&")) = self.peek() {
+        while self.peek().map_or(false, |t| matches!(t, Token::Op(s) if s == "&")) {
             self.next();
             let right = self.parse_cmp()?;
             // & returns left if both non-zero/non-null, else 0
@@ -80,12 +81,12 @@ impl Parser {
     // Comparison operators: = != < <= > >=
     fn parse_cmp(&mut self) -> Result<String, String> {
         let left = self.parse_arith()?;
-        if let Some(Token::Op(op)) = self.peek() {
-            match *op {
+        if let Some(Token::Op(op)) = self.peek().cloned() {
+            match op.as_str() {
                 "=" | "!=" | "<" | "<=" | ">" | ">=" => {
                     self.next();
                     let right = self.parse_arith()?;
-                    return Ok(compare_str(&left, op, &right));
+                    return Ok(compare_str(&left, &op, &right));
                 }
                 _ => {}
             }
@@ -96,12 +97,12 @@ impl Parser {
     // Addition/subtraction
     fn parse_arith(&mut self) -> Result<String, String> {
         let mut left = self.parse_term()?;
-        while let Some(Token::Op(op)) = self.peek() {
-            match *op {
+        while let Some(Token::Op(op)) = self.peek().cloned() {
+            match op.as_str() {
                 "+" | "-" => {
                     self.next();
                     let right = self.parse_term()?;
-                    left = arith_op(&left, op, &right)?;
+                    left = arith_op(&left, &op, &right)?;
                 }
                 _ => break,
             }
@@ -113,16 +114,13 @@ impl Parser {
     fn parse_term(&mut self) -> Result<String, String> {
         let mut left = self.parse_factor()?;
         loop {
-            match self.peek() {
-                Some(Token::Op("*")) | Some(Token::Op("/")) | Some(Token::Op("%")) => {
-                    let op = match self.next().unwrap() {
-                        Token::Op(o) => o,
-                        _ => unreachable!(),
-                    };
+            match self.peek().cloned() {
+                Some(Token::Op(op)) if matches!(op.as_str(), "*" | "/" | "%") => {
+                    self.next();
                     let right = self.parse_factor()?;
                     left = arith_op(&left, &op, &right)?;
                 }
-                Some(Token::Op(":")) => {
+                Some(Token::Op(op)) if op == ":" => {
                     self.next();
                     let right = self.parse_factor()?;
                     left = regex_match(&left, &right);
@@ -135,13 +133,13 @@ impl Parser {
 
     // Primary expressions: number, string, parenthesized, keyword functions
     fn parse_factor(&mut self) -> Result<String, String> {
-        match self.peek() {
-            Some(Token::Keyword("length")) => {
+        match self.peek().cloned() {
+            Some(Token::Keyword(k)) if k == "length" => {
                 self.next();
                 let arg = self.parse_factor()?;
                 Ok(arg.len().to_string())
             }
-            Some(Token::Keyword("substr")) => {
+            Some(Token::Keyword(k)) if k == "substr" => {
                 self.next();
                 let s = self.expect("expected string after substr")?;
                 let pos_str = self.expect("expected position after substr")?;
@@ -156,7 +154,7 @@ impl Parser {
                 let end = std::cmp::min(start + len, s_val.len());
                 Ok(s_val[start..end].to_string())
             }
-            Some(Token::Keyword("index")) => {
+            Some(Token::Keyword(k)) if k == "index" => {
                 self.next();
                 let s = self.expect("expected string after index")?;
                 let chars = self.expect("expected chars after index")?;
@@ -167,7 +165,7 @@ impl Parser {
                     None => Ok("0".to_string()),
                 }
             }
-            Some(Token::Keyword("match")) => {
+            Some(Token::Keyword(k)) if k == "match" => {
                 self.next();
                 let s = self.expect("expected string after match")?;
                 let regex = self.expect("expected regex after match")?;
@@ -190,10 +188,11 @@ impl Parser {
             }
             Some(Token::String(s)) => {
                 self.next();
-                Ok(s.clone())
+                Ok(s)
             }
             Some(Token::RParen) => Err("unexpected closing parenthesis".to_string()),
             Some(Token::Op(o)) => Err(format!("unexpected operator '{}'", o)),
+            Some(Token::Keyword(k)) => Err(format!("unknown keyword '{}'", k)),
             None => Err("missing operand".to_string()),
         }
     }
@@ -333,7 +332,7 @@ fn regex_lite(pattern: &str) -> Result<RegexLite, ()> {
 }
 
 impl RegexLite {
-    fn find(&self, text: &str) -> Option<&str> {
+    fn find<'a>(&self, text: &'a str) -> Option<&'a str> {
         let text_bytes = text.as_bytes();
         let text_len = text_bytes.len();
 
@@ -373,7 +372,10 @@ impl RegexLite {
                 }
                 PatternPiece::DotStar => {
                     // Try to match the rest of the pattern after the dot-star
-                    let remaining = &self.pattern[self.pattern.iter().position(|p| matches!(p, PatternPiece::DotStar)).unwrap() + 1..];
+                    // safe: we're inside the DotStar match arm, so at least one exists
+                    let dotstar_pos = self.pattern.iter().position(|p| matches!(p, PatternPiece::DotStar))
+                        .expect("DotStar pattern piece should exist in DotStar match arm");
+                    let remaining = &self.pattern[dotstar_pos + 1..];
                     if remaining.is_empty() {
                         pos = text.len();
                     } else {
@@ -397,7 +399,6 @@ impl RegexLite {
                                     }
                                     _ => {
                                         // Nested star - skip for now
-                                        test_pos = text.len();
                                         break;
                                     }
                                 }
@@ -430,23 +431,23 @@ fn tokenize(args: &[String]) -> Vec<Token> {
         } else if arg == ")" {
             tokens.push(Token::RParen);
         } else if arg == "|" || arg == "&" {
-            tokens.push(Token::Op(arg.as_str()));
+            tokens.push(Token::Op(arg.to_string()));
         } else if arg == "=" || arg == "!=" {
-            tokens.push(Token::Op(arg.as_str()));
+            tokens.push(Token::Op(arg.to_string()));
         } else if arg == "<" || arg == "<=" || arg == ">" || arg == ">=" {
-            tokens.push(Token::Op(arg.as_str()));
+            tokens.push(Token::Op(arg.to_string()));
         } else if arg == "+" || arg == "-" || arg == "*" || arg == "/" || arg == "%" {
-            tokens.push(Token::Op(arg.as_str()));
+            tokens.push(Token::Op(arg.to_string()));
         } else if arg == ":" {
-            tokens.push(Token::Op(":"));
+            tokens.push(Token::Op(":".to_string()));
         } else if arg == "length" {
-            tokens.push(Token::Keyword("length"));
+            tokens.push(Token::Keyword("length".to_string()));
         } else if arg == "substr" {
-            tokens.push(Token::Keyword("substr"));
+            tokens.push(Token::Keyword("substr".to_string()));
         } else if arg == "index" {
-            tokens.push(Token::Keyword("index"));
+            tokens.push(Token::Keyword("index".to_string()));
         } else if arg == "match" {
-            tokens.push(Token::Keyword("match"));
+            tokens.push(Token::Keyword("match".to_string()));
         } else if let Ok(n) = arg.parse::<i64>() {
             tokens.push(Token::Number(n));
         } else {

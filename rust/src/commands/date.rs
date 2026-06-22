@@ -1,7 +1,8 @@
 /// date: print or set the system date and time.
 use std::io::Write;
+use crate::pwriteln;
 
-use chrono::{DateTime, Datelike, Local, NaiveDate, NaiveDateTime, TimeZone, Timelike, Utc, Weekday};
+use chrono::{DateTime, Datelike, Local, Timelike, Utc};
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut utc = false;
@@ -57,8 +58,11 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     }
 
     // Default format: Mon Jun  8 12:34:56 UTC 2026
-    let local = if utc { now_utc.with_timezone(&Local) } else { now };
-    let default_fmt = local.format("%a %b %e %H:%M:%S %Z %Y").to_string();
+    let default_fmt = if utc {
+        now_utc.format("%a %b %e %H:%M:%S %Z %Y").to_string()
+    } else {
+        now.format("%a %b %e %H:%M:%S %Z %Y").to_string()
+    };
     pwriteln!(w, "{}", default_fmt);
     0
 }
@@ -124,6 +128,7 @@ fn format_custom(dt: &DateTime<Utc>, fmt: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use chrono::TimeZone;
 
     #[test]
     fn test_date_invalid_option() {
@@ -199,7 +204,7 @@ mod tests {
         assert_eq!(format_custom(&dt, "%B"), "June");
         assert_eq!(format_custom(&dt, "%b"), "Jun");
         assert_eq!(format_custom(&dt, "%%"), "%");
-        assert_eq!(format_custom(&dt, "%s"), "1788928496");
+        assert_eq!(format_custom(&dt, "%s"), dt.timestamp().to_string());
         assert_eq!(format_custom(&dt, "%j"), "159");
         assert_eq!(format_custom(&dt, "hello world"), "hello world");
     }

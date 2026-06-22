@@ -2,6 +2,7 @@
 /// Fully streaming: O(1) memory regardless of file size.
 use std::fs::File;
 use std::io::{self, BufReader, Read, Write};
+use crate::pwriteln;
 
 /// Stream-process byte reader counting lines, words, bytes, chars, max line length.
 /// Char counting works on any valid UTF-8 by counting non-continuation bytes.
@@ -61,14 +62,14 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut flag_w = false;
     let mut flag_c = false;
     let mut flag_m = false;
-    let mut flag_L = false;
+    let mut flag_max_line = false;
 
     let mut files: Vec<String> = Vec::new();
     let mut i = 0;
 
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { i += 1; break; }
+        if arg == "--" { break; }
         if arg.starts_with('-') && arg.len() > 1 {
             for ch in arg[1..].chars() {
                 match ch {
@@ -76,7 +77,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                     'w' => flag_w = true,
                     'c' => flag_c = true,
                     'm' => flag_m = true,
-                    'L' => flag_L = true,
+                    'L' => flag_max_line = true,
                     _ => {
                         eprintln!("wc: invalid option: -{}", ch);
                         return 1;
@@ -90,7 +91,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     }
 
     // Default: l, w, c, m (not L)
-    if !flag_l && !flag_w && !flag_c && !flag_m && !flag_L {
+    if !flag_l && !flag_w && !flag_c && !flag_m && !flag_max_line {
         flag_l = true;
         flag_w = true;
         flag_c = true;
@@ -103,7 +104,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         if flag_w { parts.push(format!("{:>7}", words)); }
         if flag_c { parts.push(format!("{:>7}", bytes)); }
         if flag_m { parts.push(format!("{:>7}", chars)); }
-        if flag_L { parts.push(format!("{:>7}", max_line)); }
+        if flag_max_line { parts.push(format!("{:>7}", max_line)); }
         if !name.is_empty() {
             parts.push(name.to_string());
         }
@@ -115,13 +116,13 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut total_w = 0usize;
     let mut total_c = 0usize;
     let mut total_m = 0usize;
-    let mut total_L = 0usize;
+    let mut total_max_line = 0usize;
 
     if files.is_empty() {
         let mut stdin = io::stdin().lock();
         match count_stream(&mut stdin) {
-            Ok((l, w, c, m, max_line)) => {
-                let _ = pwriteln!(w, "{}", fmt(l, w, c, m, max_line, ""));
+            Ok((l, wc, c, m, max_line)) => {
+                let _ = pwriteln!(w, "{}", fmt(l, wc, c, m, max_line, ""));
             }
             Err(e) => {
                 eprintln!("wc: stdin: {}", e);
@@ -135,13 +136,13 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         if fname == "-" {
             let mut stdin = io::stdin().lock();
             match count_stream(&mut stdin) {
-                Ok((l, w, c, m, max_line)) => {
-                    total_l += l;
-                    total_w += w;
-                    total_c += c;
-                    total_m += m;
-                    total_L = total_L.max(max_line);
-                    let _ = pwriteln!(w, "{}", fmt(l, w, c, m, max_line, fname));
+                    Ok((l, wc, c, m, max_line)) => {
+                        total_l += l;
+                        total_w += wc;
+                        total_c += c;
+                        total_m += m;
+                        total_max_line = total_max_line.max(max_line);
+                        let _ = pwriteln!(w, "{}", fmt(l, wc, c, m, max_line, fname));
                 }
                 Err(e) => {
                     eprintln!("wc: stdin: {}", e);
@@ -160,13 +161,13 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         };
         let mut reader = BufReader::new(file);
         match count_stream(&mut reader) {
-            Ok((l, w, c, m, max_line)) => {
-                total_l += l;
-                total_w += w;
-                total_c += c;
-                total_m += m;
-                total_L = total_L.max(max_line);
-                let _ = pwriteln!(w, "{}", fmt(l, w, c, m, max_line, fname));
+                    Ok((l, wc, c, m, max_line)) => {
+                        total_l += l;
+                        total_w += wc;
+                        total_c += c;
+                        total_m += m;
+                        total_max_line = total_max_line.max(max_line);
+                        let _ = pwriteln!(w, "{}", fmt(l, wc, c, m, max_line, fname));
             }
             Err(e) => {
                 eprintln!("wc: {}: {}", fname, e);
@@ -176,7 +177,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     }
 
     if files.len() > 1 {
-        let _ = pwriteln!(w, "{}", fmt(total_l, total_w, total_c, total_m, total_L, "total"));
+        let _ = pwriteln!(w, "{}", fmt(total_l, total_w, total_c, total_m, total_max_line, "total"));
     }
 
     exit_code
@@ -205,7 +206,7 @@ mod tests {
     #[test]
     fn test_count_data_multiline() {
         let result = count_data("a\nbb\nccc\n");
-        assert_eq!(result, (3, 3, 8, 8, 3));
+        assert_eq!(result, (3, 3, 9, 9, 3));
     }
 
     #[test]
@@ -218,16 +219,16 @@ mod tests {
     fn test_count_data_mixed_whitespace() {
         // tabs and spaces as word separators
         let result = count_data("a\tb  c\n");
-        assert_eq!(result, (1, 3, 8, 8, 6));
+        assert_eq!(result, (1, 3, 7, 7, 6));
     }
 
     #[test]
     fn test_count_data_utf8() {
-        // "héllo wörld\n" is 13 bytes but 12 chars
+        // "héllo wörld\n" is 14 bytes, 12 chars, 13 byte max line
         let (l, w, c, m, max_line) = count_data("héllo wörld\n");
         assert_eq!(l, 1);
         assert_eq!(w, 2);
-        assert_eq!(c, 13);
+        assert_eq!(c, 14);
         assert_eq!(m, 12);
         assert_eq!(max_line, 13);
     }
@@ -237,14 +238,14 @@ mod tests {
         let (l, w, c, m, max_line) = count_data("short\nlonger_line\nshort\n");
         assert_eq!(l, 3);
         assert_eq!(w, 3);
-        assert_eq!(c, 25);
-        assert_eq!(m, 21);
-        assert_eq!(max_line, 12);
+        assert_eq!(c, 24);
+        assert_eq!(m, 24);
+        assert_eq!(max_line, 11);
     }
 
     #[test]
     fn test_count_data_max_line_no_trailing_newline() {
-        let (l, w, c, m, max_line) = count_data("short\nlongest");
+        let (l, w, _c, _m, max_line) = count_data("short\nlongest");
         assert_eq!(l, 1);
         assert_eq!(w, 2);
         assert_eq!(max_line, 7, "should be length of 'longest' (7), not 'short' (5)");

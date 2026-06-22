@@ -1,5 +1,6 @@
 /// touch: update file timestamps or create empty files.
 use std::fs;
+use std::fs::FileTimes;
 use std::io::Write;
 
 pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
@@ -16,7 +17,7 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { i += 1; break; }
+        if arg == "--" { break; }
         if arg.starts_with('-') && arg.len() > 1 {
             for ch in arg[1..].chars() {
                 match ch {
@@ -53,17 +54,16 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
         match fs::OpenOptions::new().append(true).create(true).open(fname) {
             Ok(mut file) => {
                 let _ = file.flush();
+                let mut times = FileTimes::new();
                 if flag_a {
-                    if let Err(e) = file.set_accessed(now) {
-                        eprintln!("touch: {}: setting access time: {}", fname, e);
-                        exit_code = 1;
-                    }
+                    times = times.set_accessed(now);
                 }
                 if flag_m {
-                    if let Err(e) = file.set_modified(now) {
-                        eprintln!("touch: {}: setting modification time: {}", fname, e);
-                        exit_code = 1;
-                    }
+                    times = times.set_modified(now);
+                }
+                if let Err(e) = file.set_times(times) {
+                    eprintln!("touch: error setting times: {}", e);
+                    exit_code = 1;
                 }
             }
             Err(e) => {
@@ -92,21 +92,34 @@ mod tests {
 
     #[test]
     fn test_touch_flag_a() {
-        assert_eq!(run(&mut std::io::sink(), &["-a".into(), "/dev/null".into()]), 0);
+        let tmp = std::env::temp_dir().join("gvibu_touch_test_a");
+        let path = tmp.to_str().unwrap().to_string();
+        let _ = std::fs::remove_file(&path);
+        assert_eq!(run(&mut std::io::sink(), &["-a".into(), path.clone().into()]), 0);
+        let _ = std::fs::remove_file(&path);
     }
 
     #[test]
     fn test_touch_flag_m() {
-        assert_eq!(run(&mut std::io::sink(), &["-m".into(), "/dev/null".into()]), 0);
+        let tmp = std::env::temp_dir().join("gvibu_touch_test_m");
+        let path = tmp.to_str().unwrap().to_string();
+        assert_eq!(run(&mut std::io::sink(), &["-m".into(), path.clone().into()]), 0);
+        let _ = std::fs::remove_file(&path);
     }
 
     #[test]
     fn test_touch_flag_am() {
-        assert_eq!(run(&mut std::io::sink(), &["-am".into(), "/dev/null".into()]), 0);
+        let tmp = std::env::temp_dir().join("gvibu_touch_test_am");
+        let path = tmp.to_str().unwrap().to_string();
+        assert_eq!(run(&mut std::io::sink(), &["-am".into(), path.clone().into()]), 0);
+        let _ = std::fs::remove_file(&path);
     }
 
     #[test]
     fn test_touch_no_flags() {
-        assert_eq!(run(&mut std::io::sink(), &["/dev/null".into()]), 0);
+        let tmp = std::env::temp_dir().join("gvibu_touch_test_default");
+        let path = tmp.to_str().unwrap().to_string();
+        assert_eq!(run(&mut std::io::sink(), &[path.clone().into()]), 0);
+        let _ = std::fs::remove_file(&path);
     }
 }

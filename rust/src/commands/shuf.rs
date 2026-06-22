@@ -1,6 +1,7 @@
 /// shuf: randomly permute lines from stdin or a file.
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
+use crate::pwriteln;
 
 use rand::seq::SliceRandom;
 
@@ -59,7 +60,7 @@ mod tests {
 
     #[test]
     fn test_shuf_empty_stdin() {
-        let mut out: Vec<u8> = Vec::new();
+        let _out: Vec<u8> = Vec::new();
         // With empty stdin we can't test via sink, but we can test error cases
         assert_eq!(run(&mut std::io::sink(), &["-x".into()]), 1);
     }

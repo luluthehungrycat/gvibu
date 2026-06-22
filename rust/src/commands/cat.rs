@@ -1,6 +1,8 @@
 /// cat: concatenate files and print to stdout.
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
+use crate::pwrite;
+use crate::pwriteln;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut number_lines = false;

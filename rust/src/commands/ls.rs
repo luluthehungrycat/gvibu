@@ -3,6 +3,7 @@ use std::fs::{self, Metadata};
 use std::io::Write;
 use std::os::unix::fs::{MetadataExt, PermissionsExt};
 use std::time::UNIX_EPOCH;
+use crate::pwriteln;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut show_all = false;
@@ -12,7 +13,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut sort_time = false;
     let mut reverse = false;
     let mut sort_size = false;
-    let mut one_per_line = true; // default to 1-column
+    let mut _one_per_line = true; // default to 1-column
     let mut paths: Vec<&str> = Vec::new();
 
     for arg in args {
@@ -24,7 +25,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
             "-t" => sort_time = true,
             "-r" => reverse = true,
             "-S" => sort_size = true,
-            "-1" => one_per_line = true,
+            "-1" => _one_per_line = true,
             "--" => break,
             s if s.starts_with('-') && s.len() > 1 => {
                 // Handle bundled flags like -la, -ltr
@@ -37,7 +38,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                         't' => sort_time = true,
                         'r' => reverse = true,
                         'S' => sort_size = true,
-                        '1' => one_per_line = true,
+                        '1' => _one_per_line = true,
                         _ => {
                             eprintln!("ls: invalid option: -{}", c);
                             return 1;
@@ -56,7 +57,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut exit_code = 0;
     let mut first = true;
 
-    for path in paths {
+    for path in &paths {
         match fs::metadata(path) {
             Ok(meta) => {
                 if meta.is_dir() {
@@ -173,7 +174,7 @@ fn format_long(name: &str, meta: &Metadata, human: bool) -> String {
         meta.len().to_string()
     };
     let mtime = format_time(meta.mtime());
-    format!("{}{} {:>2} {} {} {} {}", file_type, perms, nlink, "", "", size, mtime, name)
+    format!("{}{} {:>2} {} {} {} {} {}", file_type, perms, nlink, "", "", size, mtime, name)
 }
 
 fn format_mode(mode: u32) -> String {
@@ -213,7 +214,7 @@ fn format_time(secs: i64) -> String {
     // Simple format: "Jan  2 12:34" style (6-month cutoff like GNU ls)
     let secs = if secs >= 0 { secs as u64 } else { 0 };
     let dur = std::time::Duration::from_secs(secs);
-    let time = UNIX_EPOCH + dur;
+    let _time = UNIX_EPOCH + dur;
 
     // Use chrono-like manual formatting via local time
     // For simplicity, just show the raw timestamp parts
@@ -304,13 +305,13 @@ mod tests {
     #[test]
     fn test_ls_dev_null() {
         // /dev/null is a file, not a directory - should list it
-        let result = run(&mut std::io::sink(), &["/dev/null"]);
+        let result = run(&mut std::io::sink(), &["/dev/null".into()]);
         assert_eq!(result, 0);
     }
 
     #[test]
     fn test_ls_invalid_option() {
-        let result = run(&mut std::io::sink(), &["-x"]);
+        let result = run(&mut std::io::sink(), &["-x".into()]);
         assert_eq!(result, 1);
     }
 
@@ -322,25 +323,25 @@ mod tests {
 
     #[test]
     fn test_ls_a_flag() {
-        let result = run(&mut std::io::sink(), &["-a"]);
+        let result = run(&mut std::io::sink(), &["-a".into()]);
         assert_eq!(result, 0);
     }
 
     #[test]
     fn test_ls_l_flag() {
-        let result = run(&mut std::io::sink(), &["-l"]);
+        let result = run(&mut std::io::sink(), &["-l".into()]);
         assert_eq!(result, 0);
     }
 
     #[test]
     fn test_ls_bundled_flags() {
-        let result = run(&mut std::io::sink(), &["-la"]);
+        let result = run(&mut std::io::sink(), &["-la".into()]);
         assert_eq!(result, 0);
     }
 
     #[test]
     fn test_ls_nonexistent() {
-        let result = run(&mut std::io::sink(), &["/nonexistent_ls_test_xyz"]);
+        let result = run(&mut std::io::sink(), &["/nonexistent_ls_test_xyz".into()]);
         assert_eq!(result, 1);
     }
 }

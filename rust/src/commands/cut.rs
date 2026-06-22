@@ -46,8 +46,32 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
 
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { i += 1; break; }
-        if arg == "-d" {
+        if arg == "--" { break; }
+
+        // Handle bundled short options: -f1 or -d,
+        if arg.starts_with('-') && arg.len() > 2 {
+            let bytes = arg.as_bytes();
+            let flag = bytes[1] as char;
+            let val = &arg[2..];
+            match flag {
+                'd' => {
+                    delimiter = val.as_bytes()[0];
+                }
+                'f' => {
+                    match parse_list(val) {
+                        Some(indices) => field_indices = Some(indices),
+                        None => {
+                            eprintln!("cut: invalid field list: {}", val);
+                            return 1;
+                        }
+                    }
+                }
+                _ => {
+                    eprintln!("cut: invalid option: {}", arg);
+                    return 1;
+                }
+            }
+        } else if arg == "-d" {
             i += 1;
             if i >= args.len() {
                 eprintln!("cut: option requires an argument: -d");
@@ -86,7 +110,8 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
         return 1;
     }
 
-    let indices = field_indices.unwrap();
+    // safe: field_indices was verified Some at line 84
+    let indices = field_indices.expect("field indices should be set");
     let max_idx = *indices.last().unwrap_or(&1);
 
     if files.is_empty() {

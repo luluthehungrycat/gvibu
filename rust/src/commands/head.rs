@@ -1,6 +1,7 @@
 /// head: output the first part of files.
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Read, Write};
+use crate::pwriteln;
 
 /// Print line-based output (existing -n behavior).
 fn print_lines(w: &mut dyn Write, lines: &[String], num_lines: usize) -> i32 {
@@ -71,7 +72,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
 
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { i += 1; break; }
+        if arg == "--" { break; }
         if arg == "-n" {
             i += 1;
             if i >= args.len() {

@@ -12,7 +12,7 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { i += 1; break; }
+        if arg == "--" { break; }
         if arg == "-i" {
             interactive = true;
         } else if arg == "-f" {
@@ -35,9 +35,6 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
         return 1;
     }
 
-    if interactive && force {
-        force = false; // -i overrides -f
-    }
 
     let src = &targets[0];
     let dst = &targets[1];
@@ -46,7 +43,7 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
         return 0;
     }
 
-    if interactive && fs::metadata(dst).is_ok() {
+    if interactive && !force && fs::metadata(dst).is_ok() {
         eprint!("mv: overwrite '{}'? ", dst);
         let _ = std::io::Write::flush(&mut std::io::stderr());
         let mut input = String::new();
