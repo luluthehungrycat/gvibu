@@ -15,3 +15,4 @@ wasm-lib/target/
 .gvibu/
 .claude/
 opencode-sidebar.md
+kernel/*.bin

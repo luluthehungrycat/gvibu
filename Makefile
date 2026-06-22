@@ -2,10 +2,14 @@
         wasm-browser-build wasm-browser-serve wasm-browser-clean \
         test compare python-test rust-test benchmark \
         docker-build initramfs qemu run install clean status help \
-        release release-binary release-wasm release-docker man
+        release release-binary release-wasm release-docker man \
+        vibix-all vibix-clean \
+        vibix-echo vibix-echocmd vibix-true vibix-false vibix-yes vibix-clear \
+        vibix-printenv vibix-cat
 
 PYTHON := python3
 CARGO := $(HOME)/.cargo/bin/cargo
+NASM  := nasm
 
 all: python-build rust-build
 
@@ -120,7 +124,41 @@ man:
 status:
 	$(PYTHON) tooling/generate_command_status.py
 
-clean:
+# ── VIBIX kernel binary targets ──────────────────────────────────────────────
+# Each kernel/user_<name>.asm assembles to kernel/user_<name>.bin
+# Usage: make vibix-<name>   (e.g. vibix-echo, vibix-true)
+#        make vibix-all      (build every command)
+#        make vibix-clean    (remove all .bin files)
+
+VIBIX_DIR      = kernel
+VIBIX_SOURCES  = $(wildcard $(VIBIX_DIR)/user_*.asm)
+VIBIX_BINARIES = $(VIBIX_SOURCES:.asm=.bin)
+NASM_FLAGS     = -f bin -I $(VIBIX_DIR)/
+
+# Generic pattern: any .asm in kernel/ → .bin
+$(VIBIX_DIR)/user_%.bin: $(VIBIX_DIR)/user_%.asm $(wildcard $(VIBIX_DIR)/vibix_*.inc)
+	$(NASM) $(NASM_FLAGS) $< -o $@
+
+# Named targets for each command
+vibix-echo:    $(VIBIX_DIR)/user_echo_init.bin  # test-harness echo (PID 1)
+vibix-echocmd: $(VIBIX_DIR)/user_echo.bin       # thin echo command
+vibix-true:    $(VIBIX_DIR)/user_true.bin
+vibix-false:   $(VIBIX_DIR)/user_false.bin
+vibix-yes:     $(VIBIX_DIR)/user_yes.bin
+vibix-clear:   $(VIBIX_DIR)/user_clear.bin
+vibix-printenv: $(VIBIX_DIR)/user_printenv.bin
+vibix-cat:     $(VIBIX_DIR)/user_cat.bin
+
+vibix-all: $(VIBIX_BINARIES)
+	@echo "VIBIX binaries built:"
+	ls -1 $(VIBIX_DIR)/user_*.bin
+
+vibix-clean:
+	rm -f $(VIBIX_DIR)/user_*.bin
+
+# ── Clean ────────────────────────────────────────────────────────────────────
+
+clean: vibix-clean
 	cd rust && $(CARGO) clean
 	rm -rf rust/target wasm-lib/pkg wasm-lib/target
 
@@ -152,4 +190,7 @@ help:
 	@echo "  release-wasm - Build browser WASM and package as tar.gz"
 	@echo "  release-docker - Build and tag Docker image for GHCR"
 	@echo "  status       - Show command implementation status"
+	@echo "  vibix-all    - Build all VIBIX flat binaries (echo, true, false, yes, clear, printenv, cat)"
+	@echo "  vibix-<name> - Build specific VIBIX binary (vibix-echo, vibix-true, vibix-false, etc.)"
+	@echo "  vibix-clean  - Remove all VIBIX binary artifacts"
 	@echo "  clean        - Clean build artifacts"
