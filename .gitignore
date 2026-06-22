@@ -14,3 +14,4 @@ wasm-lib/pkg/
 wasm-lib/target/
 .gvibu/
 .claude/
+opencode-sidebar.md
