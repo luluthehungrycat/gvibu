@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "pyright": "^1.1.408",
-    "yaml-language-server": "^1.21.0"
-  }
-}
