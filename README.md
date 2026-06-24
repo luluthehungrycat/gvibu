@@ -72,14 +72,14 @@ make benchmark       # Rust vs Python speed comparison
 ```
 gvibu-ai-lab/
 ├── rust/                 # Rust implementation
-│   ├── src/commands/     # 53 command modules
+│   ├── src/commands/     # 58 command modules
 │   ├── src/main.rs       # Multicall binary dispatch
 │   ├── src/lib.rs        # Library entry (for WASM)
 │   └── tests/
-│       ├── cli.rs        # 100+ integration tests
+│       ├── cli.rs        # 332+ integration tests
 │       └── fuzz.rs       # 24 property-based tests
 ├── python-ref/           # Python reference implementation
-├── specs/commands/       # 53 command specifications
+├── specs/commands/       # 58 command specifications
 ├── shared-tests/cases/   # Shared test cases (both impls)
 ├── tests/                # Python test suite
 ├── wasm-lib/             # WASM bindings + browser demo

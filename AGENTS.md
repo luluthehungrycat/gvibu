@@ -134,3 +134,9 @@ Usage notes:
 <!-- SKILLS_TABLE_END -->
 
 </skills_system>
+
+---
+
+## Project-Specific Guidelines
+
+**Parallelization Warning:** When dispatching multiple subagents for parallel work, ensure they have **no overlapping write targets**. The integration tests in `rust/tests/cli.rs` are a single shared file — if multiple fixers modify it simultaneously, merge conflicts will occur. Source files (individual command implementations) are safe for parallel modification as they are independent. Always assign each file to exactly one writer subagent.
