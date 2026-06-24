@@ -7,6 +7,7 @@ use std::path::Path;
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut human = false;
     let mut summary = false;
+    let mut max_depth: Option<usize> = None;
     let mut paths: Vec<&str> = Vec::new();
 
     let mut i = 0;
@@ -14,18 +15,72 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         match args[i].as_str() {
             "-h" => human = true,
             "-s" => summary = true,
+            "-d" => {
+                if i + 1 < args.len() {
+                    match args[i + 1].parse::<usize>() {
+                        Ok(d) => max_depth = Some(d),
+                        Err(_) => {
+                            pwriteln!(w, "du: invalid max depth: {}", args[i + 1]);
+                            return 1;
+                        }
+                    }
+                    i += 1;
+                } else {
+                    pwriteln!(w, "du: -d requires an argument");
+                    return 1;
+                }
+            }
+            arg if arg.starts_with("--max-depth=") => {
+                let value = &arg[12..]; // "--max-depth=" is 12 chars
+                match value.parse::<usize>() {
+                    Ok(d) => max_depth = Some(d),
+                    Err(_) => {
+                        pwriteln!(w, "du: invalid max depth: {}", value);
+                        return 1;
+                    }
+                }
+            }
+            "--max-depth" => {
+                if i + 1 < args.len() {
+                    match args[i + 1].parse::<usize>() {
+                        Ok(d) => max_depth = Some(d),
+                        Err(_) => {
+                            pwriteln!(w, "du: invalid max depth: {}", args[i + 1]);
+                            return 1;
+                        }
+                    }
+                    i += 1;
+                } else {
+                    pwriteln!(w, "du: --max-depth requires an argument");
+                    return 1;
+                }
+            }
             "--" => { break; }
             arg if arg.starts_with('-') && arg.len() > 1 => {
                 // Handle bundled flags: -hs, -sh
-                for c in arg[1..].chars() {
+                let mut j = 1;
+                while j < arg.len() {
+                    let c = arg.chars().nth(j).unwrap();
                     match c {
                         'h' => human = true,
                         's' => summary = true,
+                        '0'..='9' => {
+                            // Handle -dN or --max-depth=N
+                            let num_str: String = arg.chars().skip(j).collect();
+                            if let Ok(d) = num_str.parse::<usize>() {
+                                max_depth = Some(d);
+                                break;
+                            } else {
+                                pwriteln!(w, "du: invalid option: -{}", c);
+                                return 1;
+                            }
+                        }
                         _ => {
                             pwriteln!(w, "du: invalid option: -{}", c);
                             return 1;
                         }
                     }
+                    j += 1;
                 }
             }
             p => paths.push(p),
@@ -42,9 +97,9 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
 
     for path_str in &paths {
         let path = Path::new(path_str);
-        match du_walk(path, summary) {
+        match du_walk(path, summary, max_depth) {
             Ok(entries) => {
-                for (size, p) in &entries {
+                for (size, p, depth) in &entries {
                     let display = if *p == "." { "." } else { p };
                     if human {
                         pwriteln!(w, "{}\t{}", human_size(*size), display);
@@ -52,7 +107,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                         pwriteln!(w, "{}\t{}", size, display);
                     }
                 }
-                if let Some((total, _)) = entries.last() {
+                if let Some((total, _, _)) = entries.last() {
                     grand_total += total;
                 }
             }
@@ -74,11 +129,11 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     exit_code
 }
 
-fn du_walk(path: &Path, summary: bool) -> Result<Vec<(u64, String)>, String> {
+fn du_walk(path: &Path, summary: bool, max_depth: Option<usize>) -> Result<Vec<(u64, String, usize)>, String> {
     let meta = fs::symlink_metadata(path).map_err(|e| format!("{}", e))?;
 
     if meta.is_dir() && !summary {
-        let mut entries: Vec<(u64, String)> = Vec::new();
+        let mut entries: Vec<(u64, String, usize)> = Vec::new();
         let dir_entries = fs::read_dir(path).map_err(|e| format!("{}", e))?;
 
         for entry in dir_entries {
@@ -86,24 +141,48 @@ fn du_walk(path: &Path, summary: bool) -> Result<Vec<(u64, String)>, String> {
             let sub_path = entry.path();
             let sub_meta = fs::symlink_metadata(&sub_path).map_err(|e| format!("{}", e))?;
 
+            // Skip symlinks to avoid counting them multiple times
+            if sub_meta.file_type().is_symlink() {
+                continue;
+            }
+
             if sub_meta.is_dir() {
-                let sub_entries = du_walk(&sub_path, false)?;
+                // Check depth limit
+                let current_depth = count_path_depth(&sub_path, path);
+                if let Some(max) = max_depth {
+                    if current_depth > max {
+                        continue;
+                    }
+                }
+                let sub_entries = du_walk(&sub_path, false, max_depth)?;
                 entries.extend(sub_entries);
             } else {
-                entries.push((sub_meta.len(), sub_path.to_string_lossy().to_string()));
+                entries.push((sub_meta.len(), sub_path.to_string_lossy().to_string(), 0));
             }
         }
 
         // Sort by path for deterministic output
         entries.sort_by(|a, b| a.1.cmp(&b.1));
 
-        let dir_size: u64 = entries.iter().map(|(s, _)| s).sum();
-        entries.push((dir_size, path.to_string_lossy().to_string()));
+        let dir_size: u64 = entries.iter().map(|(s, _, _)| s).sum();
+        let depth = count_path_depth(path, path);
+        entries.push((dir_size, path.to_string_lossy().to_string(), depth));
         Ok(entries)
     } else {
         let size = meta.len();
-        Ok(vec![(size, path.to_string_lossy().to_string())])
+        Ok(vec![(size, path.to_string_lossy().to_string(), 0)])
     }
+}
+
+fn count_path_depth(path: &Path, base: &Path) -> usize {
+    let path_str = path.to_string_lossy();
+    let base_str = base.to_string_lossy();
+    
+    if path_str == base_str {
+        return 0;
+    }
+    
+    path_str.split('/').count().saturating_sub(base_str.split('/').count())
 }
 
 fn human_size(bytes: u64) -> String {
@@ -176,5 +255,18 @@ mod tests {
         let gb = 1073741824u64;
         let result = human_size(gb);
         assert_eq!(result, "1.0G");
+    }
+
+    #[test]
+    fn test_max_depth_flag() {
+        assert_eq!(run(&mut std::io::sink(), &["--max-depth=1".into(), "/dev/null".into()]), 0);
+    }
+
+    #[test]
+    fn test_count_path_depth() {
+        let path = Path::new("/tmp/test");
+        let base = Path::new("/tmp");
+        assert_eq!(count_path_depth(path, base), 1);
+        assert_eq!(count_path_depth(base, base), 0);
     }
 }
