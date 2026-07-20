@@ -18,9 +18,10 @@ path = "src/lib.rs"
 
 [dependencies]
 libc = "0.2"
-rand = "0.8"
+rand = "0.9"
 regex = "1"
 chrono = "0.4"
+getrandom = { version = "0.2", features = ["js"] }
 
 [dev-dependencies]
 proptest = "1"

@@ -1,0 +1,15 @@
+[package]
+name = "gvibu-vibix"
+version = "0.1.0"
+edition = "2021"
+description = "VIBIX flat binary target for gvibu - bare-metal coreutils"
+
+[lib]
+name = "gvibu_vibix"
+crate-type = ["staticlib", "rlib"]
+
+[[bin]]
+name = "vibix"
+path = "src/main.rs"
+
+[dependencies]

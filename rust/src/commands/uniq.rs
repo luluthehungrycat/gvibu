@@ -1,6 +1,59 @@
 use std::io::{self, BufRead, Write};
 
 pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
+    if let Some(stdin) = crate::get_wasm_stdin() {
+        let mut show_unique = false;
+        let mut show_repeated = false;
+        let mut show_count = false;
+        for arg in args {
+            match arg.as_str() {
+                "-u" => show_unique = true,
+                "-d" => show_repeated = true,
+                "-c" => show_count = true,
+                _ => {
+                    eprintln!("uniq: invalid option -- '{}'", arg);
+                    return 1;
+                }
+            }
+        }
+        let mut lines: Vec<String> = Vec::new();
+        for line in stdin.lines() {
+            lines.push(line.to_string());
+        }
+        if lines.is_empty() {
+            return 0;
+        }
+        let mut output_lines: Vec<(u64, String)> = Vec::new();
+        let mut current = &lines[0];
+        let mut count: u64 = 1;
+        for line in &lines[1..] {
+            if line == current {
+                count += 1;
+            } else {
+                output_lines.push((count, current.clone()));
+                current = line;
+                count = 1;
+            }
+        }
+        output_lines.push((count, current.clone()));
+        for (c, line) in &output_lines {
+            let print_it = if show_unique && !show_repeated {
+                *c == 1
+            } else if show_repeated && !show_unique {
+                *c > 1
+            } else {
+                true
+            };
+            if print_it {
+                if show_count {
+                    writeln!(stdout, "{:>4} {}", c, line).ok();
+                } else {
+                    writeln!(stdout, "{}", line).ok();
+                }
+            }
+        }
+        return 0;
+    }
     let mut show_unique = false;
     let mut show_repeated = false;
     let mut show_count = false;

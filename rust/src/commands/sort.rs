@@ -248,9 +248,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                     'u' => unique = true,
                     'f' => fold_case = true,
                     'k' => {
-                        // Combined like -k2 (no space before value)
-                        // safe: arg contains 'k' because we matched on it at the 'k' arm
-                        let spec = &arg[arg.find('k').expect("sort -k: 'k' not found in arg") + 1..];
+                        let spec = &arg[arg.find('k').unwrap_or_else(|| unreachable!("sort -k arm matched but 'k' not found in arg")) + 1..];
                         if spec.is_empty() {
                             eprintln!("sort: option requires an argument: -k");
                             return 1;
@@ -262,7 +260,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                                 return 1;
                             }
                         }
-                        break; // -k is the last meaningful char in combined flags
+                        break;
                     }
                     _ => {
                         eprintln!("sort: invalid option: -{}", ch);
@@ -274,6 +272,34 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
             files.push(arg.clone());
         }
         i += 1;
+    }
+
+    if let Some(stdin) = crate::get_wasm_stdin() {
+        if files.is_empty() {
+            let lines: Vec<String> = stdin.lines().map(String::from).collect();
+            return sort_and_output(w, &lines, &key_specs, reverse, numeric, unique, fold_case);
+        }
+        let mut lines: Vec<String> = Vec::new();
+        for fname in &files {
+            if fname == "-" {
+                for line in stdin.lines() {
+                    lines.push(line.to_string());
+                }
+            } else {
+                match std::fs::File::open(fname) {
+                    Ok(file) => {
+                        let reader = io::BufReader::new(file);
+                        for line in reader.lines() {
+                            if let Ok(l) = line { lines.push(l); }
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("sort: {}: {}", fname, e);
+                    }
+                }
+            }
+        }
+        return sort_and_output(w, &lines, &key_specs, reverse, numeric, unique, fold_case);
     }
 
     let lines = read_lines(&files);
@@ -376,6 +402,96 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         pwriteln!(w, "{}", line);
     }
 
+    0
+}
+
+fn sort_and_output(
+    w: &mut dyn Write,
+    lines: &[String],
+    key_specs: &[KeySpec],
+    reverse: bool,
+    numeric: bool,
+    unique: bool,
+    fold_case: bool,
+) -> i32 {
+    let make_sort_key = |line: &str| -> Vec<String> {
+        let mut keys = Vec::new();
+        for ks in key_specs {
+            keys.push(extract_key(line, ks));
+        }
+        keys
+    };
+
+    let mut sorted: Vec<(Vec<String>, String)> = lines
+        .iter()
+        .map(|line| {
+            let keys = make_sort_key(line);
+            (keys, line.clone())
+        })
+        .collect();
+
+    sorted.sort_by(|a, b| {
+        for (i, ks) in key_specs.iter().enumerate() {
+            let a_key = &a.0[i];
+            let b_key = &b.0[i];
+            let use_numeric = ks.numeric || numeric;
+            let use_reverse = ks.reverse || reverse;
+            let cmp = if use_numeric {
+                let an = numeric_prefix(a_key);
+                let bn = numeric_prefix(b_key);
+                match (an, bn) {
+                    (Some(na), Some(nb)) => na.partial_cmp(&nb).unwrap_or(std::cmp::Ordering::Equal),
+                    (Some(_), None) => std::cmp::Ordering::Less,
+                    (None, Some(_)) => std::cmp::Ordering::Greater,
+                    (None, None) => {
+                        if fold_case {
+                            a_key.to_lowercase().cmp(&b_key.to_lowercase())
+                        } else {
+                            a_key.cmp(b_key)
+                        }
+                    }
+                }
+            } else {
+                if fold_case {
+                    a_key.to_lowercase().cmp(&b_key.to_lowercase())
+                } else {
+                    a_key.cmp(b_key)
+                }
+            };
+            if cmp != std::cmp::Ordering::Equal {
+                return if use_reverse { cmp.reverse() } else { cmp };
+            }
+        }
+        let cmp = if numeric {
+            let an = numeric_prefix(&a.1);
+            let bn = numeric_prefix(&b.1);
+            match (an, bn) {
+                (Some(na), Some(nb)) => na.partial_cmp(&nb).unwrap_or(std::cmp::Ordering::Equal),
+                (Some(_), None) => std::cmp::Ordering::Less,
+                (None, Some(_)) => std::cmp::Ordering::Greater,
+                (None, None) => {
+                    if fold_case {
+                        a.1.to_lowercase().cmp(&b.1.to_lowercase())
+                    } else {
+                        a.1.cmp(&b.1)
+                    }
+                }
+            }
+        } else if fold_case {
+            a.1.to_lowercase().cmp(&b.1.to_lowercase())
+        } else {
+            a.1.cmp(&b.1)
+        };
+        if reverse { cmp.reverse() } else { cmp }
+    });
+
+    let mut result: Vec<String> = sorted.into_iter().map(|(_, line)| line).collect();
+    if unique {
+        result.dedup();
+    }
+    for line in &result {
+        pwriteln!(w, "{}", line);
+    }
     0
 }
 

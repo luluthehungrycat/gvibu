@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+use std::sync::LazyLock;
+
 pub mod basename;
 pub mod cat;
 pub mod dirname;
@@ -128,6 +131,16 @@ pub const COMMANDS: &[Command] = &[
     Command { names: &["df"], run: df::run },
 ];
 
+/// O(1) name -> Command lookup table built once at first access from COMMANDS.
+/// Preserves the COMMANDS array as the source of truth (used by wasm-lib).
+pub static COMMAND_MAP: LazyLock<HashMap<&'static str, &'static Command>> =
+    LazyLock::new(|| {
+        COMMANDS
+            .iter()
+            .flat_map(|cmd| cmd.names.iter().map(move |name| (*name, cmd)))
+            .collect()
+    });
+
 pub fn lookup(name: &str) -> Option<&'static Command> {
-    COMMANDS.iter().find(|cmd| cmd.names.contains(&name))
+    COMMAND_MAP.get(name).copied()
 }

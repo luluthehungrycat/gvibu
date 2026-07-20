@@ -1,0 +1,12 @@
+/home/moritz/agent/repos/gvibu-ai-lab/target/debug/deps/float_cmp-3a018526351e3d81.d: /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/lib.rs /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/macros.rs /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/ulps.rs /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/ulps_eq.rs /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/eq.rs /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/ratio.rs
+
+/home/moritz/agent/repos/gvibu-ai-lab/target/debug/deps/libfloat_cmp-3a018526351e3d81.rlib: /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/lib.rs /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/macros.rs /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/ulps.rs /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/ulps_eq.rs /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/eq.rs /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/ratio.rs
+
+/home/moritz/agent/repos/gvibu-ai-lab/target/debug/deps/libfloat_cmp-3a018526351e3d81.rmeta: /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/lib.rs /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/macros.rs /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/ulps.rs /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/ulps_eq.rs /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/eq.rs /home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/ratio.rs
+
+/home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/lib.rs:
+/home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/macros.rs:
+/home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/ulps.rs:
+/home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/ulps_eq.rs:
+/home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/eq.rs:
+/home/moritz/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/float-cmp-0.8.0/src/ratio.rs:

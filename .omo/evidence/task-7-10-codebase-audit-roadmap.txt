@@ -1,0 +1,108 @@
+================================================================================
+TASK: Add 4 CI jobs to .github/workflows/parity.yml (clippy, audit, benchmark, fuzz)
+================================================================================
+Plan reference: .omo/plans/codebase-audit-roadmap.md, Todo 7-10 (Wave 1 / P0)
+
+Files modified:
+  - /workspace/repo/.github/workflows/parity.yml   (added 4 new jobs after docker;
+                                                  existing test/wasm/docker jobs
+                                                  are unchanged)
+
+No other files were created or modified. No new files were added.
+
+================================================================================
+1. clippy job
+================================================================================
+- runs-on: ubuntu-latest
+- needs: test   (matches the existing pattern: wasm and docker also need test)
+- continue-on-error: true   (per task: "first month" ramp-up)
+- Python setup: NOT required.
+- Toolchain: dtolnay/rust-toolchain@v1 with profile: minimal, toolchain: stable,
+  components: clippy. Matches the existing test/wasm job's Rust-setup pattern.
+- Command: cargo clippy --manifest-path rust/Cargo.toml -- -D warnings
+  (treats every warning as an error; gated only by continue-on-error)
+- 3 steps: Checkout, Set up Rust, Run clippy.
+
+================================================================================
+2. audit job
+================================================================================
+- runs-on: ubuntu-latest
+- needs: test
+- continue-on-error: NOT set -> required check (per task: "fail on
+  vulnerabilities").
+- Toolchain: dtolnay/rust-toolchain@v1 with profile: minimal, toolchain: stable.
+- Steps:
+    1. Checkout repository
+    2. Set up Rust
+    3. Install cargo-audit   (cargo install cargo-audit --locked)
+    4. Run cargo audit (rust)        (cargo audit --manifest-path rust/Cargo.toml)
+    5. Run cargo audit (wasm-lib)    (cargo audit --manifest-path wasm-lib/Cargo.toml)
+  Each manifest is audited as a separate step so a failure in one clearly
+  identifies which crate introduced the vulnerability.
+
+================================================================================
+3. benchmark job
+================================================================================
+- runs-on: ubuntu-latest
+- needs: test
+- continue-on-error: true   (per task: informative / non-blocking)
+- Steps:
+    1. Checkout repository
+    2. Set up Python 3.11   (actions/setup-python@v5, python-version: '3.11',
+                             same as the test job)
+    3. Set up Rust          (dtolnay/rust-toolchain@v1, profile: minimal,
+                             toolchain: stable)
+    4. Run benchmark        (make benchmark, which depends on rust-release
+                             and runs tooling/benchmark.py)
+  All stdout/stderr is captured in the GitHub Actions log automatically.
+
+================================================================================
+4. fuzz job
+================================================================================
+- runs-on: ubuntu-latest
+- needs: test
+- continue-on-error: NOT set -> required check.
+- Toolchain: dtolnay/rust-toolchain@v1 with profile: minimal, toolchain: stable.
+- Command: timeout 300 cargo test --manifest-path rust/Cargo.toml --test fuzz
+  The 300-second GNU timeout caps the proptest run so a runaway shrink or
+  unexpectedly slow case cannot stall CI; non-zero exit from timeout fails the
+  required check. The integration target is rust/tests/fuzz.rs (24 property
+  tests using proptest).
+- 3 steps: Checkout, Set up Rust, Run fuzz tests (time-limited).
+
+================================================================================
+Verification
+================================================================================
+YAML parseability confirmed by:
+    node -e "const y=require('js-yaml'); const d=y.load(require('fs').readFileSync(
+    '/workspace/repo/.github/workflows/parity.yml','utf8')); console.log(
+    Object.keys(d.jobs))"
+
+Output:
+    [ 'test', 'wasm', 'docker', 'clippy', 'audit', 'benchmark', 'fuzz' ]
+    Count: 7
+
+Per-job structural verification:
+  - test:     needs=(none),  steps=8  (UNCHANGED)
+  - wasm:     needs=test,   steps=8  (UNCHANGED)
+  - docker:   needs=test,   steps=3  (UNCHANGED)
+  - clippy:   needs=test,   steps=3,  continue-on-error=true
+  - audit:    needs=test,   steps=5,  continue-on-error=undefined (required)
+  - benchmark: needs=test,  steps=4,  continue-on-error=true
+  - fuzz:     needs=test,   steps=3,  continue-on-error=undefined (required)
+
+All four new jobs:
+  - run on ubuntu-latest
+  - use dtolnay/rust-toolchain@v1 with profile: minimal + toolchain: stable
+  - audit/benchmark/fuzz/clippy all need: test (consistent with existing jobs)
+  - clippy and benchmark are non-blocking (continue-on-error: true)
+  - audit and fuzz are required (no continue-on-error)
+
+================================================================================
+Constraints honored
+================================================================================
+- Did NOT modify any existing job (test/wasm/docker are byte-for-byte
+  identical to the prior state apart from the appended new jobs).
+- Did NOT remove or change the `needs: test` dependency on existing jobs.
+- Did NOT add any new files. Only .github/workflows/parity.yml was edited.
+- Did NOT change any other file.

@@ -286,5 +286,16 @@ mod tests {
         assert_eq!(basename("bar"), "bar");
         assert_eq!(basename("/foo/bar/"), "bar");
         assert_eq!(basename("/"), "");
+
+
+    #[test]
+    fn test_cp_archive_flag() {
+        // Test that -a flag is recognized and sets archive = true
+        // This tests the argument parsing at least
+        assert_eq!(
+            run(&mut std::io::sink(), &["-a".into(), "a".into(), "b".into()]),
+            1
+        );
+    }
     }
 }

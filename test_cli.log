@@ -1,0 +1,365 @@
+
+running 255 tests
+test basename_no_args ... ok
+test basename_root_path ... ok
+test basename_no_suffix ... ok
+test basename_suffix_equals_basename ... ok
+test basename_trailing_slash ... ok
+test chmod_invalid_option ... ok
+test chmod_nonexistent ... ok
+test cat_nonexistent_file ... ok
+test cat_dev_null ... ok
+test cat_stdin_no_numbering ... ok
+test cat_invalid_option ... ok
+test chmod_no_args ... ok
+test chmod_octal_dev_null ... ok
+test chown_dev_null ... ok
+test chown_nonexistent ... ok
+test cat_stdin_hello ... ok
+test comm_one_arg ... ok
+test basename_with_suffix ... ok
+test cp_single_arg ... ok
+test cp_nonexistent_source ... ok
+test comm_no_args ... ok
+test cat_numbered_lines ... ok
+test cp_missing_args ... ok
+test chown_no_args ... ok
+test cp_invalid_option ... ok
+test date_format_string ... ok
+test date_utc_flag ... ok
+test cut_invalid_option ... ok
+test date_invalid_option ... ok
+test comm_invalid_option ... ok
+test cut_field_stdin ... ok
+test cut_dev_null ... ok
+test cut_multi_field ... ok
+test date_default_format ... ok
+test cut_custom_delimiter ... ok
+test dirname_relative_path ... ok
+test dirname_root_itself ... ok
+test df_invalid_option ... ok
+test df_human_readable ... ok
+test dirname_root_parent ... ok
+test dirname_no_args ... ok
+test df_no_args ... ok
+test dirname_normal_path ... ok
+test du_invalid_option ... FAILED
+test df_bundled_flags ... ok
+test du_human_readable_dev_null ... ok
+test dirname_simple_name ... ok
+test echo_dash_n_not_first ... ok
+test du_bundled_flags ... ok
+test du_dev_null ... ok
+test dirname_deep_path ... ok
+test echo_e_newline ... ok
+test echo_e_disables_escapes ... ok
+test du_nonexistent ... FAILED
+test echo_e_tab ... ok
+test env_run_command ... ok
+test echo_no_newline ... ok
+test env_unset ... ok
+test echo_no_args ... ok
+test env_ignore ... ok
+test echo_with_args ... ok
+test echo_e_with_n ... ok
+test echo_e_no_effect ... ok
+test expr_comparison ... ok
+test expr_addition ... ok
+test env_print ... ok
+test env_command_not_found ... ok
+test expr_division ... ok
+test false_with_args ... ok
+test false_no_args ... ok
+test expr_multiplication ... ok
+test fold_invalid_option ... ok
+test env_run_command_with_var ... ok
+test expr_string_length ... ok
+test env_var_assign ... ok
+test fold_width_10 ... FAILED
+test grep_invalid_option ... ok
+test grep_bundled_flags ... ok
+test grep_count ... ok
+test expr_subtraction ... ok
+test grep_ignore_case ... ok
+test grep_invalid_pattern ... ok
+test grep_invert ... ok
+test grep_line_number ... ok
+test head_c_flag_zero ... ok
+test grep_no_match_stdin ... ok
+test head_nonexistent_file ... ok
+test grep_file_match ... ok
+test hostname_no_args ... ok
+test head_stdin_n1 ... ok
+test head_c_missing_arg ... ok
+test head_dev_null ... ok
+test head_multi_file_dev_null ... ok
+test grep_missing_pattern ... ok
+test head_invalid_c_value ... ok
+test head_c_flag_dev_null ... ok
+test head_c_flag_stdin ... ok
+test grep_nonexistent_file ... ok
+test hostname_with_args ... ok
+test id_name_user ... ok
+test id_real_user ... FAILED
+test id_no_args ... ok
+test id_group_flag ... FAILED
+test id_supp_groups ... FAILED
+test id_user_flag ... FAILED
+test join_invalid_option ... ok
+test join_no_args ... ok
+test kill_invalid_option ... ok
+test ln_no_args ... ok
+test ln_invalid_option ... ok
+test kill_no_args ... ok
+test kill_unknown_signal ... ok
+test link_too_many_args ... ok
+test kill_list_signals ... ok
+test link_nonexistent_source ... ok
+test logname_with_args ... ok
+test ls_bundled_flags ... ok
+test ls_current_dir ... ok
+test ls_invalid_option ... ok
+test link_no_args ... ok
+test mv_nonexistent_source ... ok
+test ls_l_flag ... ok
+test ls_dev_null ... ok
+test link_one_arg ... ok
+test logname_no_args ... FAILED
+test mkdir_invalid_option ... ok
+test ln_one_arg ... ok
+test ls_nonexistent ... ok
+test mv_no_args ... ok
+test printf_no_format ... ok
+test nl_dev_null ... ok
+test printenv_known_var ... ok
+test pwd_no_args ... ok
+test mkdir_no_args ... ok
+test nl_invalid_option ... ok
+test printf_format_string ... ok
+test printf_percent_d ... ok
+test printf_percent_s ... ok
+test nl_no_args ... ok
+test realpath_no_args ... ok
+test printenv_all ... ok
+test readlink_no_args ... ok
+test printf_newline_escape ... ok
+test printenv_unknown_var ... ok
+test pwd_with_args ... ok
+test readlink_nonexistent ... ok
+test rm_nonexistent ... ok
+test rm_force_nonexistent ... ok
+test realpath_too_many_args ... ok
+test seq_first_greater_than_last ... ok
+test readlink_too_many_args ... ok
+test seq_first_last ... ok
+test realpath_nonexistent ... ok
+test seq_no_args ... ok
+test seq_first_step_last ... ok
+test seq_negative_step ... ok
+test rm_no_args ... ok
+test seq_invalid_arg ... ok
+test seq_basic ... ok
+test rmdir_no_args ... ok
+test rmdir_nonexistent ... ok
+test seq_with_sep ... ok
+test shuf_nonexistent_file ... ok
+test shuf_too_many_args ... ok
+test seq_equal_width ... ok
+test shuf_empty_stdin ... ok
+test seq_step_zero ... ok
+test sleep_invalid_number ... ok
+test sleep_zero ... ok
+test sleep_negative ... ok
+test sort_invalid_option ... ok
+test sleep_no_args ... ok
+test sort_key_numeric ... ok
+test sort_reverse ... ok
+test sort_multi_key ... ok
+test sort_unique ... ok
+test seq_w_and_s ... FAILED
+test sort_numeric ... ok
+test split_invalid_option ... ok
+test tac_dev_null ... ok
+test sort_stdin ... ok
+test sum_empty_file ... ok
+test tac_invalid_option ... ok
+test tail_dev_null ... ok
+test sum_no_args ... ok
+test sum_nonexistent_file ... ok
+test split_nonexistent_file ... ok
+test tac_stdin_basic ... ok
+test tail_c_flag_5 ... ok
+test tail_n_flag_3 ... ok
+test tail_no_args_stdin ... ok
+test split_no_args ... ok
+test tail_invalid_option ... ok
+test tee_stdin_to_stdout ... ok
+test test_bracket_alias ... ok
+test test_false_expr ... ok
+test test_file_exists ... ok
+test test_bracket_missing_closing ... FAILED
+test test_file_not_exists ... ok
+test test_not_operator ... ok
+test touch_invalid_option ... ok
+test tee_invalid_option ... ok
+test test_true_expr ... ok
+test touch_nonexistent_directory ... ok
+test test_string_empty ... ok
+test touch_access_only ... ok
+test touch_both_flags ... ok
+test tr_delete ... ok
+test touch_creates_file ... ok
+test tr_basic_translate ... ok
+test tr_squeeze ... FAILED
+test touch_mod_only ... ok
+test touch_no_args ... ok
+test test_string_nonempty ... ok
+test tr_invalid_option ... ok
+test true_with_args ... ok
+test true_no_args ... ok
+test uname_n ... ok
+test uname_all ... ok
+test uname_invalid_option ... ok
+test uname_default ... ok
+test uname_s ... ok
+test uniq_count ... ok
+test uniq_all_unique ... ok
+test uname_m ... ok
+test uname_r ... ok
+test uniq_repeated_only ... ok
+test uniq_invalid_option ... ok
+test uniq_stdin_basic ... ok
+test uniq_unique_only ... ok
+test unlink_no_args ... ok
+test wc_all_flags_with_l ... ok
+test wc_dev_null ... ok
+test wc_combined_flags ... ok
+test wc_chars_stdin_utf8 ... ok
+test unlink_nonexistent ... ok
+test uptime_no_args ... ok
+test unlink_too_many_args ... ok
+test wc_max_line_dev_null ... ok
+test wc_all_flags ... ok
+test wc_lines_only ... ok
+test wc_chars_only ... ok
+test who_invalid_option ... ok
+test wc_stdin ... ok
+test who_no_args ... ok
+test wc_multi_file ... ok
+test whoami_with_args ... ok
+test uptime_with_args ... FAILED
+test wc_max_line_stdin ... ok
+test which_no_args ... ok
+test which_found ... ok
+test whoami_no_args ... FAILED
+test which_not_found ... ok
+test yes_with_args_first_line ... ok
+test yes_default_first_line ... ok
+
+failures:
+
+---- du_invalid_option stdout ----
+
+thread 'du_invalid_option' (90154) panicked at tests/cli.rs:2057:9:
+assertion `left == right` failed
+  left: "du: invalid option: -x\n"
+ right: ""
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- du_nonexistent stdout ----
+
+thread 'du_nonexistent' (90157) panicked at tests/cli.rs:2068:9:
+assertion `left == right` failed
+  left: "du: /nonexistent_du_test_xyz: No such file or directory (os error 2)\n"
+ right: ""
+
+---- fold_width_10 stdout ----
+
+thread 'fold_width_10' (90207) panicked at tests/cli.rs:1752:5:
+assertion `left == right` failed
+  left: "hello worl\nd this is \na long lin\ne\n"
+ right: "hello worl\nd this is\na long li\nne\n"
+
+---- id_real_user stdout ----
+
+thread 'id_real_user' (90263) panicked at tests/cli.rs:941:5:
+real uid should be positive
+
+---- id_group_flag stdout ----
+
+thread 'id_group_flag' (90258) panicked at tests/cli.rs:918:5:
+gid should be positive, got: "0\n"
+
+---- id_supp_groups stdout ----
+
+thread 'id_supp_groups' (90264) panicked at tests/cli.rs:933:5:
+should output group list
+
+---- id_user_flag stdout ----
+
+thread 'id_user_flag' (90267) panicked at tests/cli.rs:910:5:
+uid should be positive, got: "0\n"
+
+---- logname_no_args stdout ----
+
+thread 'logname_no_args' (90296) panicked at tests/cli.rs:1291:5:
+assertion `left == right` failed: stderr: logname: no login name
+
+  left: 1
+ right: 0
+
+---- seq_w_and_s stdout ----
+
+thread 'seq_w_and_s' (90384) panicked at tests/cli.rs:704:5:
+assertion `left == right` failed
+  left: "1 2 3\n"
+ right: "01 02 03\n"
+
+---- test_bracket_missing_closing stdout ----
+
+thread 'test_bracket_missing_closing' (90450) panicked at tests/cli.rs:1666:5:
+assertion `left == right` failed
+  left: 0
+ right: 1
+
+---- tr_squeeze stdout ----
+
+thread 'tr_squeeze' (90488) panicked at tests/cli.rs:1062:5:
+assertion `left == right` failed: stderr: tr: missing operand
+
+  left: 1
+ right: 0
+
+---- uptime_with_args stdout ----
+
+thread 'uptime_with_args' (90526) panicked at tests/cli.rs:1340:5:
+assertion `left == right` failed
+  left: 0
+ right: 1
+
+---- whoami_no_args stdout ----
+
+thread 'whoami_no_args' (90561) panicked at tests/cli.rs:1152:5:
+assertion `left == right` failed: stderr: whoami: cannot find username
+
+  left: 1
+ right: 0
+
+
+failures:
+    du_invalid_option
+    du_nonexistent
+    fold_width_10
+    id_group_flag
+    id_real_user
+    id_supp_groups
+    id_user_flag
+    logname_no_args
+    seq_w_and_s
+    test_bracket_missing_closing
+    tr_squeeze
+    uptime_with_args
+    whoami_no_args
+
+test result: FAILED. 242 passed; 13 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+

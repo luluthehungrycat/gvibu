@@ -4,27 +4,45 @@ use crate::pwrite;
 use crate::pwriteln;
 
 fn get_uid() -> u32 {
+    // SAFETY: `libc::getuid` is an async-signal-safe POSIX function that takes no
+    // arguments and always returns a valid `uid_t` (non-negative integer); the
+    // kernel guarantees the call is safe to make on any thread.
     unsafe { libc::getuid() }
 }
 
 fn get_gid() -> u32 {
+    // SAFETY: `libc::getgid` is an async-signal-safe POSIX function that takes no
+    // arguments and always returns a valid `gid_t` (non-negative integer); the
+    // kernel guarantees the call is safe to make on any thread.
     unsafe { libc::getgid() }
 }
 
 fn get_euid() -> u32 {
+    // SAFETY: `libc::geteuid` is an async-signal-safe POSIX function that takes
+    // no arguments and always returns a valid `uid_t` (non-negative integer);
+    // the kernel guarantees the call is safe to make on any thread.
     unsafe { libc::geteuid() }
 }
 
 fn get_egid() -> u32 {
+    // SAFETY: `libc::getegid` is an async-signal-safe POSIX function that takes
+    // no arguments and always returns a valid `gid_t` (non-negative integer);
+    // the kernel guarantees the call is safe to make on any thread.
     unsafe { libc::getegid() }
 }
 
 fn get_groups() -> Vec<u32> {
+    // SAFETY: per POSIX, when `bufsize` is 0, `libc::getgroups` ignores `buf`
+    // (even if NULL) and only returns the number of supplementary group IDs;
+    // passing `null_mut()` is therefore well-defined.
     let ngroups = unsafe { libc::getgroups(0, std::ptr::null_mut()) };
     if ngroups <= 0 {
         return Vec::new();
     }
     let mut groups: Vec<u32> = vec![0; ngroups as usize];
+    // SAFETY: `groups` is a heap-allocated `Vec<u32>` of length `ngroups`, so
+    // its pointer is valid for writing `ngroups` `gid_t` values; the buffer is
+    // exclusively owned by this function for the duration of the call.
     let ret = unsafe { libc::getgroups(ngroups, groups.as_mut_ptr()) };
     if ret < 0 {
         return Vec::new();

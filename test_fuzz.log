@@ -1,0 +1,2105 @@
+
+running 35 tests
+test fuzz_basename_no_crash ... FAILED
+test fuzz_basename_with_suffix ... FAILED
+test fuzz_dirname_no_crash ... FAILED
+test fuzz_date_no_crash ... FAILED
+test fuzz_echo_no_crash ... FAILED
+test fuzz_false_any_args ... FAILED
+test fuzz_cat_stable ... FAILED
+test fuzz_printf_no_crash ... FAILED
+test fuzz_printf_s_specifier ... FAILED
+test fuzz_cut_delimiter ... ok
+test fuzz_expr_no_crash ... ok
+test fuzz_printf_d_specifier ... ok
+test fuzz_date_flag_no_crash ... ok
+test fuzz_head_no_crash ... ok
+test fuzz_head_c_flag ... ok
+test fuzz_cp_no_crash ... ok
+test fuzz_cut_field ... ok
+test fuzz_test_no_crash ... FAILED
+test fuzz_tr_basic ... FAILED
+test fuzz_true_any_args ... FAILED
+test fuzz_split_concat_roundtrip ... ok
+test fuzz_cp_preserves_content ... ok
+test fuzz_seq_three_args ... ok
+test fuzz_expr_addition_commutes ... ok
+test fuzz_expr_multiplication_commutes ... ok
+test fuzz_seq_two_args ... ok
+test fuzz_sort_reverse ... ok
+test fuzz_sort_unique ... ok
+test fuzz_sort_output_is_sorted ... ok
+test fuzz_sort_no_crash ... ok
+test fuzz_uniq_no_crash ... ok
+test fuzz_wc_counts_consistent ... ok
+test fuzz_split_no_crash ... ok
+test fuzz_wc_no_crash ... ok
+test fuzz_yes_no_crash ... ok
+
+failures:
+
+---- fuzz_basename_no_crash stdout ----
+proptest: FileFailurePersistence::SourceParallel set, but failed to find lib.rs or main.rs
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_no_crash' (91746) panicked at tests/fuzz.rs:89:1:
+Test failed: failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }.
+minimal failing input: ref path = "\0"
+	successes: 0
+	local rejects: 0
+	global rejects: 0
+
+
+---- fuzz_basename_with_suffix stdout ----
+proptest: FileFailurePersistence::SourceParallel set, but failed to find lib.rs or main.rs
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_basename_with_suffix' (91747) panicked at tests/fuzz.rs:97:1:
+Test failed: failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }.
+minimal failing input: ref path = "", ref suffix = "\0"
+	successes: 0
+	local rejects: 0
+	global rejects: 0
+
+
+---- fuzz_dirname_no_crash stdout ----
+proptest: FileFailurePersistence::SourceParallel set, but failed to find lib.rs or main.rs
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_dirname_no_crash' (91761) panicked at tests/fuzz.rs:108:1:
+Test failed: failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }.
+minimal failing input: ref path = "\0"
+	successes: 0
+	local rejects: 0
+	global rejects: 0
+
+
+---- fuzz_date_no_crash stdout ----
+proptest: FileFailurePersistence::SourceParallel set, but failed to find lib.rs or main.rs
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_date_no_crash' (91760) panicked at tests/fuzz.rs:378:1:
+Test failed: failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }.
+minimal failing input: ref fmt = "\0"
+	successes: 0
+	local rejects: 0
+	global rejects: 0
+
+
+---- fuzz_echo_no_crash stdout ----
+proptest: FileFailurePersistence::SourceParallel set, but failed to find lib.rs or main.rs
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_echo_no_crash' (91762) panicked at tests/fuzz.rs:73:1:
+Test failed: failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }.
+minimal failing input: ref args = [
+    "\0",
+]
+	successes: 0
+	local rejects: 0
+	global rejects: 0
+
+
+---- fuzz_false_any_args stdout ----
+proptest: FileFailurePersistence::SourceParallel set, but failed to find lib.rs or main.rs
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_false_any_args' (91795) panicked at tests/fuzz.rs:60:1:
+Test failed: failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }.
+minimal failing input: ref args = [
+    "\0",
+]
+	successes: 0
+	local rejects: 0
+	global rejects: 0
+
+
+---- fuzz_cat_stable stdout ----
+proptest: FileFailurePersistence::SourceParallel set, but failed to find lib.rs or main.rs
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{7a03c}\u{8c800}'\u{6b1e4}\u{e0a39}\"G🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{7a03c}\u{8c800}'\u{6b1e4}\u{e0a39}\"G🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{8c800}'\u{6b1e4}\u{e0a39}\"G🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{8c800}'\u{6b1e4}\u{e0a39}\"G🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "'\u{6b1e4}\u{e0a39}\"G🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "'\u{6b1e4}\u{e0a39}\"G🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{6b1e4}\u{e0a39}\"G🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{6b1e4}\u{e0a39}\"G🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{e0a39}\"G🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{e0a39}\"G🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\"G🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\"G🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "G🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "G🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "🕴\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{96052}\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{56da3}=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "=%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "%#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "#$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "$¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "¥D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "D\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{b}\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\r🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "🕴^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "^^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "^\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{4cdb7}\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{1b}𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "𓥳Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "Ѩ\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{94116}u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "u\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\0Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "Ⱥ)*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: ")*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: ")*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "*¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "¥x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "x<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "<\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\0%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "%[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "[?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "?'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "'\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\r\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\t(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "(\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{dcd01}H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "H\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{c5e7a}+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "+?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "?🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "🕴%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "%/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "/\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\tz\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "z\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "z\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{c5b37}ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "ၖjPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "jPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "jPDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "PDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "PDL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "DL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "DL&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "L&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "L&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "&Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "Ѩ\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{1b}\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{f1b96}\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\\\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{86348}\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{b6c8b}:=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: ":=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: ":=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "=?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "?*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "*\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\rU\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "U\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "U\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{7a4ea}o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "o\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{de7df}🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "🕴\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{7f}?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "?🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "🕴\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\"\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{ad467}:\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: ":\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: ":\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{3}|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "|\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{fcf86}\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{b}\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\tN)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "N)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "N)\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: ")\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: ")\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{7f}\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{e2124}`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "`}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "}.�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: ".�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: ".�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "�2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "2\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{18e64}`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "`={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "={?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "{?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "{?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "?%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "%`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "`ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "ÀѨj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "Ѩj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "Ѩj\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "j\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "j\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{a84c8}\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{b}*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "*.\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: ".\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: ".\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{6e977}\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\tZ\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "Z\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "Z\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{4a1a7}\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{8}\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{6}ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "ï\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{c311e}`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "`\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{5c6d7}-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "-\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\u{14672}\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\t:𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "\t:𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: ":𮏩\u{1b16c}\u{6fc5e}\n"
+ right: ":𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "𮏩\u{1b16c}\u{6fc5e}\n"
+ right: "𮏩\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{1b16c}\u{6fc5e}\n"
+ right: "\u{1b16c}\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{6fc5e}\n"
+ right: "\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{6fc5e}\n"
+ right: "\u{6fc5e}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{37e7f}\n"
+ right: "\u{37e7f}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{1bf90}\n"
+ right: "\u{1bf90}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{e018}\n"
+ right: "\u{e018}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "灜\n"
+ right: "灜"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "㡾\n"
+ right: "㡾"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "\u{1c8f}\n"
+ right: "\u{1c8f}"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "ຘ\n"
+ right: "ຘ"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "ޜ\n"
+ right: "ޜ"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "О\n"
+ right: "О"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "ɟ\n"
+ right: "ɟ"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "ƀ\n"
+ right: "ƀ"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "Đ\n"
+ right: "Đ"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "Ø\n"
+ right: "Ø"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "¼\n"
+ right: "¼"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "®\n"
+ right: "®"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "§\n"
+ right: "§"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "¤\n"
+ right: "¤"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "¢\n"
+ right: "¢"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:334:9:
+assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "¡\n"
+ right: "¡"
+
+thread 'fuzz_cat_stable' (91748) panicked at tests/fuzz.rs:328:1:
+Test failed: assertion `left == right` failed: cat stdin should preserve content exactly
+  left: "¡\n"
+ right: "¡".
+minimal failing input: ref content = "¡"
+	successes: 0
+	local rejects: 0
+	global rejects: 0
+
+
+---- fuzz_printf_no_crash stdout ----
+proptest: FileFailurePersistence::SourceParallel set, but failed to find lib.rs or main.rs
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_printf_no_crash' (93501) panicked at tests/fuzz.rs:341:1:
+Test failed: failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }.
+minimal failing input: ref fmt = "\0", ref args = []
+	successes: 0
+	local rejects: 0
+	global rejects: 0
+
+
+---- fuzz_printf_s_specifier stdout ----
+proptest: FileFailurePersistence::SourceParallel set, but failed to find lib.rs or main.rs
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "JQ'En\"G[`yF)3sssvHW\\A$o)*-T%[?'"
+ right: "JQ'En\"G[`yF)3sssvHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "Q'En\"G[`yF)3sssvHW\\A$o)*-T%[?'"
+ right: "Q'En\"G[`yF)3sssvHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "'En\"G[`yF)3sssvHW\\A$o)*-T%[?'"
+ right: "'En\"G[`yF)3sssvHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "En\"G[`yF)3sssvHW\\A$o)*-T%[?'"
+ right: "En\"G[`yF)3sssvHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "n\"G[`yF)3sssvHW\\A$o)*-T%[?'"
+ right: "n\"G[`yF)3sssvHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "\"G[`yF)3sssvHW\\A$o)*-T%[?'"
+ right: "\"G[`yF)3sssvHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "G[`yF)3sssvHW\\A$o)*-T%[?'"
+ right: "G[`yF)3sssvHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "[`yF)3sssvHW\\A$o)*-T%[?'"
+ right: "[`yF)3sssvHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "`yF)3sssvHW\\A$o)*-T%[?'"
+ right: "`yF)3sssvHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "yF)3sssvHW\\A$o)*-T%[?'"
+ right: "yF)3sssvHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "F)3sssvHW\\A$o)*-T%[?'"
+ right: "F)3sssvHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: ")3sssvHW\\A$o)*-T%[?'"
+ right: ")3sssvHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "3sssvHW\\A$o)*-T%[?'"
+ right: "3sssvHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "sssvHW\\A$o)*-T%[?'"
+ right: "sssvHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "ssvHW\\A$o)*-T%[?'"
+ right: "ssvHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "svHW\\A$o)*-T%[?'"
+ right: "svHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "vHW\\A$o)*-T%[?'"
+ right: "vHW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "HW\\A$o)*-T%[?'"
+ right: "HW\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "W\\A$o)*-T%[?'"
+ right: "W\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "\\A$o)*-T%[?'"
+ right: "\\A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "A$o)*-T%[?'"
+ right: "A$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "$o)*-T%[?'"
+ right: "$o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "o)*-T%[?'"
+ right: "o)*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: ")*-T%[?'"
+ right: ")*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "*-T%[?'"
+ right: "*-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "-T%[?'"
+ right: "-T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "T%[?'"
+ right: "T%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "%[?'"
+ right: "%[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "[?'"
+ right: "[?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "?'"
+ right: "?' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: "'"
+ right: "' "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: ""
+ right: " "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:362:9:
+assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: ""
+ right: " "
+
+thread 'fuzz_printf_s_specifier' (93534) panicked at tests/fuzz.rs:357:1:
+Test failed: assertion `left == right` failed: printf %%s should reproduce string exactly
+  left: ""
+ right: " ".
+minimal failing input: ref text = " "
+	successes: 0
+	local rejects: 0
+	global rejects: 0
+
+
+---- fuzz_test_no_crash stdout ----
+proptest: FileFailurePersistence::SourceParallel set, but failed to find lib.rs or main.rs
+
+thread 'fuzz_test_no_crash' (95067) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_test_no_crash' (95067) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_test_no_crash' (95067) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_test_no_crash' (95067) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_test_no_crash' (95067) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_test_no_crash' (95067) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_test_no_crash' (95067) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_test_no_crash' (95067) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_test_no_crash' (95067) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_test_no_crash' (95067) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_test_no_crash' (95067) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_test_no_crash' (95067) panicked at tests/fuzz.rs:176:1:
+Test failed: failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }.
+minimal failing input: ref args = [
+    "\0",
+]
+	successes: 0
+	local rejects: 0
+	global rejects: 0
+
+
+---- fuzz_tr_basic stdout ----
+proptest: FileFailurePersistence::SourceParallel set, but failed to find lib.rs or main.rs
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:31:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_tr_basic' (95110) panicked at tests/fuzz.rs:210:1:
+Test failed: failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }.
+minimal failing input: ref input = "", ref set1 = "\0", ref set2 = ""
+	successes: 0
+	local rejects: 0
+	global rejects: 0
+
+
+---- fuzz_true_any_args stdout ----
+proptest: FileFailurePersistence::SourceParallel set, but failed to find lib.rs or main.rs
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:15:10:
+failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }
+
+thread 'fuzz_true_any_args' (95129) panicked at tests/fuzz.rs:50:1:
+Test failed: failed to run gvibu: Error { kind: InvalidInput, message: "nul byte found in provided data" }.
+minimal failing input: ref args = [
+    "\0",
+]
+	successes: 0
+	local rejects: 0
+	global rejects: 0
+
+
+
+failures:
+    fuzz_basename_no_crash
+    fuzz_basename_with_suffix
+    fuzz_cat_stable
+    fuzz_date_no_crash
+    fuzz_dirname_no_crash
+    fuzz_echo_no_crash
+    fuzz_false_any_args
+    fuzz_printf_no_crash
+    fuzz_printf_s_specifier
+    fuzz_test_no_crash
+    fuzz_tr_basic
+    fuzz_true_any_args
+
+test result: FAILED. 23 passed; 12 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.93s
+

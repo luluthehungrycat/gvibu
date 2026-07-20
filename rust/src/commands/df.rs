@@ -7,6 +7,8 @@ use crate::pwriteln;
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut human = false;
     let mut show_type = false;
+    let mut show_inodes = false;
+    let mut all = false;
     let mut explicit_paths: Vec<&str> = Vec::new();
 
     let mut i = 0;
@@ -14,12 +16,16 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         match args[i].as_str() {
             "-h" => human = true,
             "-T" => show_type = true,
+            "-i" => show_inodes = true,
+            "-a" => all = true,
             "--" => { break; }
             arg if arg.starts_with('-') && arg.len() > 1 => {
                 for c in arg[1..].chars() {
                     match c {
                         'h' => human = true,
                         'T' => show_type = true,
+                        'i' => show_inodes = true,
+                        'a' => all = true,
                         _ => {
                             pwriteln!(w, "df: invalid option: -{}", c);
                             return 1;
@@ -42,10 +48,34 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     };
 
     // Print header
-    if show_type {
-        pwriteln!(w, "Filesystem     Type       1K-blocks      Used    Available  Use% Mounted on");
+    if show_inodes {
+        if show_type {
+            if human {
+                pwriteln!(w, "Filesystem     Type     Inodes    IUsed   IFree IUse% Mounted on");
+            } else {
+                pwriteln!(w, "Filesystem     Type     Inodes    IUsed   IFree IUse% Mounted on");
+            }
+        } else {
+            if human {
+                pwriteln!(w, "Filesystem     Inodes    IUsed   IFree IUse% Mounted on");
+            } else {
+                pwriteln!(w, "Filesystem     Inodes    IUsed   IFree IUse% Mounted on");
+            }
+        }
     } else {
-        pwriteln!(w, "Filesystem     1K-blocks      Used    Available  Use% Mounted on");
+        if show_type {
+            if human {
+                pwriteln!(w, "Filesystem     Type       Size      Used    Avail Use% Mounted on");
+            } else {
+                pwriteln!(w, "Filesystem     Type       1K-blocks      Used    Available  Use% Mounted on");
+            }
+        } else {
+            if human {
+                pwriteln!(w, "Filesystem     Size      Used    Avail Use% Mounted on");
+            } else {
+                pwriteln!(w, "Filesystem     1K-blocks      Used    Available  Use% Mounted on");
+            }
+        }
     }
 
     let mut exit_code = 0;
@@ -57,69 +87,160 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
             }
         }
 
-        if mount.fs_type == "rootfs" || mount.fs_type == "proc" || mount.fs_type == "sysfs" || mount.fs_type == "cgroup" || mount.fs_type == "devpts" || mount.fs_type == "devtmpfs" || mount.fs_type == "tmpfs" || mount.fs_type == "pstore" || mount.fs_type == "securityfs" || mount.fs_type == "hugetlbfs" || mount.fs_type == "mqueue" || mount.fs_type == "debugfs" || mount.fs_type == "tracefs" || mount.fs_type == "configfs" || mount.fs_type == "efivarfs" || mount.fs_type == "fusectl" {
+        // Skip pseudo-filesystems unless -a is specified
+        if !all && is_pseudo_fs(&mount.fs_type) {
             continue;
         }
 
-        match get_fs_stats(&mount.mount_point) {
-            Some((total_1k, used_1k, avail_1k, use_pct)) => {
-                if human {
-                    let total_h = human_size(total_1k * 1024);
-                    let used_h = human_size(used_1k * 1024);
-                    let avail_h = human_size(avail_1k * 1024);
-                    if show_type {
-                        let _ = writeln!(
-                            w,
-                            "{:<14} {:<11} {:>5} {:>8} {:>8} {:>3}% {}",
-                            mount.fs_file,
-                            mount.fs_type,
-                            total_h,
-                            used_h,
-                            avail_h,
-                            use_pct,
-                            mount.mount_point
-                        );
-                    } else {
-                        let _ = writeln!(
-                            w,
-                            "{:<14} {:>5} {:>8} {:>8} {:>3}% {}",
-                            mount.fs_file,
-                            total_h,
-                            used_h,
-                            avail_h,
-                            use_pct,
-                            mount.mount_point
-                        );
-                    }
-                } else {
-                    if show_type {
-                        let _ = writeln!(
-                            w,
-                            "{:<14} {:<11} {:>8} {:>8} {:>8} {:>3}% {}",
-                            mount.fs_file,
-                            mount.fs_type,
-                            total_1k,
-                            used_1k,
-                            avail_1k,
-                            use_pct,
-                            mount.mount_point
-                        );
-                    } else {
-                        let _ = writeln!(
-                            w,
-                            "{:<14} {:>8} {:>8} {:>8} {:>3}% {}",
-                            mount.fs_file,
-                            total_1k,
-                            used_1k,
-                            avail_1k,
-                            use_pct,
-                            mount.mount_point
-                        );
+        if show_inodes {
+            match get_fs_stats(&mount.mount_point) {
+                Some((total_1k, used_1k, avail_1k, use_pct)) => {
+                    match get_inode_stats(&mount.mount_point) {
+                        Some((total_inodes, used_inodes, free_inodes, inode_use_pct)) => {
+                            if show_type {
+                                if human {
+                                    let total_h = human_size(total_1k * 1024);
+                                    let used_h = human_size(used_1k * 1024);
+                                    let avail_h = human_size(avail_1k * 1024);
+                                    let _ = writeln!(
+                                        w,
+                                        "{:<14} {:<11} {:>8} {:>8} {:>8} {:>3}% {:>8} {:>8} {:>8} {:>3}% {}",
+                                        mount.fs_file,
+                                        mount.fs_type,
+                                        total_h,
+                                        used_h,
+                                        avail_h,
+                                        use_pct,
+                                        total_inodes,
+                                        used_inodes,
+                                        free_inodes,
+                                        inode_use_pct,
+                                        mount.mount_point
+                                    );
+                                } else {
+                                    let _ = writeln!(
+                                        w,
+                                        "{:<14} {:<11} {:>8} {:>8} {:>8} {:>3}% {:>8} {:>8} {:>8} {:>3}% {}",
+                                        mount.fs_file,
+                                        mount.fs_type,
+                                        total_1k,
+                                        used_1k,
+                                        avail_1k,
+                                        use_pct,
+                                        total_inodes,
+                                        used_inodes,
+                                        free_inodes,
+                                        inode_use_pct,
+                                        mount.mount_point
+                                    );
+                                }
+                            } else {
+                                if human {
+                                    let total_h = human_size(total_1k * 1024);
+                                    let used_h = human_size(used_1k * 1024);
+                                    let avail_h = human_size(avail_1k * 1024);
+                                    let _ = writeln!(
+                                        w,
+                                        "{:<14} {:>8} {:>8} {:>8} {:>3}% {:>8} {:>8} {:>8} {:>3}% {}",
+                                        mount.fs_file,
+                                        total_h,
+                                        used_h,
+                                        avail_h,
+                                        use_pct,
+                                        total_inodes,
+                                        used_inodes,
+                                        free_inodes,
+                                        inode_use_pct,
+                                        mount.mount_point
+                                    );
+                                } else {
+                                    let _ = writeln!(
+                                        w,
+                                        "{:<14} {:>8} {:>8} {:>8} {:>3}% {:>8} {:>8} {:>8} {:>3}% {}",
+                                        mount.fs_file,
+                                        total_1k,
+                                        used_1k,
+                                        avail_1k,
+                                        use_pct,
+                                        total_inodes,
+                                        used_inodes,
+                                        free_inodes,
+                                        inode_use_pct,
+                                        mount.mount_point
+                                    );
+                                }
+                            }
+                        }
+                        None => {
+                            exit_code = 1;
+                        }
                     }
                 }
+                None => {
+                    exit_code = 1;
+                }
             }
-            None => {
-                exit_code = 1;
+        } else {
+            match get_fs_stats(&mount.mount_point) {
+                Some((total_1k, used_1k, avail_1k, use_pct)) => {
+                    if human {
+                        let total_h = human_size(total_1k * 1024);
+                        let used_h = human_size(used_1k * 1024);
+                        let avail_h = human_size(avail_1k * 1024);
+                        if show_type {
+                            let _ = writeln!(
+                                w,
+                                "{:<14} {:<11} {:>5} {:>8} {:>8} {:>3}% {}",
+                                mount.fs_file,
+                                mount.fs_type,
+                                total_h,
+                                used_h,
+                                avail_h,
+                                use_pct,
+                                mount.mount_point
+                            );
+                        } else {
+                            let _ = writeln!(
+                                w,
+                                "{:<14} {:>5} {:>8} {:>8} {:>3}% {}",
+                                mount.fs_file,
+                                total_h,
+                                used_h,
+                                avail_h,
+                                use_pct,
+                                mount.mount_point
+                            );
+                        }
+                    } else {
+                        if show_type {
+                            let _ = writeln!(
+                                w,
+                                "{:<14} {:<11} {:>8} {:>8} {:>8} {:>3}% {}",
+                                mount.fs_file,
+                                mount.fs_type,
+                                total_1k,
+                                used_1k,
+                                avail_1k,
+                                use_pct,
+                                mount.mount_point
+                            );
+                        } else {
+                            let _ = writeln!(
+                                w,
+                                "{:<14} {:>8} {:>8} {:>8} {:>3}% {}",
+                                mount.fs_file,
+                                total_1k,
+                                used_1k,
+                                avail_1k,
+                                use_pct,
+                                mount.mount_point
+                            );
+                        }
+                    }
+                }
+                None => {
+                    exit_code = 1;
+                }
             }
         }
     }
@@ -151,13 +272,31 @@ fn read_mounts() -> Result<Vec<MountInfo>, String> {
     Ok(mounts)
 }
 
+fn is_pseudo_fs(fs_type: &str) -> bool {
+    matches!(
+        fs_type,
+        "rootfs" | "proc" | "sysfs" | "cgroup" | "devpts" | "devtmpfs" |
+        "tmpfs" | "pstore" | "securityfs" | "hugetlbfs" | "mqueue" |
+        "debugfs" | "tracefs" | "configfs" | "efivarfs" | "fusectl" |
+        "autofs" | "binfmt_misc" | "bpf"
+    )
+}
+
 fn get_fs_stats(path: &str) -> Option<(u64, u64, u64, u64)> {
     let cpath = CString::new(path).ok()?;
     let mut stat = std::mem::MaybeUninit::<libc::statvfs>::uninit();
+    // SAFETY: `cpath` is a NUL-terminated `CString` (valid C string pointer),
+    // and `stat.as_mut_ptr()` returns a valid, properly aligned pointer to a
+    // stack-allocated `MaybeUninit<libc::statvfs>` whose size matches what
+    // `libc::statvfs` expects. The kernel will write the struct on success,
+    // and we only read it after checking `ret == 0`.
     let ret = unsafe { libc::statvfs(cpath.as_ptr(), stat.as_mut_ptr()) };
     if ret != 0 {
         return None;
     }
+    // SAFETY: `libc::statvfs` returned 0 (success) and the POSIX contract
+    // guarantees it fully initialised the `statvfs` struct in this case, so
+    // `assume_init` is sound and yields a fully-valid `libc::statvfs`.
     let stat = unsafe { stat.assume_init() };
 
     let frsize = stat.f_frsize as u64;
@@ -175,6 +314,36 @@ fn get_fs_stats(path: &str) -> Option<(u64, u64, u64, u64)> {
     };
 
     Some((total_1k, used_1k, avail_1k, use_pct))
+}
+
+fn get_inode_stats(path: &str) -> Option<(u64, u64, u64, u64)> {
+    let cpath = CString::new(path).ok()?;
+    let mut stat = std::mem::MaybeUninit::<libc::statvfs>::uninit();
+    // SAFETY: `cpath` is a NUL-terminated `CString` (valid C string pointer),
+    // and `stat.as_mut_ptr()` returns a valid, properly aligned pointer to a
+    // stack-allocated `MaybeUninit<libc::statvfs>` whose size matches what
+    // `libc::statvfs` expects. The kernel will write the struct on success,
+    // and we only read it after checking `ret == 0`.
+    let ret = unsafe { libc::statvfs(cpath.as_ptr(), stat.as_mut_ptr()) };
+    if ret != 0 {
+        return None;
+    }
+    // SAFETY: `libc::statvfs` returned 0 (success) and the POSIX contract
+    // guarantees it fully initialised the `statvfs` struct in this case, so
+    // `assume_init` is sound and yields a fully-valid `libc::statvfs`.
+    let stat = unsafe { stat.assume_init() };
+
+    let files = stat.f_files as u64;
+    let ffree = stat.f_ffree as u64;
+    let favail = stat.f_favail as u64;
+    let used = files.saturating_sub(ffree);
+    let use_pct = if files > 0 {
+        (used * 100) / files
+    } else {
+        0
+    };
+
+    Some((files, used, ffree, use_pct))
 }
 
 fn human_size(bytes: u64) -> String {
@@ -238,5 +407,26 @@ mod tests {
         // Just check it doesn't crash - relies on /proc/mounts
         let result = run(&mut std::io::sink(), &[]);
         assert!(result == 0 || result == 1);
+    }
+
+    #[test]
+    fn test_inode_flag() {
+        let result = run(&mut std::io::sink(), &["-i".into()]);
+        assert!(result == 0 || result == 1);
+    }
+
+    #[test]
+    fn test_all_flag() {
+        let result = run(&mut std::io::sink(), &["-a".into()]);
+        assert!(result == 0 || result == 1);
+    }
+
+    #[test]
+    fn test_is_pseudo_fs() {
+        assert!(is_pseudo_fs("proc"));
+        assert!(is_pseudo_fs("sysfs"));
+        assert!(is_pseudo_fs("tmpfs"));
+        assert!(!is_pseudo_fs("ext4"));
+        assert!(!is_pseudo_fs("xfs"));
     }
 }

@@ -3,6 +3,75 @@ use std::io::{self, BufRead, Write};
 use crate::pwriteln;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
+    if let Some(stdin) = crate::get_wasm_stdin() {
+        let mut width: usize = 80;
+        let mut break_spaces = false;
+        let mut i = 0;
+        while i < args.len() {
+            let arg = &args[i];
+            if arg == "--" { break; }
+            if arg == "-w" {
+                i += 1;
+                if i >= args.len() {
+                    eprintln!("fold: option requires an argument: -w");
+                    return 1;
+                }
+                match args[i].parse::<usize>() {
+                    Ok(n) if n > 0 => width = n,
+                    Ok(_) | Err(_) => {
+                        eprintln!("fold: invalid width: {}", args[i]);
+                        return 1;
+                    }
+                }
+            } else if arg == "-s" {
+                break_spaces = true;
+            } else if arg.starts_with('-') && arg.len() > 1 {
+                eprintln!("fold: invalid option: {}", arg);
+                return 1;
+            } else {
+                eprintln!("fold: file arguments not supported");
+                return 1;
+            }
+            i += 1;
+        }
+        if width == 0 {
+            eprintln!("fold: width must be positive");
+            return 1;
+        }
+        for l in stdin.lines() {
+            let mut remaining = l;
+            while !remaining.is_empty() {
+                if remaining.len() <= width {
+                    pwriteln!(w, "{}", remaining);
+                    break;
+                }
+                let split = if break_spaces {
+                    let truncated = &remaining[..width];
+                    let last_space = truncated.rfind(char::is_whitespace);
+                    match last_space {
+                        Some(pos) if pos > 0 => pos,
+                        _ => width,
+                    }
+                } else {
+                    width
+                };
+                let (chunk, rest) = remaining.split_at(split);
+                let trimmed_chunk = if break_spaces {
+                    chunk.trim_end()
+                } else {
+                    chunk
+                };
+                pwriteln!(w, "{}", trimmed_chunk);
+                remaining = if break_spaces {
+                    rest.trim_start()
+                } else {
+                    rest
+                };
+            }
+        }
+        return 0;
+    }
+
     let mut width: usize = 80;
     let mut break_spaces = false;
 

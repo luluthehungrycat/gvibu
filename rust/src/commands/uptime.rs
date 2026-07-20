@@ -15,8 +15,18 @@ fn get_uptime_seconds() -> u64 {
 /// then compute uptime from wall clock.
 #[cfg(not(target_os = "linux"))]
 fn get_uptime_seconds() -> u64 {
+    // SAFETY: `libc::timeval` is a POD struct of two integer fields whose
+    // all-zero byte pattern is a valid instance, so `mem::zeroed()` is sound;
+    // the value is only read after `sysctlbyname` returns 0 (success) and
+    // populates the buffer.
     let mut boottime: libc::timeval = unsafe { std::mem::zeroed() };
     let mut len = std::mem::size_of::<libc::timeval>() as libc::size_t;
+    // SAFETY: the first argument is a pointer to a NUL-terminated byte string
+    // literal (`b"kern.boottime\0"`) with `'static` lifetime, the second is a
+    // valid pointer to a stack-allocated `libc::timeval` of the correct size
+    // (matching `len`), the length pointer is initialised to that size, and
+    // the old-value pointer is NULL with old-value size 0 (no read). The call
+    // therefore satisfies the `sysctlbyname` FFI contract.
     let ret = unsafe {
         libc::sysctlbyname(
             b"kern.boottime\0".as_ptr() as *const libc::c_char,
