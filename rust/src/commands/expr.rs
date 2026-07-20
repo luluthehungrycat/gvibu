@@ -372,9 +372,13 @@ impl RegexLite {
                 }
                 PatternPiece::DotStar => {
                     // Try to match the rest of the pattern after the dot-star
-                    // safe: we're inside the DotStar match arm, so at least one exists
-                    let dotstar_pos = self.pattern.iter().position(|p| matches!(p, PatternPiece::DotStar))
-                        .expect("DotStar pattern piece should exist in DotStar match arm");
+                    // Invariant: we are inside the DotStar match arm, so the pattern
+                    // is guaranteed to contain at least one PatternPiece::DotStar.
+                    let dotstar_pos = self
+                        .pattern
+                        .iter()
+                        .position(|p| matches!(p, PatternPiece::DotStar))
+                        .unwrap_or_else(|| unreachable!("DotStar arm matched but no DotStar piece found in pattern"));
                     let remaining = &self.pattern[dotstar_pos + 1..];
                     if remaining.is_empty() {
                         pos = text.len();

@@ -196,6 +196,27 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
         return 1;
     }
 
+    if let Some(stdin) = crate::get_wasm_stdin() {
+        if files.is_empty() {
+            let mut reader = BufReader::new(stdin.as_bytes());
+            process_reader(stdout, &mut reader, delimiter, field_indices.as_ref(), byte_indices.as_ref(), char_indices.as_ref(), suppress_non_matching);
+        } else {
+            for f in &files {
+                match File::open(f) {
+                    Ok(file) => {
+                        let mut reader = BufReader::new(file);
+                        process_reader(stdout, &mut reader, delimiter, field_indices.as_ref(), byte_indices.as_ref(), char_indices.as_ref(), suppress_non_matching);
+                    }
+                    Err(e) => {
+                        eprintln!("cut: {}: {}", f, e);
+                        return 1;
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
     if files.is_empty() {
         let mut reader = BufReader::new(io::stdin());
         process_reader(stdout, &mut reader, delimiter, field_indices.as_ref(), byte_indices.as_ref(), char_indices.as_ref(), suppress_non_matching);

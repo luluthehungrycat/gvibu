@@ -66,7 +66,7 @@ fn parse_symbolic(s: &str) -> Option<(char, char, u32)> {
         }
         ('a', bits)
     } else {
-        let ch = who_str.chars().next().unwrap();
+        let ch = who_str.chars().next().unwrap_or('a');
         let bits = match ch {
             'u' => perm_bits << 6,
             'g' => perm_bits << 3,

@@ -90,7 +90,6 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         i += 1;
     }
 
-    // Default: l, w, c, m (not L)
     if !flag_l && !flag_w && !flag_c && !flag_m && !flag_max_line {
         flag_l = true;
         flag_w = true;
@@ -110,6 +109,73 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         }
         parts.join(" ")
     };
+
+    if let Some(stdin) = crate::get_wasm_stdin() {
+        let mut total_l = 0usize;
+        let mut total_w = 0usize;
+        let mut total_c = 0usize;
+        let mut total_m = 0usize;
+        let mut total_max_line = 0usize;
+        let mut stdin_reader = stdin.as_bytes();
+        if files.is_empty() {
+            match count_stream(&mut stdin_reader) {
+                Ok((l, wc, c, m, max_line)) => {
+                    let _ = pwriteln!(w, "{}", fmt(l, wc, c, m, max_line, ""));
+                }
+                Err(e) => {
+                    eprintln!("wc: stdin: {}", e);
+                    return 1;
+                }
+            }
+            return 0;
+        }
+        for fname in &files {
+            if fname == "-" {
+                let mut cursor = stdin.as_bytes();
+                match count_stream(&mut cursor) {
+                    Ok((l, wc, c, m, max_line)) => {
+                        total_l += l;
+                        total_w += wc;
+                        total_c += c;
+                        total_m += m;
+                        total_max_line = total_max_line.max(max_line);
+                        let _ = pwriteln!(w, "{}", fmt(l, wc, c, m, max_line, fname));
+                    }
+                    Err(e) => {
+                        eprintln!("wc: stdin: {}", e);
+                        return 1;
+                    }
+                }
+                continue;
+            }
+            let file = match File::open(fname) {
+                Ok(f) => f,
+                Err(e) => {
+                    eprintln!("wc: {}: {}", fname, e);
+                    return 1;
+                }
+            };
+            let mut reader = BufReader::new(file);
+            match count_stream(&mut reader) {
+                Ok((l, wc, c, m, max_line)) => {
+                    total_l += l;
+                    total_w += wc;
+                    total_c += c;
+                    total_m += m;
+                    total_max_line = total_max_line.max(max_line);
+                    let _ = pwriteln!(w, "{}", fmt(l, wc, c, m, max_line, fname));
+                }
+                Err(e) => {
+                    eprintln!("wc: {}: {}", fname, e);
+                    return 1;
+                }
+            }
+        }
+        if files.len() > 1 {
+            let _ = pwriteln!(w, "{}", fmt(total_l, total_w, total_c, total_m, total_max_line, "total"));
+        }
+        return 0;
+    }
 
     let mut exit_code = 0;
     let mut total_l = 0usize;

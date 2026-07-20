@@ -116,6 +116,53 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         i += 1;
     }
 
+    if let Some(stdin) = crate::get_wasm_stdin() {
+        if files.is_empty() {
+            if let Some(nbytes) = num_bytes {
+                let data = read_n_bytes(stdin.as_bytes(), nbytes);
+                return print_bytes(w, &data, nbytes);
+            } else {
+                let lines = read_n_lines(BufReader::new(stdin.as_bytes()), num_lines);
+                return print_lines(w, &lines, num_lines);
+            }
+        }
+        for (idx, fname) in files.iter().enumerate() {
+            if files.len() > 1 {
+                if idx > 0 {
+                    pwriteln!(w);
+                }
+                pwriteln!(w, "==> {} <==", fname);
+            }
+            if fname == "-" {
+                if let Some(nbytes) = num_bytes {
+                    let data = read_n_bytes(stdin.as_bytes(), nbytes);
+                    print_bytes(w, &data, nbytes);
+                } else {
+                    let lines = read_n_lines(BufReader::new(stdin.as_bytes()), num_lines);
+                    print_lines(w, &lines, num_lines);
+                }
+            } else {
+                match File::open(fname) {
+                    Ok(file) => {
+                        if let Some(nbytes) = num_bytes {
+                            let data = read_n_bytes(file, nbytes);
+                            print_bytes(w, &data, nbytes);
+                        } else {
+                            let reader = BufReader::new(file);
+                            let lines = read_n_lines(reader, num_lines);
+                            print_lines(w, &lines, num_lines);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("head: {}: {}", fname, e);
+                        return 1;
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
     let mut exit_code = 0;
 
     if files.is_empty() {

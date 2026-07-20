@@ -285,10 +285,18 @@ fn is_pseudo_fs(fs_type: &str) -> bool {
 fn get_fs_stats(path: &str) -> Option<(u64, u64, u64, u64)> {
     let cpath = CString::new(path).ok()?;
     let mut stat = std::mem::MaybeUninit::<libc::statvfs>::uninit();
+    // SAFETY: `cpath` is a NUL-terminated `CString` (valid C string pointer),
+    // and `stat.as_mut_ptr()` returns a valid, properly aligned pointer to a
+    // stack-allocated `MaybeUninit<libc::statvfs>` whose size matches what
+    // `libc::statvfs` expects. The kernel will write the struct on success,
+    // and we only read it after checking `ret == 0`.
     let ret = unsafe { libc::statvfs(cpath.as_ptr(), stat.as_mut_ptr()) };
     if ret != 0 {
         return None;
     }
+    // SAFETY: `libc::statvfs` returned 0 (success) and the POSIX contract
+    // guarantees it fully initialised the `statvfs` struct in this case, so
+    // `assume_init` is sound and yields a fully-valid `libc::statvfs`.
     let stat = unsafe { stat.assume_init() };
 
     let frsize = stat.f_frsize as u64;
@@ -311,10 +319,18 @@ fn get_fs_stats(path: &str) -> Option<(u64, u64, u64, u64)> {
 fn get_inode_stats(path: &str) -> Option<(u64, u64, u64, u64)> {
     let cpath = CString::new(path).ok()?;
     let mut stat = std::mem::MaybeUninit::<libc::statvfs>::uninit();
+    // SAFETY: `cpath` is a NUL-terminated `CString` (valid C string pointer),
+    // and `stat.as_mut_ptr()` returns a valid, properly aligned pointer to a
+    // stack-allocated `MaybeUninit<libc::statvfs>` whose size matches what
+    // `libc::statvfs` expects. The kernel will write the struct on success,
+    // and we only read it after checking `ret == 0`.
     let ret = unsafe { libc::statvfs(cpath.as_ptr(), stat.as_mut_ptr()) };
     if ret != 0 {
         return None;
     }
+    // SAFETY: `libc::statvfs` returned 0 (success) and the POSIX contract
+    // guarantees it fully initialised the `statvfs` struct in this case, so
+    // `assume_init` is sound and yields a fully-valid `libc::statvfs`.
     let stat = unsafe { stat.assume_init() };
 
     let files = stat.f_files as u64;

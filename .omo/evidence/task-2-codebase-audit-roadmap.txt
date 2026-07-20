@@ -1,0 +1,176 @@
+=== TASK 2: Add // SAFETY: documentation comments above every unsafe block in 6 Rust command files ===
+Date: 2026-07-20T15:47:46Z
+Toolchain: rustc 1.85.0 (4d91de4e4 2025-02-17), cargo 1.85.0
+Project: /workspace/repo (gvibu multicall coreutils)
+
+=== Files Modified (only the 6 listed in the task) ===
+ rust/src/commands/chown.rs  |  5 +++++
+ rust/src/commands/df.rs     | 16 ++++++++++++++++
+ rust/src/commands/id.rs     | 18 ++++++++++++++++++
+ rust/src/commands/kill.rs   |  4 ++++
+ rust/src/commands/uname.rs  |  8 ++++++++
+ rust/src/commands/uptime.rs | 10 ++++++++++
+ 6 files changed, 61 insertions(+)
+
+Total: 16 unsafe blocks documented across 6 files, with only comment additions
+(no logic changes, no unsafe blocks removed, no other files modified).
+
+=== Per-File SAFETY / unsafe Block Counts (1:1) ===
+  id.rs:     unsafe={6}  SAFETY={6}  (libc::getuid, getgid, geteuid, getegid, getgroups×2)
+  kill.rs:   unsafe={1}  SAFETY={1}  (libc::kill)
+  uname.rs:  unsafe={2}  SAFETY={2}  (mem::zeroed for utsname, libc::uname)
+  uptime.rs: unsafe={2}  SAFETY={2}  (mem::zeroed for timeval, libc::sysctlbyname)
+  chown.rs:  unsafe={1}  SAFETY={1}  (libc::chown)
+  df.rs:     unsafe={4}  SAFETY={4}  (libc::statvfs×2 + assume_init×2)
+
+=== Adjacency Verification ===
+For every `unsafe {` block, the first comment line immediately above starts with
+`// SAFETY:` (verified by an awk pass that scans up to 10 lines back from each
+`unsafe {` line, stopping at the first non-comment line; no MISSING reported).
+
+=== Safety Comments (one per unsafe block) ===
+
+--- id.rs ---
+  L7  get_uid   (libc::getuid):
+      "SAFETY: `libc::getuid` is an async-signal-safe POSIX function that takes no
+       arguments and always returns a valid `uid_t` (non-negative integer); the
+       kernel guarantees the call is safe to make on any thread."
+
+  L11 get_gid   (libc::getgid):
+      "SAFETY: `libc::getgid` is an async-signal-safe POSIX function that takes no
+       arguments and always returns a valid `gid_t` (non-negative integer); the
+       kernel guarantees the call is safe to make on any thread."
+
+  L15 get_euid  (libc::geteuid):
+      "SAFETY: `libc::geteuid` is an async-signal-safe POSIX function that takes
+       no arguments and always returns a valid `uid_t` (non-negative integer);
+       the kernel guarantees the call is safe to make on any thread."
+
+  L19 get_egid  (libc::getegid):
+      "SAFETY: `libc::getegid` is an async-signal-safe POSIX function that takes
+       no arguments and always returns a valid `gid_t` (non-negative integer);
+       the kernel guarantees the call is safe to make on any thread."
+
+  L23 get_groups  size query (libc::getgroups(0, null_mut)):
+      "SAFETY: per POSIX, when `bufsize` is 0, `libc::getgroups` ignores `buf`
+       (even if NULL) and only returns the number of supplementary group IDs;
+       passing `null_mut()` is therefore well-defined."
+
+  L28 get_groups  fill buffer (libc::getgroups(ngroups, ptr)):
+      "SAFETY: `groups` is a heap-allocated `Vec<u32>` of length `ngroups`, so
+       its pointer is valid for writing `ngroups` `gid_t` values; the buffer is
+       exclusively owned by this function for the duration of the call."
+
+--- kill.rs ---
+  L125 libc::kill(pid, sig):
+      "SAFETY: `pid` is a `pid_t` parsed from CLI arguments (any value is
+       accepted by the kernel; an invalid pid simply yields `ESRCH`), and `sig`
+       is a signal number constrained by `parse_signal` to the range 1..=31
+       (or a named POSIX signal), so the call satisfies the FFI contract."
+
+--- uname.rs ---
+  L22 mem::zeroed for libc::utsname:
+      "SAFETY: `libc::utsname` is a POD struct whose all-zero byte pattern is a
+       valid instance (no niche/provenance requirements), so `mem::zeroed()` is
+       sound; the kernel will overwrite every field on the subsequent `uname`
+       call, and we never read uninitialised memory."
+
+  L23 libc::uname(&mut uts):
+      "SAFETY: `uts` is a stack-allocated, properly aligned `libc::utsname`
+       whose size matches the kernel's expectation; its address is valid for
+       the duration of the call, and `libc::uname` is safe to invoke on any
+       thread with no additional preconditions."
+
+--- uptime.rs ---
+  L18 mem::zeroed for libc::timeval:
+      "SAFETY: `libc::timeval` is a POD struct of two integer fields whose
+       all-zero byte pattern is a valid instance, so `mem::zeroed()` is sound;
+       the value is only read after `sysctlbyname` returns 0 (success) and
+       populates the buffer."
+
+  L20 libc::sysctlbyname("kern.boottime\0", ...):
+      "SAFETY: the first argument is a pointer to a NUL-terminated byte string
+       literal (`b"kern.boottime\0"`) with `'static` lifetime, the second is a
+       valid pointer to a stack-allocated `libc::timeval` of the correct size
+       (matching `len`), the length pointer is initialised to that size, and
+       the old-value pointer is NULL with old-value size 0 (no read). The call
+       therefore satisfies the `sysctlbyname` FFI contract."
+
+--- chown.rs ---
+  L71 libc::chown(c_path.as_ptr(), c_uid, c_gid):
+      "SAFETY: `c_path` is a `CString` (NUL-terminated, valid C string)
+       derived from the input `path`; `c_uid` and `c_gid` are `uid_t` /
+       `gid_t` values cast to the FFI type, with `u32::MAX` (-1 as a
+       signed value) used as the documented sentinel meaning "do not
+       change". The pointer remains valid for the duration of the call."
+
+--- df.rs ---
+  L288 libc::statvfs(cpath, stat)  (get_fs_stats):
+      "SAFETY: `cpath` is a NUL-terminated `CString` (valid C string pointer),
+       and `stat.as_mut_ptr()` returns a valid, properly aligned pointer to a
+       stack-allocated `MaybeUninit<libc::statvfs>` whose size matches what
+       `libc::statvfs` expects. The kernel will write the struct on success,
+       and we only read it after checking `ret == 0`."
+
+  L292 stat.assume_init()  (get_fs_stats):
+      "SAFETY: `libc::statvfs` returned 0 (success) and the POSIX contract
+       guarantees it fully initialised the `statvfs` struct in this case, so
+       `assume_init` is sound and yields a fully-valid `libc::statvfs`."
+
+  L314 libc::statvfs(cpath, stat)  (get_inode_stats): same as L288
+  L318 stat.assume_init()         (get_inode_stats): same as L292
+
+=== Build Output (cargo build --manifest-path rust/Cargo.toml) ===
+$ cargo build --manifest-path rust/Cargo.toml
+   Compiling gvibu v0.3.0 (/workspace/repo/rust)
+warning: use of deprecated function `rand::thread_rng`: Renamed to `rng`
+  --> src/commands/shuf.rs:48:25
+warning: unused variable: `args`
+  --> src/commands/uptime.rs:50:36
+warning: unused variable: `indices`
+  --> src/commands/cut.rs:237:25
+warning: value assigned to `i` is never read
+  --> src/commands/date.rs:132:17
+warning: unused variable: `depth`
+  --> src/commands/du.rs:102:31
+warning: unused variable: `favail`
+  --> src/commands/df.rs:338:9
+warning: `gvibu` (lib) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.99s
+
+EXIT CODE: 0  (build succeeded; only pre-existing warnings in unrelated files)
+
+=== Test Results ===
+
+$ cargo test --manifest-path rust/Cargo.toml --lib --no-fail-fast
+test result: FAILED. 331 passed; 1 failed; 0 ignored
+  - the 1 failure is `commands::date::tests::test_date_with_d_flag_iso`,
+    a pre-existing date-format test in src/commands/date.rs (unrelated to
+    this task). Confirmed by stashing the 6 file changes and reproducing
+    the same 1 failure with HEAD source.
+
+$ cargo test --manifest-path rust/Cargo.toml --test cli --no-fail-fast
+test result: FAILED. 242 passed; 13 failed; 0 ignored
+  - all 13 failures are pre-existing (environment-related: no username,
+    missing /proc/mounts entries, etc.). Confirmed by stashing the 6 file
+    changes and reproducing the same 13 failures with HEAD source.
+
+No new test failures were introduced by adding the SAFETY comments.
+
+=== Verification Method ===
+1. Per-file regex counts: each file has equal `unsafe {` and `// SAFETY:`
+   occurrences (6/1/2/2/1/4 = 16 total).
+2. Awk adjacency check: for every `unsafe {` line, the nearest preceding
+   comment line starts with `// SAFETY:` (search up to 10 lines back,
+   stopping at the first non-comment line). No MISSING reported.
+3. `cargo build` exit code 0 (build succeeds).
+4. `cargo test` results compared before/after my changes — identical
+   (331 passed + 1 pre-existing fail in lib; 242 passed + 13 pre-existing
+   fails in cli). No regressions introduced.
+5. `git diff --stat` confirms ONLY the 6 specified files were modified;
+   no unsafe blocks removed, no logic changed.
+
+=== Conclusion ===
+All 16 `unsafe {` blocks across the 6 listed files now have a preceding
+`// SAFETY:` documentation comment explaining why the call is sound.
+The build succeeds. No new test regressions. No other files modified.

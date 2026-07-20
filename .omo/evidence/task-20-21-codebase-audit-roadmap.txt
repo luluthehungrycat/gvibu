@@ -1,0 +1,184 @@
+TASK 20/21 — gvibu-linux QEMU run scripts: echo stubs -> real QEMU invocations
+==================================================================================
+
+Goal
+----
+Replace the echo-only QEMU scaffolds in gvibu-linux/ with scripts that
+actually validate inputs and (re)build a variant-specific initramfs before
+handing off to gvibu-linux/run_qemu.sh.
+
+Files modified
+--------------
+  M gvibu-linux/qemu_run_py.sh
+  M gvibu-linux/qemu_run_rs.sh
+
+Files NOT modified (as required)
+--------------------------------
+  - gvibu-linux/run_qemu.sh          (untouched, verified via git diff)
+  - gvibu-linux/build_initramfs.sh   (untouched, verified via git diff)
+
+No new files were created inside gvibu-linux/. The only new file is this
+evidence file under .omo/evidence/.
+
+----------------------------------------------------------------------
+1) gvibu-linux/qemu_run_py.sh  (Python variant)
+----------------------------------------------------------------------
+
+Before: 11 lines that only `echo`ed a qemu command string and a "this is a
+scaffold" notice. No validation, no execution, no initramfs work.
+
+After: A real run helper that:
+
+  1. Validates that <kernel-path> was provided. On missing arg, prints
+     "Error: missing kernel path" and a multi-line usage block explaining
+     default initramfs location and giving examples. Exits 1.
+
+  2. Checks for qemu-system-x86_64 in PATH. If absent, prints a clear
+     "Error: qemu-system-x86_64 not found in PATH" message with install
+     instructions for Debian/Ubuntu (apt-get), Fedora/RHEL (dnf), Arch
+     (pacman), and macOS (brew). Exits 1.
+
+  3. Verifies the kernel image file exists. If missing, prints "Error:
+     kernel image not found: <path>" and gives example paths
+     (/boot/vmlinuz-$(uname -r), ./linux/arch/x86/boot/bzImage, etc.).
+     Exits 1.
+
+  4. Verifies gvibu-python/vish.py exists. If missing, prints a clear
+     error and exits 1.
+
+  5. Builds the variant initramfs at /tmp/gvibu_py_initramfs.cpio
+     (or $2 if the user supplied a path). The initramfs is rebuilt if it
+     is missing, or if gvibu-python/vish.py (or the script itself) is
+     newer than the existing cpio. The build:
+       - Locates the host python3 binary.
+       - Runs the existing gvibu-linux/build_initramfs.sh to produce the
+         base /tmp/initramfs.cpio.
+       - Extracts the cpio into /tmp/gvibu_py_initramfs_root/.
+       - Installs python3 -> /bin/python3, then walks `ldd` to copy the
+         interpreter's dynamic libraries into the matching paths under
+         the root.
+       - Installs gvibu-python/vish.py -> /bin/vish.py (0755).
+       - Repacks the tree with cpio -o -H newc into the target path.
+
+  6. Execs gvibu-linux/run_qemu.sh "$KERNEL_PATH" "$INITRAMFS_PATH".
+     run_qemu.sh is responsible for the actual qemu-system-x86_64 call.
+
+Verified behaviors (run in this env):
+
+  $ ./gvibu-linux/qemu_run_py.sh
+  Error: missing kernel path.
+  Usage: .../qemu_run_py.sh <kernel-path> [initramfs-path]
+  ...                              # full usage block
+  exit 1
+
+  $ ./gvibu-linux/qemu_run_py.sh /tmp/nonexistent_kernel
+  Error: qemu-system-x86_64 not found in PATH.
+  Install QEMU for your distribution, e.g.:
+    Debian/Ubuntu : sudo apt-get install qemu-system-x86
+    Fedora/RHEL   : sudo dnf install qemu-system-x86
+    ...
+  exit 1
+  (QEMU is not installed in this sandbox; the script detects that
+  before doing any further work, exactly as required.)
+
+  bash -n gvibu-linux/qemu_run_py.sh  -> syntax OK.
+
+----------------------------------------------------------------------
+2) gvibu-linux/qemu_run_rs.sh  (Rust variant)
+----------------------------------------------------------------------
+
+Before: 11 lines, same echo-only scaffold as qemu_run_py.sh, but for the
+Rust path.
+
+After: A real run helper that mirrors the Python script's structure, with
+these differences:
+
+  1. Arg validation is identical: missing kernel -> error + usage + exit 1.
+
+  2. QEMU check is identical: missing qemu-system-x86_64 -> distro-aware
+     install instructions + exit 1.
+
+  3. Kernel-file check is identical: missing file -> clear error +
+     example paths + exit 1.
+
+  4. Sanity-checks the vish/ crate (vish/Cargo.toml) so the script fails
+     fast if the Rust vish source tree is gone.
+
+  5. Builds the variant initramfs at /tmp/gvibu_rs_initramfs.cpio
+     (or $2 if supplied). Rebuild triggers:
+       - initramfs missing
+       - vish binary missing
+       - vish binary newer than the cpio
+       - vish/src/main.rs or vish/Cargo.toml newer than the cpio
+     The build:
+       - If cargo is not in PATH, prints Rust install instructions and
+         exits 1.
+       - Runs `cargo build --release` inside the vish/ crate, producing
+         vish/target/release/vish.
+       - Runs the existing gvibu-linux/build_initramfs.sh for the base
+         /tmp/initramfs.cpio.
+       - Extracts the cpio into /tmp/gvibu_rs_initramfs_root/.
+       - Installs vish/target/release/vish -> /bin/vish, and copies its
+         dynamic dependencies (ldd walk) into the matching paths.
+       - Repacks with cpio -o -H newc into the target path.
+
+  6. Execs gvibu-linux/run_qemu.sh "$KERNEL_PATH" "$INITRAMFS_PATH".
+
+Verified behaviors:
+
+  $ ./gvibu-linux/qemu_run_rs.sh
+  Error: missing kernel path.
+  Usage: ...                       # full usage block
+  exit 1
+
+  $ ./gvibu-linux/qemu_run_rs.sh /tmp/nonexistent_kernel
+  Error: qemu-system-x86_64 not found in PATH.
+  Install QEMU for your distribution, e.g.:
+    ...
+  exit 1
+
+  bash -n gvibu-linux/qemu_run_rs.sh  -> syntax OK.
+
+----------------------------------------------------------------------
+3) Untouched: gvibu-linux/run_qemu.sh and gvibu-linux/build_initramfs.sh
+----------------------------------------------------------------------
+
+git diff gvibu-linux/run_qemu.sh           -> no changes
+git diff gvibu-linux/build_initramfs.sh    -> no changes
+
+Both are now invoked by the variant scripts as the actual QEMU launcher
+and base initramfs producer, respectively. The new scripts layer on top
+of these existing helpers rather than reimplementing them.
+
+----------------------------------------------------------------------
+4) Requirement coverage
+----------------------------------------------------------------------
+
+REQUIRED                                 STATUS
+---------------------------------------- ------
+Read qemu_run_py.sh (was echo-only)       done, replaced
+Validate kernel/initramfs args or error   yes (kernel required; initramfs optional with default + auto-build)
+Call run_qemu.sh with provided paths      yes (exec at end)
+Initramfs includes Python3 + vish.py      yes (build step 5)
+Clear instructions if kernel/QEMU missing yes (steps 2 + 3)
+Read qemu_run_rs.sh (was echo-only)       done, replaced
+Validate kernel/initramfs args or error   yes (kernel required; initramfs optional with default + auto-build)
+Call run_qemu.sh with provided paths      yes (exec at end)
+Initramfs includes vish Rust binary       yes (cargo build + cpio augmentation)
+Clear instructions if kernel/QEMU missing yes (steps 2 + 3)
+Read run_qemu.sh, keep existing           yes, untouched
+Read build_initramfs.sh, keep existing    yes, untouched
+Must NOT modify run_qemu.sh               confirmed by git diff
+Must NOT modify build_initramfs.sh        confirmed by git diff
+Must NOT add new files in gvibu-linux/    confirmed (only the two scripts were edited)
+
+Outcome
+-------
+Both scripts now either:
+  (a) execute QEMU with proper arguments via run_qemu.sh, after building a
+      variant-specific initramfs, or
+  (b) print a clear prerequisite error message and exit non-zero
+      (missing kernel arg, missing qemu-system-x86_64, missing kernel
+       image, missing vish source, missing cargo for the Rust variant).
+
+No more echo-only stubs.

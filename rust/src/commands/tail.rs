@@ -59,6 +59,81 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         i += 1;
     }
 
+    if let Some(stdin) = crate::get_wasm_stdin() {
+        if files.is_empty() || files == ["-"] {
+            if follow {
+                eprintln!("tail: cannot follow standard input");
+                return 1;
+            }
+            let reader = BufReader::new(stdin.as_bytes());
+            if let Some(nbytes) = num_bytes {
+                let data = read_last_bytes_reader(reader, nbytes);
+                if let Err(e) = w.write_all(&data) {
+                    if e.kind() == std::io::ErrorKind::BrokenPipe { return 0; }
+                    return 1;
+                }
+            } else {
+                let lines = read_last_lines_reader(reader, num_lines);
+                for line in &lines {
+                    if let Err(e) = write!(w, "{}", line) {
+                        if e.kind() == std::io::ErrorKind::BrokenPipe { return 0; }
+                        return 1;
+                    }
+                }
+            }
+            return 0;
+        }
+        for fname in &files {
+            if fname == "-" {
+                if follow {
+                    eprintln!("tail: cannot follow standard input");
+                    return 1;
+                }
+                let reader = BufReader::new(stdin.as_bytes());
+                if let Some(nbytes) = num_bytes {
+                    let data = read_last_bytes_reader(reader, nbytes);
+                    if let Err(e) = w.write_all(&data) {
+                        if e.kind() == std::io::ErrorKind::BrokenPipe { return 0; }
+                        return 1;
+                    }
+                } else {
+                    let lines = read_last_lines_reader(reader, num_lines);
+                    for line in &lines {
+                        if let Err(e) = write!(w, "{}", line) {
+                            if e.kind() == std::io::ErrorKind::BrokenPipe { return 0; }
+                            return 1;
+                        }
+                    }
+                }
+            } else {
+                match File::open(fname) {
+                    Ok(file) => {
+                        if let Some(nbytes) = num_bytes {
+                            let data = read_last_bytes_file(&file, nbytes);
+                            if let Err(e) = w.write_all(&data) {
+                                if e.kind() == std::io::ErrorKind::BrokenPipe { return 0; }
+                                return 1;
+                            }
+                        } else {
+                            let lines = read_last_lines_file(file, num_lines);
+                            for line in &lines {
+                                if let Err(e) = write!(w, "{}", line) {
+                                    if e.kind() == std::io::ErrorKind::BrokenPipe { return 0; }
+                                    return 1;
+                                }
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("tail: {}: {}", fname, e);
+                        return 1;
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
     let mut exit_code = 0;
 
     if files.is_empty() || files == ["-"] {

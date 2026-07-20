@@ -111,6 +111,48 @@ Every Rust command exports `pub fn run(w: &mut dyn Write, args: &[String]) -> i3
 
 Run `make benchmark` for full results.
 
+## Linux Userspace Testing (QEMU + initramfs)
+
+In addition to the standard Rust + Python test suites, gvibu can be validated
+end-to-end as a Linux userspace by booting a QEMU VM with a custom initramfs
+that contains the gvibu toolchain and vish shell.
+
+The boot path is fully scripted and reproducible. There are two variants —
+Python and Rust — each producing an initramfs that boots the corresponding
+`vish` REPL inside a QEMU x86_64 VM:
+
+```bash
+# Prerequisites: qemu-system-x86_64 on PATH, a Linux kernel image, build tools
+#   Debian/Ubuntu : sudo apt-get install qemu-system-x86
+#   Fedora/RHEL   : sudo dnf install qemu-system-x86
+
+# Build the Rust vish and boot it in QEMU (auto-builds initramfs at /tmp/gvibu_rs_initramfs.cpio)
+./gvibu-linux/qemu_run_rs.sh /path/to/vmlinuz
+
+# Build the Python vish and boot it in QEMU (auto-builds /tmp/gvibu_py_initramfs.cpio)
+./gvibu-linux/qemu_run_py.sh /path/to/vmlinuz
+
+# Or just print the QEMU command line / run a base initramfs without rebuilding
+./gvibu-linux/run_qemu.sh /path/to/vmlinuz
+```
+
+Each script:
+
+1. Validates the kernel image path and exits with a clear error if missing.
+2. Verifies `qemu-system-x86_64` is on PATH and prints distro-aware install
+   instructions if it is not.
+3. (Re)builds the variant-specific initramfs if the file is missing or any
+   source file (`vish/src/main.rs`, `vish/Cargo.toml`, or
+   `gvibu-python/vish.py`) is newer than the existing cpio.
+4. Walks the binary's `ldd` output and copies the matching dynamic libraries
+   into the initramfs root so the binary can run without a host filesystem.
+5. Repacks the cpio with `cpio -o -H newc` and hands off to
+   `gvibu-linux/run_qemu.sh` for the actual QEMU launch.
+
+The boot smoke test inside the VM is the `init` script produced by
+`gvibu-linux/build_initramfs.sh`, which exercises `gvibu true`, `gvibu false`,
+symlink dispatch, and a curated set of representative commands.
+
 ## License
 
 MIT

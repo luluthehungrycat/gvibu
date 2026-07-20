@@ -60,7 +60,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                 // Handle bundled flags: -hs, -sh
                 let mut j = 1;
                 while j < arg.len() {
-                    let c = arg.chars().nth(j).unwrap();
+                    let c = arg.chars().nth(j).unwrap_or('\0');
                     match c {
                         'h' => human = true,
                         's' => summary = true,

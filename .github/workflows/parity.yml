@@ -95,3 +95,81 @@ jobs:
           docker run --rm gvibu:ci true && echo "PASS: true" || echo "FAIL: true"
           docker run --rm gvibu:ci whoami && echo "PASS: whoami" || echo "FAIL: whoami"
           docker run --rm gvibu:ci echo hello | grep -q hello && echo "PASS: echo" || echo "FAIL: echo"
+
+  clippy:
+    runs-on: ubuntu-latest
+    needs: test
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: clippy
+
+      - name: Run clippy
+        run: cargo clippy --manifest-path rust/Cargo.toml -- -D warnings
+
+  audit:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked
+
+      - name: Run cargo audit (rust)
+        run: cargo audit --manifest-path rust/Cargo.toml
+
+      - name: Run cargo audit (wasm-lib)
+        run: cargo audit --manifest-path wasm-lib/Cargo.toml
+
+  benchmark:
+    runs-on: ubuntu-latest
+    needs: test
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - name: Run benchmark
+        run: make benchmark
+
+  fuzz:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - name: Run fuzz tests (time-limited)
+        run: timeout 300 cargo test --manifest-path rust/Cargo.toml --test fuzz

@@ -367,6 +367,92 @@ fn grep_dir_impl(
 // ---------------------------------------------------------------------------
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
+    if let Some(stdin) = crate::get_wasm_stdin() {
+        let mut cfg = GrepConfig::default();
+        let mut pattern_str: Option<String> = None;
+        let mut paths: Vec<String> = Vec::new();
+        let mut i = 0;
+        while i < args.len() {
+            match args[i].as_str() {
+                "-i" | "--ignore-case" => cfg.ignore_case = true,
+                "-r" | "-R" | "--recursive" => cfg.recursive = true,
+                "-v" | "--invert-match" => cfg.invert = true,
+                "-c" | "--count" => cfg.count = true,
+                "-n" | "--line-number" => cfg.line_numbers = true,
+                "-l" | "--files-with-matches" => cfg.files_with_matches = true,
+                "-E" | "--extended-regexp" => cfg.extended_regexp = true,
+                "-F" | "--fixed-strings" => cfg.fixed_strings = true,
+                "-w" | "--word-regexp" => cfg.word_regexp = true,
+                "-q" | "--quiet" => cfg.quiet = true,
+                "-o" | "--only-matching" => cfg.only_matching = true,
+                "-s" | "--no-messages" => cfg.no_messages = true,
+                "-A" | "--after-context" => {
+                    i += 1;
+                    if i >= args.len() { eprintln!("grep: option requires an argument: -A"); return 1; }
+                    match args[i].parse::<usize>() {
+                        Ok(v) => cfg.after_context = v,
+                        Err(_) => { eprintln!("grep: invalid context length argument: {}", args[i]); return 1; }
+                    }
+                }
+                "-B" | "--before-context" => {
+                    i += 1;
+                    if i >= args.len() { eprintln!("grep: option requires an argument: -B"); return 1; }
+                    match args[i].parse::<usize>() {
+                        Ok(v) => cfg.before_context = v,
+                        Err(_) => { eprintln!("grep: invalid context length argument: {}", args[i]); return 1; }
+                    }
+                }
+                "-C" | "--context" => {
+                    i += 1;
+                    if i >= args.len() { eprintln!("grep: option requires an argument: -C"); return 1; }
+                    match args[i].parse::<usize>() {
+                        Ok(v) => { cfg.after_context = v; cfg.before_context = v; }
+                        Err(_) => { eprintln!("grep: invalid context length argument: {}", args[i]); return 1; }
+                    }
+                }
+                "--" => break,
+                s if s.starts_with('-') && s.len() > 1 => {
+                    eprintln!("grep: invalid option: {}", s);
+                    return 1;
+                }
+                p => {
+                    if pattern_str.is_none() && !p.starts_with('-') {
+                        pattern_str = Some(p.to_string());
+                    } else {
+                        paths.push(p.to_string());
+                    }
+                }
+            }
+            i += 1;
+        }
+        let pattern = match pattern_str {
+            Some(p) => p,
+            None => { eprintln!("grep: missing pattern"); return 1; }
+        };
+        let matcher = match Matcher::new(&pattern, &cfg) {
+            Ok(m) => m,
+            Err(e) => { eprintln!("grep: invalid pattern: {}", e); return 1; }
+        };
+        let reader = BufReader::new(stdin.as_bytes());
+        if paths.is_empty() {
+            return grep_reader_impl(w, &matcher, &cfg, None, reader);
+        }
+        for path_str in &paths {
+            if path_str == "-" {
+                let r = grep_reader_impl(w, &matcher, &cfg, None, BufReader::new(stdin.as_bytes()));
+                if r == 0 { return 0; }
+            } else {
+                match File::open(path_str) {
+                    Ok(f) => {
+                        let r = grep_reader_impl(w, &matcher, &cfg, Some(path_str.as_str()), BufReader::new(f));
+                        if r == 0 { return 0; }
+                    }
+                    Err(_) => {}
+                }
+            }
+        }
+        return 1;
+    }
     let mut cfg = GrepConfig::default();
     let mut pattern_str: Option<String> = None;
     let mut paths: Vec<String> = Vec::new();

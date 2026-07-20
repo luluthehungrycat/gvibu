@@ -51,6 +51,111 @@ fn build_char_set(s: &str, complement: bool) -> Vec<u8> {
 }
 
 pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
+    if let Some(stdin) = crate::get_wasm_stdin() {
+        let mut delete = false;
+        let mut squeeze = false;
+        let mut complement = false;
+        let mut sets: Vec<String> = Vec::new();
+        let mut i = 0;
+        while i < args.len() {
+            let arg = &args[i];
+            if arg == "--" { break; }
+            if arg == "-d" {
+                delete = true;
+            } else if arg == "-s" {
+                squeeze = true;
+            } else if arg == "-c" || arg == "-C" {
+                complement = true;
+            } else if arg.starts_with('-') && arg.len() > 1 {
+                eprintln!("tr: invalid option: {}", arg);
+                return 1;
+            } else {
+                sets.push(arg.clone());
+            }
+            i += 1;
+        }
+        if delete && sets.len() < 1 {
+            eprintln!("tr: missing operand");
+            return 1;
+        }
+        if !delete && sets.len() < 2 {
+            eprintln!("tr: missing operand");
+            return 1;
+        }
+        let set1_str = if sets.is_empty() { "" } else { &sets[0] };
+        let set2_str = if sets.len() < 2 { "" } else { &sets[1] };
+        let set1 = build_char_set(set1_str, complement);
+        let set2: Vec<u8> = if delete {
+            Vec::new()
+        } else {
+            let expanded = expand_set(set2_str);
+            if expanded.is_empty() {
+                if let Some(&last) = set1.last() {
+                    vec![last; set1.len()]
+                } else {
+                    Vec::new()
+                }
+            } else {
+                expanded.iter().cycle().take(set1.len()).copied().collect()
+            }
+        };
+        let mut translate_map: [Option<u8>; 256] = [None; 256];
+        if !delete {
+            for (i, &c) in set1.iter().enumerate() {
+                if i < set2.len() {
+                    translate_map[c as usize] = Some(set2[i]);
+                } else if let Some(&last) = set2.last() {
+                    translate_map[c as usize] = Some(last);
+                }
+            }
+        }
+        let mut delete_set: [bool; 256] = [false; 256];
+        if delete {
+            for &c in &set1 {
+                delete_set[c as usize] = true;
+            }
+        }
+        let mut out_buf = [0u8; 8192];
+        let mut out_pos = 0;
+        let mut prev: Option<u8> = None;
+        for &byte in stdin.as_bytes() {
+            if delete_set[byte as usize] {
+                continue;
+            }
+            let translated = if !delete {
+                translate_map[byte as usize].unwrap_or(byte)
+            } else {
+                byte
+            };
+            if squeeze {
+                if Some(translated) == prev {
+                    continue;
+                }
+                prev = Some(translated);
+            }
+            out_buf[out_pos] = translated;
+            out_pos += 1;
+            if out_pos == 8192 {
+                if let Err(e) = stdout.write_all(&out_buf) {
+                    if e.kind() == std::io::ErrorKind::BrokenPipe {
+                        return 0;
+                    }
+                    return 1;
+                }
+                out_pos = 0;
+            }
+        }
+        if out_pos > 0 {
+            if let Err(e) = stdout.write_all(&out_buf[..out_pos]) {
+                if e.kind() == std::io::ErrorKind::BrokenPipe {
+                    return 0;
+                }
+                return 1;
+            }
+        }
+        let _ = stdout.flush();
+        return 0;
+    }
     let mut delete = false;
     let mut squeeze = false;
     let mut complement = false;

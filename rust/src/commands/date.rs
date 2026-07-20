@@ -16,7 +16,7 @@ fn parse_date_string(date_str: &str, reference: DateTime<Utc>) -> Result<DateTim
         _ => {
             // Try parsing as ISO 8601 date (YYYY-MM-DD)
             if let Ok(naive_date) = NaiveDate::parse_from_str(date_str, "%Y-%m-%d") {
-                return Ok(naive_date.and_hms_opt(0, 0, 0).unwrap().and_local_timezone(Utc).unwrap());
+                return Ok(naive_date.and_hms_opt(0, 0, 0).expect("0,0,0 is always valid NaiveTime").and_local_timezone(Utc).single().expect("Utc always succeeds"));
             }
             
             // Try parsing as full ISO 8601 datetime
@@ -37,7 +37,7 @@ fn parse_date_string(date_str: &str, reference: DateTime<Utc>) -> Result<DateTim
             
             for fmt in formats.iter() {
                 if let Ok(naive_dt) = NaiveDate::parse_from_str(date_str, fmt) {
-                    return Ok(naive_dt.and_hms_opt(0, 0, 0).unwrap().and_local_timezone(Utc).unwrap());
+                    return Ok(naive_dt.and_hms_opt(0, 0, 0).expect("0,0,0 is always valid NaiveTime").and_local_timezone(Utc).single().expect("Utc always succeeds"));
                 }
             }
             

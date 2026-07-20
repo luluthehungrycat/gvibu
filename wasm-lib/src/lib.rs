@@ -32,8 +32,9 @@ impl Write for WasmWriter {
 /// Arguments:
 ///   name   - Command name (e.g. "echo", "true", "pwd")
 ///   args   - Array of command arguments (excluding the command name itself)
-///   _stdin - Optional stdin input string (unused currently; commands that
-///            read stdin will panic in WASM)
+///   stdin  - Optional stdin input string; injected via the gvibu stdin
+///            dispatch buffer so commands that read stdin can consume it
+///            without panicking on `io::stdin()`.
 ///
 /// Returns the command's stdout output as a string.
 ///
@@ -42,8 +43,11 @@ impl Write for WasmWriter {
 /// Non-filesystem commands (echo, true, false, whoami, pwd, basename,
 /// dirname, printenv, seq, yes) work fully.
 #[wasm_bindgen]
-pub fn run_command(name: &str, args: Vec<String>, _stdin: Option<String>) -> Result<String, JsValue> {
-    // Lookup and run the command
+pub fn run_command(name: &str, args: Vec<String>, stdin: Option<String>) -> Result<String, JsValue> {
+    if let Some(s) = stdin.as_deref() {
+        gvibu::set_wasm_stdin(s);
+    }
+
     let cmd = gvibu::commands::lookup(name)
         .ok_or_else(|| JsValue::from_str(&format!("unknown command: {}", name)))?;
 

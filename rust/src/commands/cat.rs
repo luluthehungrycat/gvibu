@@ -20,6 +20,33 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         }
     }
 
+    if let Some(stdin) = crate::get_wasm_stdin() {
+        let mut line_num: usize = 1;
+        if files.is_empty() {
+            let reader = BufReader::new(stdin.as_bytes());
+            return print_lines(w, reader, number_lines, &mut line_num, "-");
+        }
+        let mut exit_code = 0;
+        for filename in files {
+            if filename == "-" {
+                let reader = BufReader::new(stdin.as_bytes());
+                exit_code |= print_lines(w, reader, number_lines, &mut line_num, "-");
+            } else {
+                match File::open(filename) {
+                    Ok(file) => {
+                        exit_code |=
+                            print_lines(w, BufReader::new(file), number_lines, &mut line_num, filename);
+                    }
+                    Err(e) => {
+                        eprintln!("cat: {}: {}", filename, e);
+                        exit_code = 1;
+                    }
+                }
+            }
+        }
+        return exit_code;
+    }
+
     let mut line_num: usize = 1;
     let mut exit_code = 0;
 

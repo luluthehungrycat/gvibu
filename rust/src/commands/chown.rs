@@ -68,6 +68,11 @@ fn chown_path(path: &str, uid: Option<u32>, gid: Option<u32>, verbose: bool) -> 
         let c_path = std::ffi::CString::new(path).unwrap_or_default();
         let c_uid = uid.unwrap_or(u32::MAX);
         let c_gid = gid.unwrap_or(u32::MAX);
+        // SAFETY: `c_path` is a `CString` (NUL-terminated, valid C string)
+        // derived from the input `path`; `c_uid` and `c_gid` are `uid_t` /
+        // `gid_t` values cast to the FFI type, with `u32::MAX` (-1 as a
+        // signed value) used as the documented sentinel meaning "do not
+        // change". The pointer remains valid for the duration of the call.
         let ret = unsafe { libc::chown(c_path.as_ptr(), c_uid, c_gid) };
         if ret == 0 {
             if verbose {

@@ -12,6 +12,7 @@ __pycache__/
 rust/target/
 wasm-lib/pkg/
 wasm-lib/target/
+vish/target/
 .gvibu/
 .claude/
 opencode-sidebar.md

@@ -19,7 +19,15 @@ fn get_kernel_info() -> (String, String, String, &'static str) {
 
 #[cfg(not(target_os = "linux"))]
 fn get_kernel_info() -> (String, String, String, &'static str) {
+    // SAFETY: `libc::utsname` is a POD struct whose all-zero byte pattern is a
+    // valid instance (no niche/provenance requirements), so `mem::zeroed()` is
+    // sound; the kernel will overwrite every field on the subsequent `uname`
+    // call, and we never read uninitialised memory.
     let mut uts: libc::utsname = unsafe { std::mem::zeroed() };
+    // SAFETY: `uts` is a stack-allocated, properly aligned `libc::utsname`
+    // whose size matches the kernel's expectation; its address is valid for
+    // the duration of the call, and `libc::uname` is safe to invoke on any
+    // thread with no additional preconditions.
     let ret = unsafe { libc::uname(&mut uts) };
     if ret != 0 {
         return ("Unknown".into(), "Unknown".into(), "Unknown".into(), std::env::consts::ARCH);

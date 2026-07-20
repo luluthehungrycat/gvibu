@@ -1,0 +1,181 @@
+==============================================================
+TASK: vish — REPL binary with built-in commands
+DATE: 2026-07-20T16:05:04+00:00
+RUST: rustc 1.85.0 (4d91de4e4 2025-02-17)
+CARGO: cargo 1.85.0 (d73d2caf9 2024-12-31)
+==============================================================
+
+## FILES TOUCHED
+  modified: vish/Cargo.toml
+  created:  vish/src/main.rs
+
+## vish/Cargo.toml (after)
+--------------------------------------------------------------
+[package]
+name = "vish"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+gvibu = { path = "../rust" }
+libc = "0.2"
+
+[dev-dependencies]
+assert_cmd = "2"
+ predicates = "2"
+--------------------------------------------------------------
+
+## vish/src/main.rs LOC (excluding blank/comment lines)
+--------------------------------------------------------------
+  pure LOC: 135
+  total lines: 172
+  250-LOC ceiling: OK (well under)
+--------------------------------------------------------------
+
+## cargo build --manifest-path vish/Cargo.toml
+--------------------------------------------------------------
+  warning: use of deprecated function `rand::thread_rng`: Renamed to `rng`
+    --> /workspace/repo/rust/src/commands/shuf.rs:48:25
+     |
+  48 |     let mut rng = rand::thread_rng();
+     |                         ^^^^^^^^^^
+     |
+     = note: `#[warn(deprecated)]` on by default
+  
+  warning: unused variable: `args`
+    --> /workspace/repo/rust/src/commands/uptime.rs:50:36
+     |
+  50 | pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
+     |                                    ^^^^ help: if this is intentional, prefix it with an underscore: `_args`
+     |
+     = note: `#[warn(unused_variables)]` on by default
+  
+  warning: unused variable: `indices`
+     --> /workspace/repo/rust/src/commands/cut.rs:237:25
+      |
+  237 |             if let Some(indices) = field_indices {
+      |                         ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_indices`
+  
+  warning: value assigned to `i` is never read
+     --> /workspace/repo/rust/src/commands/date.rs:132:17
+      |
+  132 |                 i += 1;
+      |                 ^
+      |
+      = help: maybe it is overwritten before being read?
+      = note: `#[warn(unused_assignments)]` on by default
+  
+  warning: unused variable: `depth`
+     --> /workspace/repo/rust/src/commands/du.rs:102:31
+      |
+  102 |                 for (size, p, depth) in &entries {
+      |                               ^^^^^ help: if this is intentional, prefix it with an underscore: `_depth`
+  
+  warning: unused variable: `favail`
+     --> /workspace/repo/rust/src/commands/df.rs:338:9
+      |
+  338 |     let favail = stat.f_favail as u64;
+      |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_favail`
+  
+  warning: `gvibu` (lib) generated 6 warnings
+      Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.03s
+--------------------------------------------------------------
+
+## SMOKE TEST RESULTS
+
+### T1 — pipe: 'echo "echo hello" | ./vish/target/debug/vish'
+  --- run ---
+$ echo "echo hello" | ./vish/target/debug/vish
+  --- output ---
+  | hello
+  --- exit code: 0 ---
+  result: PASS
+
+### T2 — subcmd: './vish/target/debug/vish echo hello'
+  --- run ---
+$ ./vish/target/debug/vish echo hello
+  --- output ---
+  | hello
+  --- exit code: 0 ---
+  result: PASS
+
+### T3 — help: './vish/target/debug/vish help'
+  --- run ---
+$ ./vish/target/debug/vish help
+  --- output ---
+  | gvibu — universal coreutils
+  | Built-in commands: help, version, commands, exit, quit
+  | Type a command name to run it, or one of the built-ins above.
+  --- exit code: 0 ---
+  result: PASS
+
+### T4 — version: './vish/target/debug/vish version'
+  --- run ---
+$ ./vish/target/debug/vish version
+  --- output ---
+  | gvibu v0.1.0
+  --- exit code: 0 ---
+  result: PASS
+
+### T5 — commands: './vish/target/debug/vish commands'
+  --- run ---
+$ ./vish/target/debug/vish commands | wc -l
+  --- output line count: 58 ---
+  result: PASS (58 command names listed, primary name per COMMANDS entry)
+
+### T6 — nonexistent: './vish/target/debug/vish nonexistent'
+  --- run ---
+$ ./vish/target/debug/vish nonexistent 1>/dev/null  # stderr to terminal
+  --- exit code: 1 ---
+  result: PASS
+
+## ADDITIONAL VERIFICATION
+
+### Ctrl+D / EOF in REPL: '' | ./vish/target/debug/vish
+$ echo "" | ./vish/target/debug/vish
+  output (suppressed): <empty>
+  --- exit code: 0 ---
+  result: PASS (clean exit on EOF)
+
+### Multi-line REPL: 'echo a; pwd; version; exit' piped in
+$ printf "echo a\\npwd\\nversion\\nexit\\n" | ./vish/target/debug/vish
+  | a
+  | /workspace/repo
+  | gvibu v0.1.0
+  --- exit code: 0 ---
+  result: PASS (REPL parses, dispatches, and exits on 'exit')
+
+### Subcommand exit codes propagate: true / false
+$ ./vish/target/debug/vish true; echo \$? -> 0
+  -> exit 0
+$ ./vish/target/debug/vish false; echo \$? -> 1
+  -> exit 1
+  result: PASS
+
+## SPEC COMPLIANCE
+  [x] vish/Cargo.toml depends on gvibu (path = ../rust), not clap
+  [x] edition = "2021" preserved
+  [x] REPL uses stdin().read_line()
+  [x] Prompt 'gvibu> ' only on TTY (IsTerminal check)
+  [x] Built-ins handled before lookup: exit, quit, help, version, commands
+  [x] Dispatch via gvibu::commands::lookup(name) + (cmd.run)(...)
+  [x] Subcommand mode: CLI args -> single dispatch, no REPL
+  [x] Unknown command: stderr 'NAME: command not found', exit 1
+  [x] Ctrl+C: handler installed via libc::signal(SIGINT, ...),
+         writes '^C\n' and re-prompts (INTERRUPTED atomic flag)
+  [x] Ctrl+D / EOF: process::exit(0)
+  [x] Did NOT modify any gvibu command signature
+  [x] Did NOT create files outside the two required paths
+  [x] Help text exactly matches the spec
+
+## KEY DESIGN NOTES
+  - list_commands() prints cmd.names.first() so 'test' / '[' share
+    one row, giving 58 lines for 58 COMMANDS entries.
+  - BuiltinAction enum (Continue | Exit(code)) centralizes
+    built-in handling for both main() and run_repl().
+  - signal_impl is #[cfg(unix)]-gated; non-unix build is a no-op.
+  - No pipes, redirects, job control, scripting, history, or
+    completion — strictly a command-dispatch REPL.
+
+## vish binary
+  -rwxr-xr-x 2 root root 27814088 Jul 20 16:03 vish/target/debug/vish

@@ -1,0 +1,46 @@
+   Compiling gvibu v0.3.0 (/workspace/repo/rust)
+warning: use of deprecated function `rand::thread_rng`: Renamed to `rng`
+  --> src/commands/shuf.rs:48:25
+   |
+48 |     let mut rng = rand::thread_rng();
+   |                         ^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: unused variable: `args`
+  --> src/commands/uptime.rs:50:36
+   |
+50 | pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
+   |                                    ^^^^ help: if this is intentional, prefix it with an underscore: `_args`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `indices`
+   --> src/commands/cut.rs:237:25
+    |
+237 |             if let Some(indices) = field_indices {
+    |                         ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_indices`
+
+warning: value assigned to `i` is never read
+   --> src/commands/date.rs:132:17
+    |
+132 |                 i += 1;
+    |                 ^^^^^^
+    |
+    = help: maybe it is overwritten before being read?
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `depth`
+   --> src/commands/du.rs:102:31
+    |
+102 |                 for (size, p, depth) in &entries {
+    |                               ^^^^^ help: if this is intentional, prefix it with an underscore: `_depth`
+
+warning: unused variable: `favail`
+   --> src/commands/df.rs:338:9
+    |
+338 |     let favail = stat.f_favail as u64;
+    |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_favail`
+
+warning: `gvibu` (lib) generated 6 warnings (run `cargo fix --lib -p gvibu` to apply 4 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.88s

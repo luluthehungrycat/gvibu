@@ -122,6 +122,10 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     };
 
     // Use libc::kill via unsafe
+    // SAFETY: `pid` is a `pid_t` parsed from CLI arguments (any value is
+    // accepted by the kernel; an invalid pid simply yields `ESRCH`), and `sig`
+    // is a signal number constrained by `parse_signal` to the range 1..=31
+    // (or a named POSIX signal), so the call satisfies the FFI contract.
     let result = unsafe { libc::kill(pid, sig) };
     if result == 0 {
         0

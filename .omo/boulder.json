@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "active_work_id": "codebase-audit-roadmap-33f30514",
+  "works": {
+    "codebase-audit-roadmap-33f30514": {
+      "work_id": "codebase-audit-roadmap-33f30514",
+      "active_plan": "/workspace/repo/.omo/plans/codebase-audit-roadmap.md",
+      "plan_name": "codebase-audit-roadmap",
+      "status": "active",
+      "started_at": "2026-07-20T15:26:40.320Z",
+      "updated_at": "2026-07-20T15:26:40.320Z",
+      "session_ids": [
+        "opencode:ses_08100186fffeK4r8EpQX18Hkb9"
+      ],
+      "session_origins": {
+        "opencode:ses_08100186fffeK4r8EpQX18Hkb9": "direct"
+      },
+      "agent": "atlas",
+      "task_sessions": {}
+    }
+  },
+  "active_plan": "/workspace/repo/.omo/plans/codebase-audit-roadmap.md",
+  "started_at": "2026-07-20T15:26:40.320Z",
+  "status": "active",
+  "updated_at": "2026-07-20T15:26:40.320Z",
+  "session_ids": [
+    "opencode:ses_08100186fffeK4r8EpQX18Hkb9"
+  ],
+  "session_origins": {
+    "opencode:ses_08100186fffeK4r8EpQX18Hkb9": "direct"
+  },
+  "plan_name": "codebase-audit-roadmap",
+  "task_sessions": {},
+  "agent": "atlas"
+}
