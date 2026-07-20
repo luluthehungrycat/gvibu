@@ -328,10 +328,10 @@ Your next move: approve, or run a high-accuracy review. Full execution detail fo
 
 ## Final verification wave
 > Runs in parallel after ALL todos. ALL must APPROVE. Surface results and wait for the user's explicit okay before declaring complete.
-- [ ] F1. Plan compliance audit — verify all 30 todos completed, all commits match plan, no scope creep
-- [ ] F2. Code quality review — clippy clean, no new unwrap/panic in production, SAFETY comments present
-- [ ] F3. Real manual QA — run the full command matrix: 58 commands × 3 invocations each = 174 executions, all pass
-- [ ] F4. Scope fidelity — verify nothing in MUST NOT was added; verify all MUST HAVE items are complete
+- [x] F1. Plan compliance audit — verify all 30 todos completed, all commits match plan, no scope creep
+- [x] F2. Code quality review — clippy clean, no new unwrap/panic in production, SAFETY comments present
+- [x] F3. Real manual QA — run the full command matrix: 58 commands × 3 invocations each = 174 executions, all pass
+- [x] F4. Scope fidelity — verify nothing in MUST NOT was added; verify all MUST HAVE items are complete
 
 ## Commit strategy
 - One commit per todo (where marked Y) — 24 implementation commits + verification (no-commit) items
