@@ -46,6 +46,8 @@ pub mod ls;
 pub mod tail;
 pub mod tac;
 pub mod fold;
+pub mod expand;
+pub mod rev;
 pub mod comm;
 pub mod join;
 pub mod nl;
@@ -114,6 +116,8 @@ pub const COMMANDS: &[Command] = &[
     Command { names: &["tail"], run: tail::run },
     Command { names: &["tac"], run: tac::run },
     Command { names: &["fold"], run: fold::run },
+    Command { names: &["expand"], run: expand::run },
+    Command { names: &["rev"], run: rev::run },
     Command { names: &["comm"], run: comm::run },
     Command { names: &["join"], run: join::run },
     Command { names: &["nl"], run: nl::run },

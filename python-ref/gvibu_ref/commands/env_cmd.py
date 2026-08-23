@@ -12,6 +12,7 @@ def _print_env() -> None:
 
 def run(args: list[str]) -> int:
     ignore_env = False
+    null_delimited = False
     unset_vars: list[str] = []
     cmd_and_args: list[str] = []
     set_vars: dict[str, str] = {}
@@ -21,6 +22,8 @@ def run(args: list[str]) -> int:
         arg = args[i]
         if arg == "-i" or arg == "--ignore-environment":
             ignore_env = True
+        elif arg == "-0" or arg == "--null":
+            null_delimited = True
         elif arg == "-u" or arg == "--unset":
             i += 1
             if i >= len(args):
@@ -53,8 +56,8 @@ def run(args: list[str]) -> int:
         env.pop(key, None)
 
     if not cmd_and_args:
-        for key, value in sorted(env.items()):
-            print(f"{key}={value}")
+        separator = "\0" if null_delimited else "\n"
+        sys.stdout.write("".join(f"{key}={value}{separator}" for key, value in sorted(env.items())))
         return 0
 
     # Run command

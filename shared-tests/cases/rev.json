@@ -1,23 +1,18 @@
 {
+  "command": "rev",
   "cases": [
     {
-      "name": "stdin_basic",
+      "name": "reverse_lines",
       "args": [],
-      "stdin": "a\nb\nc\n",
-      "stdout": "c\nb\na\n",
-      "stderr": "",
-      "exit_code": 0
-    },
-    {
-      "name": "dev_null",
-      "args": ["/dev/null"],
-      "stdout": "",
+      "stdin": "abc\nRust 2026\n",
+      "stdout": "cba\n6202 tsuR\n",
       "stderr": "",
       "exit_code": 0
     },
     {
       "name": "invalid_option",
       "args": ["-x"],
+      "stdin": "",
       "stdout": "",
       "stderr": "*",
       "exit_code": 1

@@ -1,0 +1,21 @@
+{
+  "command": "expand",
+  "cases": [
+    {
+      "name": "default_tabs",
+      "args": [],
+      "stdin": "\tfoo\nab\tcd\n",
+      "stdout": "        foo\nab      cd\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "custom_tab_stop",
+      "args": ["-t", "4"],
+      "stdin": "ab\tcd\n",
+      "stdout": "ab  cd\n",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}

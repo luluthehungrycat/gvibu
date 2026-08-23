@@ -1,9 +1,13 @@
 """Tests for sort command."""
-import pytest
+
+import io
+import sys
+
 from gvibu_ref.commands.sort import run
 
 
-def test_no_args():
+def test_no_args(monkeypatch):
+    monkeypatch.setattr(sys, "stdin", io.StringIO(""))
     assert run([]) == 0
 
 

@@ -90,7 +90,7 @@ def dispatch():
             id, who, kill, cut, tr, mv, rm, ln,
             chmod, chown, sort, test_cmd,
             grep, ls, cp, printf, date, expr, split,
-            tail, tac, fold, comm,
+            tail, tac, fold, comm, expand, rev,
             join, nl, shuf, sum,
             du, df,
         )
@@ -102,7 +102,7 @@ def dispatch():
             id, who, kill, cut, tr, mv, rm, ln,
             chmod, chown, sort, test_cmd,
             grep, ls, cp, printf, date, expr, split,
-            tail, tac, fold, comm,
+            tail, tac, fold, comm, expand, rev,
             join, nl, shuf, sum,
             du, df,
         )
@@ -157,6 +157,8 @@ def dispatch():
     COMMANDS["tail"] = tail
     COMMANDS["tac"] = tac
     COMMANDS["fold"] = fold
+    COMMANDS["expand"] = expand
+    COMMANDS["rev"] = rev
     COMMANDS["comm"] = comm
     COMMANDS["join"] = join
     COMMANDS["nl"] = nl
@@ -172,9 +174,9 @@ def dispatch():
 
     if cmd_name in COMMANDS:
         if argv0 == cmd_name:
-            args = sys.argv[1:]
+            args = [cmd_name, *sys.argv[1:]] if cmd_name == "[" else sys.argv[1:]
         elif len(sys.argv) > 1 and sys.argv[1] == cmd_name:
-            args = sys.argv[2:]
+            args = [cmd_name, *sys.argv[2:]] if cmd_name == "[" else sys.argv[2:]
         else:
             args = sys.argv[1:]
 

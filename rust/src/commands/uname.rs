@@ -22,10 +22,19 @@ fn get_kernel_info() -> (String, String, String, &'static str) {
     let mut uts: libc::utsname = unsafe { std::mem::zeroed() };
     let ret = unsafe { libc::uname(&mut uts) };
     if ret != 0 {
-        return ("Unknown".into(), "Unknown".into(), "Unknown".into(), std::env::consts::ARCH);
+        return (
+            "Unknown".into(),
+            "Unknown".into(),
+            "Unknown".into(),
+            std::env::consts::ARCH,
+        );
     }
     fn from_cstr(arr: &[i8]) -> String {
-        let bytes: Vec<u8> = arr.iter().take_while(|&&b| b != 0).map(|&b| b as u8).collect();
+        let bytes: Vec<u8> = arr
+            .iter()
+            .take_while(|&&b| b != 0)
+            .map(|&b| b as u8)
+            .collect();
         String::from_utf8_lossy(&bytes).to_string()
     }
     let sysname = from_cstr(&uts.sysname);
@@ -40,12 +49,14 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let mut all_flag = false;
 
     for arg in args {
-        if arg == "--" { break; }
+        if arg == "--" {
+            break;
+        }
         if let Some(chars) = arg.strip_prefix('-') {
             for ch in chars.chars() {
                 match ch {
                     'a' => all_flag = true,
-                    's' | 'n' | 'r' | 'm' => flags.push(ch),
+                    's' | 'n' | 'r' | 'v' | 'm' | 'o' => flags.push(ch),
                     _ => {
                         eprintln!("uname: invalid option: -{}", ch);
                         return 1;
@@ -63,19 +74,50 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     }
 
     if all_flag {
-        flags = String::from("snrm");
+        flags = String::from("snrvmo");
     }
 
     let (sysname, nodename, release, machine) = get_kernel_info();
-    let sysname = if sysname.is_empty() { "Linux" } else { &sysname };
+    let sysname = if sysname.is_empty() {
+        "Linux"
+    } else {
+        &sysname
+    };
+    let version = if cfg!(target_os = "linux") {
+        std::fs::read_to_string("/proc/sys/kernel/version")
+            .or_else(|_| std::fs::read_to_string("/proc/version"))
+            .map(|value| value.trim().to_string())
+            .unwrap_or_default()
+    } else {
+        String::from("Unknown")
+    };
+    let operating_system = if sysname == "Linux" {
+        "GNU/Linux"
+    } else {
+        sysname
+    };
 
     let mut parts = Vec::new();
     for flag in flags.chars() {
         match flag {
             's' => parts.push(sysname),
-            'n' => parts.push(if nodename.is_empty() { "(none)" } else { &nodename }),
-            'r' => parts.push(if release.is_empty() { "(unknown)" } else { &release }),
-            'm' => parts.push(machine),
+            'n' => parts.push(if nodename.is_empty() {
+                "(none)"
+            } else {
+                &nodename
+            }),
+            'r' => parts.push(if release.is_empty() {
+                "(unknown)"
+            } else {
+                &release
+            }),
+            'v' => parts.push(if version.is_empty() {
+                "(unknown)"
+            } else {
+                &version
+            }),
+            'm' => parts.push(&machine),
+            'o' => parts.push(operating_system),
             _ => {}
         }
     }

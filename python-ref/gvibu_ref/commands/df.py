@@ -61,7 +61,8 @@ def run(args: list[str]) -> int:
         try:
             st = os.statvfs(mount_point)
         except OSError:
-            exit_code = 1
+            # A mount can disappear or be inaccessible while /proc/mounts
+            # is being read; skip it like df does for unavailable mounts.
             continue
 
         frsize = st.f_frsize

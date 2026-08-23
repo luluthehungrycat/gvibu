@@ -1,7 +1,53 @@
 /// touch: update file timestamps or create empty files.
 use std::fs;
+use std::io::{self, Write};
+
+#[cfg(not(unix))]
 use std::fs::FileTimes;
-use std::io::Write;
+
+#[cfg(unix)]
+fn update_times(path: &str, access: bool, modification: bool) -> io::Result<()> {
+    use std::ffi::CString;
+
+    let path = CString::new(path)
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "path contains NUL"))?;
+    let now = libc::timespec {
+        tv_sec: 0,
+        tv_nsec: libc::UTIME_NOW,
+    };
+    let omit = libc::timespec {
+        tv_sec: 0,
+        tv_nsec: libc::UTIME_OMIT,
+    };
+    let times = [
+        if access { now } else { omit },
+        if modification { now } else { omit },
+    ];
+
+    let result = unsafe { libc::utimensat(libc::AT_FDCWD, path.as_ptr(), times.as_ptr(), 0) };
+    if result == 0 {
+        Ok(())
+    } else {
+        Err(io::Error::last_os_error())
+    }
+}
+
+#[cfg(not(unix))]
+fn update_times(path: &str, access: bool, modification: bool) -> io::Result<()> {
+    let file = fs::OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open(path)?;
+    let now = std::time::SystemTime::now();
+    let mut times = FileTimes::new();
+    if access {
+        times = times.set_accessed(now);
+    }
+    if modification {
+        times = times.set_modified(now);
+    }
+    file.set_times(times)
+}
 
 pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let _ = stdout;
@@ -17,7 +63,9 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { break; }
+        if arg == "--" {
+            break;
+        }
         if arg.starts_with('-') && arg.len() > 1 {
             for ch in arg[1..].chars() {
                 match ch {
@@ -46,22 +94,14 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
         flag_m = true;
     }
 
-    let now = std::time::SystemTime::now();
     let mut exit_code = 0;
 
     for fname in files {
-        // Open to create if missing (append mode)
+        // Open to create if missing (append mode).
         match fs::OpenOptions::new().append(true).create(true).open(fname) {
             Ok(mut file) => {
                 let _ = file.flush();
-                let mut times = FileTimes::new();
-                if flag_a {
-                    times = times.set_accessed(now);
-                }
-                if flag_m {
-                    times = times.set_modified(now);
-                }
-                if let Err(e) = file.set_times(times) {
+                if let Err(e) = update_times(fname, flag_a, flag_m) {
                     eprintln!("touch: error setting times: {}", e);
                     exit_code = 1;
                 }
@@ -87,7 +127,10 @@ mod tests {
 
     #[test]
     fn test_touch_invalid_option() {
-        assert_eq!(run(&mut std::io::sink(), &["-x".into(), "/tmp/test".into()]), 1);
+        assert_eq!(
+            run(&mut std::io::sink(), &["-x".into(), "/tmp/test".into()]),
+            1
+        );
     }
 
     #[test]
@@ -95,7 +138,10 @@ mod tests {
         let tmp = std::env::temp_dir().join("gvibu_touch_test_a");
         let path = tmp.to_str().unwrap().to_string();
         let _ = std::fs::remove_file(&path);
-        assert_eq!(run(&mut std::io::sink(), &["-a".into(), path.clone().into()]), 0);
+        assert_eq!(
+            run(&mut std::io::sink(), &["-a".into(), path.clone().into()]),
+            0
+        );
         let _ = std::fs::remove_file(&path);
     }
 
@@ -103,7 +149,10 @@ mod tests {
     fn test_touch_flag_m() {
         let tmp = std::env::temp_dir().join("gvibu_touch_test_m");
         let path = tmp.to_str().unwrap().to_string();
-        assert_eq!(run(&mut std::io::sink(), &["-m".into(), path.clone().into()]), 0);
+        assert_eq!(
+            run(&mut std::io::sink(), &["-m".into(), path.clone().into()]),
+            0
+        );
         let _ = std::fs::remove_file(&path);
     }
 
@@ -111,7 +160,10 @@ mod tests {
     fn test_touch_flag_am() {
         let tmp = std::env::temp_dir().join("gvibu_touch_test_am");
         let path = tmp.to_str().unwrap().to_string();
-        assert_eq!(run(&mut std::io::sink(), &["-am".into(), path.clone().into()]), 0);
+        assert_eq!(
+            run(&mut std::io::sink(), &["-am".into(), path.clone().into()]),
+            0
+        );
         let _ = std::fs::remove_file(&path);
     }
 

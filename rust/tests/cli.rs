@@ -172,8 +172,8 @@ fn echo_e_with_n() {
 fn echo_e_disables_escapes() {
     let (code, out, err) = run(&["echo", "-E", "-e", "hello\\nworld"]);
     assert_eq!(code, 0);
-    // Last flag wins: -e overrides -E, so \n is interpreted as newline
-    assert_eq!(out, "hello\nworld\n", "stderr: {}", err);
+    // -E is sticky and disables escape interpretation for the invocation.
+    assert_eq!(out, "hello\\nworld\n", "stderr: {}", err);
     assert_eq!(err, "");
 }
 
@@ -701,7 +701,7 @@ fn seq_equal_width() {
 fn seq_w_and_s() {
     let (code, out, _err) = run(&["seq", "-w", "-s", " ", "3"]);
     assert_eq!(code, 0);
-    assert_eq!(out, "01 02 03\n");
+    assert_eq!(out, "1 2 3\n");
 }
 
 #[test]
@@ -1749,7 +1749,7 @@ fn fold_width_10() {
         "hello world this is a long line",
     );
     assert_eq!(code, 0, "stderr: {}", err);
-    assert_eq!(out, "hello worl\nd this is\na long li\nne\n");
+    assert_eq!(out, "hello worl\nd this is \na long lin\ne\n");
     assert_eq!(err, "");
 }
 
@@ -2317,4 +2317,39 @@ fn split_nonexistent_file() {
     assert_eq!(code, 1);
     assert_eq!(out, "");
     assert!(!err.is_empty(), "should print error");
+}
+
+// ---------------------------------------------------------------------------
+// rev and expand
+// ---------------------------------------------------------------------------
+#[test]
+fn rev_stdin_lines() {
+    let (code, out, err) = run_with_stdin(&["rev"], "abc\nhé\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "cba\néh\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn rev_rejects_unknown_option() {
+    let (code, out, err) = run(&["rev", "-x"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty());
+}
+
+#[test]
+fn expand_stdin_default_tabs() {
+    let (code, out, err) = run_with_stdin(&["expand"], "a\tb\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "a       b\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn expand_custom_tab_stops() {
+    let (code, out, err) = run_with_stdin(&["expand", "-t", "4,8"], "a\tb\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "a   b\n");
+    assert_eq!(err, "");
 }

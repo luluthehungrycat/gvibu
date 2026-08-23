@@ -52,26 +52,29 @@ fn interpret_escapes(s: &str) -> String {
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut newline = true;
-    let mut enable_escapes = false;
+    let mut escape_requested = false;
+    let mut escape_disabled = false;
     let mut start_idx = 0;
 
     while start_idx < args.len() {
         let arg = &args[start_idx];
-        if arg == "--" { start_idx += 1; break; }
+        if arg == "--" {
+            start_idx += 1;
+            break;
+        }
         if arg == "-n" {
             newline = false;
-            start_idx += 1;
         } else if arg == "-e" {
-            enable_escapes = true;
-            start_idx += 1;
+            escape_requested = true;
         } else if arg == "-E" {
-            enable_escapes = false;
-            start_idx += 1;
+            escape_disabled = true;
         } else {
             break;
         }
+        start_idx += 1;
     }
 
+    let enable_escapes = escape_requested && !escape_disabled;
     for (i, arg) in args.iter().enumerate().skip(start_idx) {
         if i > start_idx {
             pwrite!(w, " ");
@@ -86,9 +89,9 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     if newline {
         pwriteln!(w);
     }
-
     0
 }
+
 
 #[cfg(test)]
 mod tests {

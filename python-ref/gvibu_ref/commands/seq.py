@@ -22,6 +22,9 @@ def _parse_args(args: list[str]):
                 return None
             separator = args[i]
             i += 1
+        elif arg.startswith("-") and len(arg) > 1 and arg[1:].isdigit():
+            pos_args.append(arg)
+            i += 1
         elif arg.startswith("-") and len(arg) > 1:
             # Combined flags
             for j, ch in enumerate(arg[1:]):

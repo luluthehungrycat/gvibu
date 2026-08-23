@@ -102,8 +102,8 @@
         "expected_exit_code": 0
     },
     {
-        "name": "dev_null_is_file",
-        "args": ["-f", "/dev/null"],
+        "name": "regular_file",
+        "args": ["-f", "README.md"],
         "expected_exit_code": 0
     },
     {

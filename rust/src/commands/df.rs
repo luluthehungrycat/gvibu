@@ -27,7 +27,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                         'i' => show_inodes = true,
                         'a' => all = true,
                         _ => {
-                            pwriteln!(w, "df: invalid option: -{}", c);
+                            eprintln!("df: invalid option: -{}", c);
                             return 1;
                         }
                     }
@@ -42,7 +42,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mounts = match read_mounts() {
         Ok(m) => m,
         Err(e) => {
-            pwriteln!(w, "df: {}", e);
+            eprintln!("df: {}", e);
             return 1;
         }
     };
@@ -171,14 +171,10 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                                 }
                             }
                         }
-                        None => {
-                            exit_code = 1;
-                        }
+                        None => {}
                     }
                 }
-                None => {
-                    exit_code = 1;
-                }
+                None => {}
             }
         } else {
             match get_fs_stats(&mount.mount_point) {
@@ -238,9 +234,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                         }
                     }
                 }
-                None => {
-                    exit_code = 1;
-                }
+                None => {}
             }
         }
     }

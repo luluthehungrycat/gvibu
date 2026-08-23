@@ -206,8 +206,6 @@ def run(args: list[str]) -> int:
                 else:
                     print(f"sort: invalid option: -{ch}", file=sys.stderr)
                     return 1
-            if combined_key:
-                break
         else:
             files.append(arg)
         i += 1
@@ -235,7 +233,7 @@ def run(args: list[str]) -> int:
             else:
                 keys.append((2, k.lower() if fold_case else k))
         # Whole line tiebreaker
-        keys.append((3, line.lower() if fold_case else line))
+        keys.append((3, item.lower() if fold_case else item))
         return keys
 
     if key_specs:

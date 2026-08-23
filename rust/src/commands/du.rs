@@ -35,7 +35,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                 match value.parse::<usize>() {
                     Ok(d) => max_depth = Some(d),
                     Err(_) => {
-                        pwriteln!(w, "du: invalid max depth: {}", value);
+                        eprintln!("du: invalid max depth: {}", value);
                         return 1;
                     }
                 }
@@ -45,13 +45,13 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                     match args[i + 1].parse::<usize>() {
                         Ok(d) => max_depth = Some(d),
                         Err(_) => {
-                            pwriteln!(w, "du: invalid max depth: {}", args[i + 1]);
+                            eprintln!("du: invalid max depth: {}", args[i + 1]);
                             return 1;
                         }
                     }
                     i += 1;
                 } else {
-                    pwriteln!(w, "du: --max-depth requires an argument");
+                    eprintln!("du: --max-depth requires an argument");
                     return 1;
                 }
             }
@@ -71,12 +71,12 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                                 max_depth = Some(d);
                                 break;
                             } else {
-                                pwriteln!(w, "du: invalid option: -{}", c);
+                                eprintln!("du: invalid option: -{}", c);
                                 return 1;
                             }
                         }
                         _ => {
-                            pwriteln!(w, "du: invalid option: -{}", c);
+                            eprintln!("du: invalid option: -{}", c);
                             return 1;
                         }
                     }
@@ -112,7 +112,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                 }
             }
             Err(e) => {
-                pwriteln!(w, "du: {}: {}", path_str, e);
+                eprintln!("du: {}: {}", path_str, e);
                 exit_code = 1;
             }
         }

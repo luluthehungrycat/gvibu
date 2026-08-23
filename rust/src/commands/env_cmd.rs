@@ -6,6 +6,7 @@ use std::process;
 
 pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let mut ignore_env = false;
+    let mut null_delimited = false;
     let mut unset_vars: Vec<String> = Vec::new();
     let mut set_vars: BTreeMap<String, String> = BTreeMap::new();
     let mut cmd_and_args: Vec<String> = Vec::new();
@@ -18,6 +19,8 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
             break;
         } else if arg == "-i" || arg == "--ignore-environment" {
             ignore_env = true;
+        } else if arg == "-0" || arg == "--null" {
+            null_delimited = true;
         } else if arg == "-u" || arg == "--unset" {
             i += 1;
             if i >= args.len() {
@@ -62,8 +65,9 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     }
 
     if cmd_and_args.is_empty() {
+        let separator = if null_delimited { '\0' } else { '\n' };
         for (key, value) in &final_env {
-            writeln!(stdout, "{}={}", key, value).ok();
+            write!(stdout, "{}={}{}", key, value, separator).ok();
         }
         return 0;
     }
@@ -73,7 +77,10 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let cmd_rest: Vec<&str> = cmd_and_args[1..].iter().map(|s| s.as_str()).collect();
 
     // Convert env BTreeMap to Vec<(&str, &str)>
-    let env_vec: Vec<(&str, &str)> = final_env.iter().map(|(k, v)| (k.as_str(), v.as_str())).collect();
+    let env_vec: Vec<(&str, &str)> = final_env
+        .iter()
+        .map(|(k, v)| (k.as_str(), v.as_str()))
+        .collect();
 
     match process::Command::new(cmd_name)
         .args(&cmd_rest)

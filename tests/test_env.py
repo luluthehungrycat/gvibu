@@ -22,7 +22,7 @@ def test_env_unset(capsys):
     result = env_cmd.run(["-u", "PATH"])
     out, _ = capsys.readouterr()
     assert result == 0
-    assert "PATH=" not in out
+    assert not any(line.startswith("PATH=") for line in out.splitlines())
 
 
 def test_env_ignore(capsys):
