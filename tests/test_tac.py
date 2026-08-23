@@ -1,9 +1,12 @@
 """Tests for tac command."""
 
+import io
+import sys
+
 from gvibu_ref.commands import tac
 
-
-def test_stdin_basic(capsys):
+def test_stdin_basic(capsys, monkeypatch):
+    monkeypatch.setattr(sys, "stdin", io.StringIO("a\nb\nc\n"))
     ret = tac.run([])
     out, err = capsys.readouterr()
     assert ret == 0

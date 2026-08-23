@@ -1,5 +1,7 @@
-from gvibu_ref.commands.uniq import run as uniq_run
+import io
+import sys
 
+from gvibu_ref.commands.uniq import run as uniq_run
 
 def test_uniq_invalid_option(capfd):
     code = uniq_run(["-x"])
@@ -9,16 +11,19 @@ def test_uniq_invalid_option(capfd):
     assert "uniq:" in err
 
 
-def test_uniq_u_flag(capfd):
+def test_uniq_u_flag(capfd, monkeypatch):
+    monkeypatch.setattr(sys, "stdin", io.StringIO(""))
     code = uniq_run(["-u"])
     assert code == 0
 
 
-def test_uniq_d_flag(capfd):
+def test_uniq_d_flag(capfd, monkeypatch):
+    monkeypatch.setattr(sys, "stdin", io.StringIO(""))
     code = uniq_run(["-d"])
     assert code == 0
 
 
-def test_uniq_c_flag(capfd):
+def test_uniq_c_flag(capfd, monkeypatch):
+    monkeypatch.setattr(sys, "stdin", io.StringIO(""))
     code = uniq_run(["-c"])
     assert code == 0

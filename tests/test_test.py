@@ -1,6 +1,20 @@
 """Tests for test/[ command."""
+import subprocess
+import sys
+
 import pytest
 from gvibu_ref.commands.test_cmd import run
+
+
+def test_cli_bracket_missing_close():
+    result = subprocess.run(
+        [sys.executable, "python-ref/gvibu_ref/main.py", "[", "x", "=", "x"],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 1
+    assert result.stdout == ""
+    assert "missing ']'" in result.stderr
 
 
 def test_no_args():
@@ -79,8 +93,10 @@ def test_dev_null_exists():
     assert run(["-e", "/dev/null"]) == 0
 
 
-def test_dev_null_is_file():
-    assert run(["-f", "/dev/null"]) == 0
+def test_regular_file_is_file(tmp_path):
+    path = tmp_path / "regular-file"
+    path.write_text("content")
+    assert run(["-f", str(path)]) == 0
 
 
 def test_root_is_dir():

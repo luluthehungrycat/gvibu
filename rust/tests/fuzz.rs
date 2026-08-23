@@ -3,6 +3,9 @@
 /// when given random inputs across a wide range of values.
 use proptest::prelude::*;
 use std::process::Command;
+fn safe_string() -> impl Strategy<Value = String> {
+    any::<String>().prop_filter("safe process argument", |value| !value.contains('\0'))
+}
 
 fn gvibu_bin() -> &'static str {
     env!("CARGO_BIN_EXE_gvibu")
@@ -30,12 +33,9 @@ fn run_with_stdin(args: &[&str], stdin: &str) -> (i32, String, String) {
         .spawn()
         .expect("failed to run gvibu");
     use std::io::Write;
-    child
-        .stdin
-        .take()
-        .unwrap()
-        .write_all(stdin.as_bytes())
-        .expect("failed to write stdin");
+    let mut stdin_pipe = child.stdin.take().unwrap();
+    let _ = stdin_pipe.write_all(stdin.as_bytes());
+    drop(stdin_pipe);
     let output = child.wait_with_output().expect("failed to read output");
     (
         output.status.code().unwrap_or(-1),
@@ -49,7 +49,7 @@ fn run_with_stdin(args: &[&str], stdin: &str) -> (i32, String, String) {
 // ---------------------------------------------------------------------------
 proptest! {
     #[test]
-    fn fuzz_true_any_args(ref args in proptest::collection::vec(".*", 0..10)) {
+    fn fuzz_true_any_args(ref args in proptest::collection::vec(safe_string(), 0..10)) {
         let mut cmd_args = vec!["true"];
         cmd_args.extend(args.iter().map(|s| s.as_str()));
         let (code, _, _) = run(&cmd_args);
@@ -59,7 +59,7 @@ proptest! {
 
 proptest! {
     #[test]
-    fn fuzz_false_any_args(ref args in proptest::collection::vec(".*", 0..10)) {
+    fn fuzz_false_any_args(ref args in proptest::collection::vec(safe_string(), 0..10)) {
         let mut cmd_args = vec!["false"];
         cmd_args.extend(args.iter().map(|s| s.as_str()));
         let (code, _, _) = run(&cmd_args);
@@ -72,7 +72,7 @@ proptest! {
 // ---------------------------------------------------------------------------
 proptest! {
     #[test]
-    fn fuzz_echo_no_crash(ref args in proptest::collection::vec(".*", 0..10)) {
+    fn fuzz_echo_no_crash(ref args in proptest::collection::vec(safe_string(), 0..10)) {
         let mut cmd_args = vec!["echo"];
         cmd_args.extend(args.iter().map(|s| s.as_str()));
         let (code, out, _) = run(&cmd_args);
@@ -88,7 +88,7 @@ proptest! {
 // ---------------------------------------------------------------------------
 proptest! {
     #[test]
-    fn fuzz_basename_no_crash(ref path in ".*") {
+    fn fuzz_basename_no_crash(ref path in safe_string()) {
         let (code, _, _) = run(&["basename", path]);
         assert!(code == 0 || code == 1, "basename should only exit 0 or 1, got {}", code);
     }
@@ -96,7 +96,7 @@ proptest! {
 
 proptest! {
     #[test]
-    fn fuzz_basename_with_suffix(ref path in ".*", ref suffix in ".*") {
+    fn fuzz_basename_with_suffix(ref path in safe_string(), ref suffix in safe_string()) {
         let (code, _, _) = run(&["basename", path, suffix]);
         assert!(code == 0 || code == 1, "basename with suffix should only exit 0 or 1");
     }
@@ -107,7 +107,7 @@ proptest! {
 // ---------------------------------------------------------------------------
 proptest! {
     #[test]
-    fn fuzz_dirname_no_crash(ref path in ".*") {
+    fn fuzz_dirname_no_crash(ref path in safe_string()) {
         let (code, _, _) = run(&["dirname", path]);
         assert!(code == 0 || code == 2, "dirname should only exit 0 or 2, got {}", code);
     }
@@ -118,7 +118,7 @@ proptest! {
 // ---------------------------------------------------------------------------
 proptest! {
     #[test]
-    fn fuzz_sort_no_crash(ref lines in proptest::collection::vec(".*", 0..30)) {
+    fn fuzz_sort_no_crash(ref lines in proptest::collection::vec(safe_string(), 0..30)) {
         let input = lines.join("\n");
         let (code, out, _) = run_with_stdin(&["sort"], &input);
         assert_eq!(code, 0, "sort should not crash");
@@ -175,7 +175,7 @@ proptest! {
 // ---------------------------------------------------------------------------
 proptest! {
     #[test]
-    fn fuzz_test_no_crash(ref args in proptest::collection::vec(".*", 1..8)) {
+    fn fuzz_test_no_crash(ref args in proptest::collection::vec(safe_string(), 1..8)) {
         let mut cmd_args = vec!["test"];
         cmd_args.extend(args.iter().map(|s| s.as_str()));
         let (code, _, _) = run(&cmd_args);
@@ -188,7 +188,7 @@ proptest! {
 // ---------------------------------------------------------------------------
 proptest! {
     #[test]
-    fn fuzz_cut_field(ref lines in proptest::collection::vec(".*", 0..10)) {
+    fn fuzz_cut_field(ref lines in proptest::collection::vec(safe_string(), 0..10)) {
         let input = lines.join("\n");
         let (code, _, _) = run_with_stdin(&["cut", "-f1"], &input);
         assert!(code == 0 || code == 1, "cut should not crash, got {}", code);
@@ -197,7 +197,7 @@ proptest! {
 
 proptest! {
     #[test]
-    fn fuzz_cut_delimiter(ref lines in proptest::collection::vec(".*", 0..10)) {
+    fn fuzz_cut_delimiter(ref lines in proptest::collection::vec(safe_string(), 0..10)) {
         let input = lines.join("\n");
         let (code, _, _) = run_with_stdin(&["cut", "-d,", "-f1"], &input);
         assert!(code == 0 || code == 1, "cut should not crash with delimiter");
@@ -209,7 +209,7 @@ proptest! {
 // ---------------------------------------------------------------------------
 proptest! {
     #[test]
-    fn fuzz_tr_basic(ref input in ".*", ref set1 in ".{0,5}", ref set2 in ".{0,5}") {
+    fn fuzz_tr_basic(ref input in safe_string(), ref set1 in safe_string(), ref set2 in safe_string()) {
         let (code, _, _) = run_with_stdin(&["tr", set1, set2], input);
         assert!(code == 0 || code == 1, "tr should not crash, got {}", code);
     }
@@ -246,7 +246,7 @@ proptest! {
 // ---------------------------------------------------------------------------
 proptest! {
     #[test]
-    fn fuzz_uniq_no_crash(ref lines in proptest::collection::vec(".*", 0..15)) {
+    fn fuzz_uniq_no_crash(ref lines in proptest::collection::vec(safe_string(), 0..15)) {
         let input = lines.join("\n");
         let (code, out, _) = run_with_stdin(&["uniq"], &input);
         assert_eq!(code, 0, "uniq should not crash");
@@ -340,13 +340,13 @@ proptest! {
 // ---------------------------------------------------------------------------
 proptest! {
     #[test]
-    fn fuzz_printf_no_crash(ref fmt in ".{0,30}", ref args in proptest::collection::vec("[\x20-\x7e]{0,10}", 0..4)) {
+    fn fuzz_printf_no_crash(fmt in safe_string(), ref args in proptest::collection::vec("[\x20-\x7e]{0,10}", 0..4)) {
         let mut cmd_args = vec!["printf"];
         // Prevent format strings starting with '-' from being eaten as flags
         if fmt.starts_with('-') {
             cmd_args.push("--");
         }
-        cmd_args.push(fmt);
+        cmd_args.push(fmt.as_str());
         cmd_args.extend(args.iter().map(|s| s.as_str()));
         let (code, _, _) = run(&cmd_args);
         assert!(code == 0 || code == 1,
@@ -359,7 +359,7 @@ proptest! {
     fn fuzz_printf_s_specifier(ref text in "[\x20-\x7e]{0,50}") {
         let (code, out, _) = run(&["printf", "%s", text]);
         assert_eq!(code, 0, "printf %%s should succeed");
-        assert_eq!(out.trim_end(), *text, "printf %%s should reproduce string exactly");
+        assert_eq!(out, *text, "printf %%s should reproduce string exactly");
     }
 }
 
@@ -377,7 +377,7 @@ proptest! {
 // ---------------------------------------------------------------------------
 proptest! {
     #[test]
-    fn fuzz_date_no_crash(ref fmt in ".{0,40}") {
+    fn fuzz_date_no_crash(fmt in safe_string()) {
         let arg = format!("+{}", fmt);
         let (code, _, _) = run(&["date", &arg]);
         assert!(code == 0 || code == 1,

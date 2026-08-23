@@ -23,13 +23,26 @@ def run_command(cmd: list[str], stdin: str = "") -> tuple[int, str, str]:
 
 
 def load_test_cases(command: str) -> list[dict]:
-    """Load test cases for a command from shared-tests."""
+    """Load current and legacy test cases for a command."""
     path = f"shared-tests/cases/{command}.json"
     if not os.path.exists(path):
         return []
     with open(path) as f:
         data = json.load(f)
+    if isinstance(data, list):
+        return data
     return data.get("cases", [])
+
+
+def output_matches(actual: str, expected: str, substring: bool = False) -> bool:
+    """Match exact modern cases and substring-based legacy diagnostics."""
+    if expected == "$PWD\n":
+        return actual == f"{os.getcwd()}\n"
+    if expected == "*":
+        return True
+    if substring:
+        return expected in actual
+    return actual == expected
 
 
 def run_tests_for_command(
@@ -50,10 +63,13 @@ def run_tests_for_command(
     for case in cases:
         name = case.get("name", "unnamed")
         args = case.get("args", [])
+        if args and args[0] == command:
+            args = args[1:]
         stdin_input = case.get("stdin", "")
-        expected_stdout = case.get("stdout", "")
-        expected_stderr = case.get("stderr", "")
-        expected_exit = case.get("exit_code", 0)
+        expected_stdout = case.get("stdout", case.get("expected_stdout", ""))
+        expected_stderr = case.get("stderr", case.get("expected_stderr", ""))
+        expected_exit = case.get("exit_code", case.get("expected_exit_code", 0))
+        legacy_stderr = "expected_stderr" in case
 
         python_full_cmd = python_cmd + [command] + args
         rust_full_cmd = rust_cmd + [command] + args
@@ -62,13 +78,13 @@ def run_tests_for_command(
         rust_code, rust_out, rust_err = run_command(rust_full_cmd, stdin=stdin_input)
 
         py_match = (
-            (expected_stdout == "*" or py_out == expected_stdout)
-            and (expected_stderr == "*" or py_err == expected_stderr)
+            output_matches(py_out, expected_stdout)
+            and output_matches(py_err, expected_stderr, legacy_stderr)
             and py_code == expected_exit
         )
         rust_match = (
-            (expected_stdout == "*" or rust_out == expected_stdout)
-            and (expected_stderr == "*" or rust_err == expected_stderr)
+            output_matches(rust_out, expected_stdout)
+            and output_matches(rust_err, expected_stderr, legacy_stderr)
             and rust_code == expected_exit
         )
 
@@ -113,7 +129,7 @@ def main():
     python_cmd = ["python3", "python-ref/gvibu_ref/main.py"]
     rust_cmd = ["rust/target/debug/gvibu"]
 
-    commands = ["true", "false", "echo", "pwd", "basename", "dirname", "cat", "wc", "head", "yes", "printenv", "sleep", "touch", "seq", "which", "uname", "env", "whoami", "link", "unlink", "tee", "mkdir", "rmdir", "hostname", "logname", "readlink", "realpath", "uniq", "uptime", "id", "who", "kill", "cut", "tr", "mv", "rm", "ln", "chmod", "chown", "sort", "grep", "ls", "cp", "printf", "date", "expr", "split", "tail", "tac", "fold", "comm", "join", "nl", "shuf", "sum", "du", "df", "test"]
+    commands = ["true", "false", "echo", "pwd", "basename", "dirname", "cat", "wc", "head", "yes", "printenv", "sleep", "touch", "seq", "which", "uname", "env", "whoami", "link", "unlink", "tee", "mkdir", "rmdir", "hostname", "logname", "readlink", "realpath", "uniq", "uptime", "id", "who", "kill", "cut", "tr", "mv", "rm", "ln", "chmod", "chown", "sort", "grep", "ls", "cp", "printf", "date", "expr", "split", "tail", "tac", "fold", "expand", "rev", "comm", "join", "nl", "shuf", "sum", "du", "df", "test"]
 
     all_results = []
 

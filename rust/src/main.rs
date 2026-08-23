@@ -4,16 +4,26 @@ use std::io;
 use std::process;
 
 fn resolve_command<'a>(argv0_basename: &'a str, args: &'a [String]) -> Option<(&'a str, &'a [String])> {
-    // Symlink mode: argv0 basename is the command name
+    // Symlink mode: argv0 basename is the command name.
     if commands::lookup(argv0_basename).is_some() {
-        return Some((argv0_basename, &args[1..]));
+        let run_args = if argv0_basename == "[" {
+            args
+        } else {
+            &args[1..]
+        };
+        return Some((argv0_basename, run_args));
     }
 
-    // Subcommand mode: argv0 is the binary name, args[1] is the command
+    // Subcommand mode: argv0 is the binary name, args[1] is the command.
     if commands::BINARY_NAMES.contains(&argv0_basename.as_ref()) && args.len() > 1 {
         let cmd_name = &args[1];
         if commands::lookup(cmd_name).is_some() {
-            return Some((cmd_name.as_str(), &args[2..]));
+            let run_args = if cmd_name == "[" {
+                &args[1..]
+            } else {
+                &args[2..]
+            };
+            return Some((cmd_name.as_str(), run_args));
         }
     }
 

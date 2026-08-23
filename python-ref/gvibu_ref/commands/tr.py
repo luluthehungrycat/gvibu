@@ -52,22 +52,24 @@ def run(args: list[str]) -> int:
             sets.append(arg)
         i += 1
 
-    if (delete and len(sets) < 1) or (not delete and len(sets) < 2):
+    if not sets or (not delete and not squeeze and len(sets) < 2):
         print("tr: missing operand", file=sys.stderr)
         return 1
 
-    set1 = build_char_set(sets[0] if sets else "", complement)
+    set1 = build_char_set(sets[0], complement)
+    translate = not delete and len(sets) >= 2
 
     if delete:
         delete_set = set1
         translate_map = {}
-    else:
-        set2_list = expand_set(sets[1] if len(sets) > 1 else "")
-        if not set2_list and set1:
-            set2_list = [sorted(set1)[-1]] * len(set1)
+    elif translate:
+        set2_list = expand_set(sets[1])
         translate_map = {}
         for idx, c in enumerate(sorted(set1)):
             translate_map[c] = set2_list[idx % len(set2_list)] if set2_list else c
+        delete_set = set()
+    else:
+        translate_map = {}
         delete_set = set()
 
     input_data = sys.stdin.buffer.read()

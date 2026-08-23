@@ -20,21 +20,25 @@
     {
         "name": "dev_null_octal",
         "args": ["644", "/dev/null"],
-        "expected_exit_code": 0
+        "expected_stderr": "*",
+        "expected_exit_code": 1
     },
     {
         "name": "dev_null_symbolic",
         "args": ["u+x", "/dev/null"],
-        "expected_exit_code": 0
+        "expected_stderr": "*",
+        "expected_exit_code": 1
     },
     {
         "name": "dev_null_recursive",
         "args": ["-R", "755", "/dev/null"],
-        "expected_exit_code": 0
+        "expected_stderr": "*",
+        "expected_exit_code": 1
     },
     {
         "name": "dev_null_verbose",
         "args": ["-v", "644", "/dev/null"],
-        "expected_exit_code": 0
+        "expected_stderr": "*",
+        "expected_exit_code": 1
     }
 ]

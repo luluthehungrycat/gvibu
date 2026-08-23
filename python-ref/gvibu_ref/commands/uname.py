@@ -13,7 +13,7 @@ def run(args: list[str]) -> int:
             for ch in arg[1:]:
                 if ch == "a":
                     all_flag = True
-                elif ch in ("s", "n", "r", "m"):
+                elif ch in ("s", "n", "r", "v", "m", "o"):
                     flags.add(ch)
                 else:
                     print(f"uname: invalid option: -{ch}", file=sys.stderr)
@@ -33,8 +33,12 @@ def run(args: list[str]) -> int:
         parts.append(uname_info.nodename)
     if all_flag or "r" in flags:
         parts.append(uname_info.release)
+    if all_flag or "v" in flags:
+        parts.append(uname_info.version)
     if all_flag or "m" in flags:
         parts.append(uname_info.machine)
+    if all_flag or "o" in flags:
+        parts.append("GNU/Linux" if uname_info.sysname == "Linux" else uname_info.sysname)
 
     print(" ".join(parts))
     return 0

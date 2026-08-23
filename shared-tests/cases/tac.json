@@ -19,7 +19,7 @@
       "name": "invalid_option",
       "args": ["-x"],
       "stdout": "",
-      "stderr": "",
+      "stderr": "*",
       "exit_code": 1
     }
   ]

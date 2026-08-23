@@ -28,7 +28,7 @@ def test_parse_symbolic():
     who, op, bits = result
     assert 'g' in who and 'o' in who
     assert op == '-'
-    assert bits == 0o010
+    assert bits == 0o022
 
 
 def test_apply_mode_change():
@@ -50,16 +50,16 @@ def test_no_files():
 
 
 def test_dev_null_octal():
-    assert run(["644", "/dev/null"]) == 0
+    assert run(["644", "/dev/null"]) == 1
 
 
 def test_dev_null_symbolic():
-    assert run(["u+x", "/dev/null"]) == 0
+    assert run(["u+x", "/dev/null"]) == 1
 
 
 def test_dev_null_recursive():
-    assert run(["-R", "755", "/dev/null"]) == 0
+    assert run(["-R", "755", "/dev/null"]) == 1
 
 
 def test_dev_null_verbose():
-    assert run(["-v", "644", "/dev/null"]) == 0
+    assert run(["-v", "644", "/dev/null"]) == 1

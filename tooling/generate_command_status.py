@@ -14,18 +14,24 @@ def get_spec_status(command: str) -> str:
 
 
 def get_python_status(command: str) -> str:
-    """Check if Python implementation exists."""
-    cmd_path = f"python-ref/gvibu_ref/commands/{command}.py"
-    if os.path.exists(cmd_path):
-        return f"python-ref implementation"
+    """Check if a Python implementation exists."""
+    candidates = (
+        f"python-ref/gvibu_ref/commands/{command}.py",
+        f"python-ref/gvibu_ref/commands/{command}_cmd.py",
+    )
+    if any(os.path.exists(path) for path in candidates):
+        return "python-ref implementation"
     return "-"
 
 
 def get_rust_status(command: str) -> str:
-    """Check if Rust implementation exists."""
-    cmd_path = f"rust/src/commands/{command}_cmd.rs"
-    if os.path.exists(cmd_path):
-        return f"rust implementation"
+    """Check if a Rust implementation exists."""
+    candidates = (
+        f"rust/src/commands/{command}.rs",
+        f"rust/src/commands/{command}_cmd.rs",
+    )
+    if any(os.path.exists(path) for path in candidates):
+        return "rust implementation"
     return "-"
 
 
@@ -34,8 +40,14 @@ def main():
     os.chdir(base_dir)
     
     commands = [
-        "true", "false", "echo", "pwd",
-        "basename", "dirname", "cat", "head", "wc"
+        "true", "false", "echo", "pwd", "basename", "dirname", "cat", "wc",
+        "head", "yes", "printenv", "sleep", "touch", "seq", "which", "uname",
+        "env", "whoami", "link", "unlink", "tee", "mkdir", "rmdir",
+        "hostname", "logname", "readlink", "realpath", "uniq", "uptime",
+        "id", "who", "kill", "cut", "tr", "mv", "rm", "ln", "chmod", "chown",
+        "sort", "grep", "ls", "cp", "printf", "date", "expr", "split",
+        "tail", "tac", "fold", "expand", "rev", "comm", "join", "nl", "shuf",
+        "sum", "du", "df", "test",
     ]
     
     print("| Command | Spec | Python (gvibu-ref) | Rust (gvibu) | Notes |")
@@ -46,14 +58,14 @@ def main():
         python = get_python_status(cmd)
         rust = get_rust_status(cmd)
         
-        if not os.path.exists(f"specs/commands/{cmd}.md") and cmd not in ["basename", "dirname", "cat", "head", "wc"]:
+        if spec == "Spec pending":
             notes = "Not started"
-        elif cmd in ["basename", "dirname", "cat", "head", "wc"]:
-            notes = "Scaffolded"
         elif python != "-" and rust != "-":
             notes = "Complete"
         elif python != "-":
             notes = "Python done"
+        elif rust != "-":
+            notes = "Rust done"
         else:
             notes = "Not started"
         

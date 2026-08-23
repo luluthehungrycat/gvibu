@@ -14,6 +14,11 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut reverse = false;
     let mut sort_size = false;
     let mut _one_per_line = true; // default to 1-column
+    let mut color = false;
+    let mut append_indicator = false;
+    let mut list_directories_themselves = false;
+    let mut recursive = false;
+    let mut show_inode = false;
     let mut paths: Vec<&str> = Vec::new();
 
     for arg in args {
@@ -26,6 +31,11 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
             "-r" => reverse = true,
             "-S" => sort_size = true,
             "-1" => _one_per_line = true,
+            "--color" => color = true,
+            "-F" => append_indicator = true,
+            "-d" => list_directories_themselves = true,
+            "-R" => recursive = true,
+            "-i" => show_inode = true,
             "--" => break,
             s if s.starts_with('-') && s.len() > 1 => {
                 // Handle bundled flags like -la, -ltr
@@ -39,6 +49,10 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                         'r' => reverse = true,
                         'S' => sort_size = true,
                         '1' => _one_per_line = true,
+                        'F' => append_indicator = true,
+                        'd' => list_directories_themselves = true,
+                        'R' => recursive = true,
+                        'i' => show_inode = true,
                         _ => {
                             eprintln!("ls: invalid option: -{}", c);
                             return 1;
@@ -60,7 +74,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     for path in &paths {
         match fs::metadata(path) {
             Ok(meta) => {
-                if meta.is_dir() {
+                if meta.is_dir() && !list_directories_themselves {
                     if !first {
                         pwriteln!(w);
                     }
@@ -68,7 +82,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                         pwriteln!(w, "{}:", path);
                     }
                     first = false;
-                    exit_code |= list_directory(w, path, long, show_all, show_almost_all, human, sort_time, reverse, sort_size);
+                    exit_code |= list_directory(w, path, long, show_all, show_almost_all, human, sort_time, reverse, sort_size, color, append_indicator, recursive, show_inode);
                     if paths.len() > 1 {
                         pwriteln!(w);
                     }
@@ -78,9 +92,18 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                     }
                     first = false;
                     if long {
-                        pwriteln!(w, "{}", format_long(path, &meta, human));
+                        pwriteln!(w, "{}", format_long(path, &meta, human, show_inode));
                     } else {
-                        pwriteln!(w, "{}", display_name(path));
+                        let name = display_name(path);
+                        if show_inode {
+                            pwriteln!(w, "{} {}", meta.ino(), name);
+                        } else if append_indicator {
+                            pwriteln!(w, "{}{}", name, get_indicator(&meta));
+                        } else if color {
+                            pwriteln!(w, "{}", colorize_name(name, &meta));
+                        } else {
+                            pwriteln!(w, "{}", name);
+                        }
                     }
                 }
             }
@@ -104,6 +127,10 @@ fn list_directory(
     sort_time: bool,
     reverse: bool,
     sort_size: bool,
+    color: bool,
+    append_indicator: bool,
+    recursive: bool,
+    show_inode: bool,
 ) -> i32 {
     let entries = match fs::read_dir(dir) {
         Ok(d) => d,
@@ -128,9 +155,9 @@ fn list_directory(
                         continue;
                     }
                 }
-                match e.metadata() {
+                match e.path().symlink_metadata() {
                     Ok(m) => items.push((name, m)),
-                    Err(_) => items.push((name, unsafe { std::mem::zeroed() })),
+                    Err(_) => {}
                 }
             }
             Err(_) => {}
@@ -152,29 +179,54 @@ fn list_directory(
 
     if long {
         for (name, meta) in &items {
-            pwriteln!(w, "{}", format_long(name, meta, human));
+            pwriteln!(w, "{}", format_long(name, meta, human, show_inode));
         }
     } else {
-        for (name, _meta) in &items {
-            pwriteln!(w, "{}", name);
+        for (name, meta) in &items {
+            if show_inode {
+                pwriteln!(w, "{} {}", meta.ino(), name);
+            } else if append_indicator {
+                pwriteln!(w, "{}{}", name, get_indicator(meta));
+            } else if color {
+                pwriteln!(w, "{}", colorize_name(name, meta));
+            } else {
+                pwriteln!(w, "{}", name);
+            }
+        }
+    }
+
+    // Handle recursive listing
+    if recursive {
+        for (name, meta) in &items {
+            if meta.is_dir() {
+                let subdir_path = if dir == "." {
+                    name.clone()
+                } else {
+                    format!("{}/{}", dir, name)
+                };
+                pwriteln!(w);
+                pwriteln!(w, "{}:", subdir_path);
+                let _ = list_directory(w, &subdir_path, long, show_all, show_almost_all, human, sort_time, reverse, sort_size, color, append_indicator, recursive, show_inode);
+            }
         }
     }
 
     0
 }
 
-fn format_long(name: &str, meta: &Metadata, human: bool) -> String {
+fn format_long(name: &str, meta: &Metadata, human: bool, show_inode: bool) -> String {
     let file_type = if meta.is_dir() { 'd' } else if meta.file_type().is_symlink() { 'l' } else { '-' };
     let mode = meta.permissions().mode();
     let perms = format_mode(mode);
     let nlink = meta.nlink();
+    let inode = if show_inode { format!("{} ", meta.ino()) } else { String::new() };
     let size = if human {
         human_size(meta.len())
     } else {
         meta.len().to_string()
     };
     let mtime = format_time(meta.mtime());
-    format!("{}{} {:>2} {} {} {} {} {}", file_type, perms, nlink, "", "", size, mtime, name)
+    format!("{}{}{} {:>2} {} {} {} {} {}", inode, file_type, perms, nlink, "", "", size, mtime, name)
 }
 
 fn format_mode(mode: u32) -> String {
@@ -218,7 +270,6 @@ fn format_time(secs: i64) -> String {
 
     // Use chrono-like manual formatting via local time
     // For simplicity, just show the raw timestamp parts
-    // We'll do a basic approach
     let (year, month, day, hour, min) = unix_to_ymd_hm(secs as i64);
     let now_secs = std::time::SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -298,6 +349,39 @@ fn display_name(path: &str) -> &str {
     path.rsplit('/').next().unwrap_or(path)
 }
 
+fn get_indicator(meta: &Metadata) -> &'static str {
+    if meta.is_dir() {
+        "/"
+    } else if meta.file_type().is_symlink() {
+        "@"
+    } else if is_executable(meta) {
+        "*"
+    } else {
+        ""
+    }
+}
+
+fn is_executable(meta: &Metadata) -> bool {
+    let mode = meta.permissions().mode();
+    // Check if any execute bit is set (user, group, or other)
+    mode & 0o111 != 0
+}
+
+fn colorize_name(name: &str, meta: &Metadata) -> String {
+    // ANSI color codes for different file types
+    // Note: In a real implementation, we'd need to check if stdout is a terminal
+    // For now, we'll just add the color codes
+    if meta.is_dir() {
+        format!("\x1b[34m{}\x1b[0m", name) // Blue for directories
+    } else if meta.file_type().is_symlink() {
+        format!("\x1b[36m{}\x1b[0m", name) // Cyan for symlinks
+    } else if is_executable(meta) {
+        format!("\x1b[32m{}\x1b[0m", name) // Green for executables
+    } else {
+        name.to_string()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -343,5 +427,47 @@ mod tests {
     fn test_ls_nonexistent() {
         let result = run(&mut std::io::sink(), &["/nonexistent_ls_test_xyz".into()]);
         assert_eq!(result, 1);
+    }
+
+    #[test]
+    fn test_ls_color_flag() {
+        let result = run(&mut std::io::sink(), &["--color".into()]);
+        assert_eq!(result, 0);
+    }
+
+    #[test]
+    fn test_ls_f_flag() {
+        let result = run(&mut std::io::sink(), &["-F".into()]);
+        assert_eq!(result, 0);
+    }
+
+    #[test]
+    fn test_ls_d_flag() {
+        let result = run(&mut std::io::sink(), &["-d".into()]);
+        assert_eq!(result, 0);
+    }
+
+    #[test]
+    fn test_ls_r_flag() {
+        let result = run(&mut std::io::sink(), &["-R".into()]);
+        assert_eq!(result, 0);
+    }
+
+    #[test]
+    fn test_ls_i_flag() {
+        let result = run(&mut std::io::sink(), &["-i".into()]);
+        assert_eq!(result, 0);
+    }
+
+    #[test]
+    fn test_ls_bundled_new_flags() {
+        let result = run(&mut std::io::sink(), &["-Fi".into()]);
+        assert_eq!(result, 0);
+    }
+
+    #[test]
+    fn test_ls_all_new_flags() {
+        let result = run(&mut std::io::sink(), &["-FdRi".into()]);
+        assert_eq!(result, 0);
     }
 }

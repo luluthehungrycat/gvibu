@@ -134,3 +134,36 @@ Usage notes:
 <!-- SKILLS_TABLE_END -->
 
 </skills_system>
+
+---
+
+## Project-Specific Guidelines
+
+**Parallelization Warning:** When dispatching multiple subagents for parallel work, ensure they have **no overlapping write targets**. The integration tests in `rust/tests/cli.rs` are a single shared file — if multiple fixers modify it simultaneously, merge conflicts will occur. Source files (individual command implementations) are safe for parallel modification as they are independent. Always assign each file to exactly one writer subagent.
+
+## GVIBU/VIBIX ownership
+
+GVIBU owns coreutils command behavior, flags, stdout/stderr routing, exit
+status semantics, and the userland runtime it shares with VISH and VIBIT.
+`vibix-lib/` is the current runtime home for VIBIX syscall bindings, typed
+errno/sentinel conversion, descriptors, checked I/O, and the allocator-facing
+`brk` boundary.
+
+VIBIX owns kernel mechanisms and the syscall ABI; VIBIT owns PID 1,
+launch/reaping, and supervision; VISH owns parsing, expansion, interactive
+behavior, and shell policy; image packaging belongs to the integration owner.
+Do not edit sibling repositories from this worktree. Record exact ABI,
+consumer, and QEMU verification handoffs instead.
+
+The Linux and WASM writer-based command surfaces are distinct from the no-std
+VIBIX runtime. A compile or local unit test does not establish VIBIX
+portability; claims require the VIBIX kernel and full VIBIT → VISH → GVIBU
+QEMU path.
+
+## Documentation maintenance
+
+Keep `ROADMAP.md` as the current artifact, ownership, milestone, and
+verification contract. Keep `CHANGELOG.md` as the dated record of completed
+GVIBU changes and the evidence run for each change. Update both when a
+runtime/API boundary, image artifact, support claim, or cross-repository
+handoff changes. Never mark VIBIX portability complete from compilation alone.

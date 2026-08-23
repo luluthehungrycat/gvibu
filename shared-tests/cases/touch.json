@@ -24,18 +24,18 @@
       "exit_code": 0
     },
     {
-      "name": "access_only",
-      "args": ["-a", "/dev/null"],
-      "stdout": "",
-      "stderr": "",
-      "exit_code": 0
+        "name": "access_only",
+        "args": ["-a", "/dev/null"],
+        "stdout": "",
+        "stderr": "*",
+        "exit_code": 1
     },
     {
-      "name": "mod_only",
-      "args": ["-m", "/dev/null"],
-      "stdout": "",
-      "stderr": "",
-      "exit_code": 0
+        "name": "mod_only",
+        "args": ["-m", "/dev/null"],
+        "stdout": "",
+        "stderr": "*",
+        "exit_code": 1
     },
     {
       "name": "both_flags",

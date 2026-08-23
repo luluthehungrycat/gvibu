@@ -2,7 +2,6 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
 use crate::pwrite;
-use crate::pwriteln;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut number_lines = false;
@@ -49,23 +48,36 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     exit_code
 }
 
-fn print_lines<R: BufRead>(w: &mut dyn Write, reader: R, number: bool, line_num: &mut usize, _src: &str) -> i32 {
-    for line in reader.lines() {
-        match line {
-            Ok(l) => {
-                if number {
-                    pwrite!(w, "{:>6}\t", line_num);
-                    *line_num += 1;
+fn print_lines<R: BufRead>(w: &mut dyn Write, mut reader: R, number: bool, line_num: &mut usize, src: &str) -> i32 {
+    if !number {
+        return match io::copy(&mut reader, w) {
+            Ok(_) => 0,
+            Err(e) => {
+                eprintln!("cat: {}: read error: {}", src, e);
+                1
+            }
+        };
+    }
+
+    let mut line = Vec::new();
+    loop {
+        line.clear();
+        match reader.read_until(b'\n', &mut line) {
+            Ok(0) => return 0,
+            Ok(_) => {
+                pwrite!(w, "{:>6}\t", line_num);
+                *line_num += 1;
+                if let Err(e) = w.write_all(&line) {
+                    eprintln!("cat: {}: write error: {}", src, e);
+                    return 1;
                 }
-                pwriteln!(w, "{}", l);
             }
             Err(e) => {
-                eprintln!("cat: {}: read error: {}", _src, e);
+                eprintln!("cat: {}: read error: {}", src, e);
                 return 1;
             }
         }
     }
-    0
 }
 
 #[cfg(test)]

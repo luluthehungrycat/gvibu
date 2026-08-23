@@ -57,6 +57,27 @@ Tests do NOT verify:
 
 This is NOT a GNU replacement. Commands are learning exercises and may lack features you expect from GNU coreutils.
 
+## GVIBU/VIBIX support matrix
+
+| Surface | Status | Evidence required |
+|---|---|---|
+| Linux Rust multicall | Supported for documented command specs | `cargo test`, parity tests |
+| WASM writer path | Supported for writer-compatible commands | WASM build and wrapper checks |
+| VIBIX `vibix-lib` raw/runtime layer | In progress; checked `echo` slice only | no-std build, runtime contract tests |
+| VIBIX flat-binary integration | Compatibility path, not fully portable | VIBIX kernel plus QEMU command smoke |
+| VIBIX canonical VFS 14/15 | Pending kernel registration handoff | kernel tests and QEMU verification |
+
+VIBIX runtime errors are typed before use: negative errno encodings and
+`u64::MAX` sentinels are not successful pointers, lengths, descriptors, or
+process IDs. A non-empty checked write that makes zero progress is a runtime
+error. Command semantics remain in GVIBU: normal output goes to stdout,
+diagnostics go to stderr, runtime failures return status 1, and usage errors
+return status 2 where specified.
+
+The VIBIX runtime does not yet install a global allocator. It owns the checked
+`brk` boundary and will not claim heap support until allocation lifetime and
+resident-shell reuse are verified.
+
 ## Reference
 
 - POSIX.1-2017: https://pubs.opengroup.org/onlinepubs/9699919799/
