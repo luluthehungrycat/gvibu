@@ -1,24 +1,29 @@
-//! gvibu-vibix: bare-metal VIBIX target for 58 Unix coreutils.
+//! gvibu-vibix: bare-metal VIBIX target for the first shared GVIBU runtime slice.
 //!
-//! Provides syscall wrappers, a no-alloc `VibixWriter` implementing
-//! `core::fmt::Write`, and no_std implementations of the 5 simplest
-//! commands (true, false, echo, yes, printenv).
+//! `runtime` provides allocation-free typed syscall-result conversion,
+//! descriptors, checked I/O, and the allocator-facing `brk` boundary.
+//! `sys` contains the raw ABI wrappers. The VIBIX command implementations
+//! remain here so command flags and output semantics stay owned by GVIBU.
 //!
 //! # Memory layout
 //! - Code loaded at `0x2000000` (flat physical addresses)
 //! - Stack at `0x2002000` (grows downward, set by `_start`)
 //!
 //! # Syscall ABI
-//! - `rax` = call number, `rdi/rsi/rdx` = args
-//! - Return in `rax`. rcx, r11, and arg regs clobbered.
-//! - `0` = exit, `1` = write, `2` = read, `11` = open, `12` = close
+//! - `rax` = call number, `rdi/rsi/rdx/r8/r9` = arguments
+//! - `rcx` and `r11` are preserved by the kernel; all other general registers
+//!   are caller-clobbered
+//! - compatibility output/input use syscall 1/2; canonical VFS 14/15 remain
+//!   pending kernel registration and QEMU verification
 
-#![no_std]
+#![cfg_attr(not(test), no_std)]
 
+pub mod runtime;
 pub mod sys;
 
 // ── Panic handler ────────────────────────────────────────────────────────────
 
+#[cfg(not(test))]
 #[panic_handler]
 fn lib_panic(info: &core::panic::PanicInfo<'_>) -> ! {
     // PanicInfo::message() returns PanicMessage which implements Display
@@ -113,27 +118,30 @@ pub fn cmd_echo(args: &[&str]) -> i32 {
         }
     }
 
-    // Print positional arguments
+    // Print positional arguments through the checked runtime path.
     for (i, arg) in args[start..].iter().enumerate() {
-        if i > 0 {
-            vibix_print(" ");
+        if i > 0 && runtime::write_stdout(b" ").is_err() {
+            return 1;
         }
-        if enable_escapes {
-            write_escaped_str(arg);
+        let result = if enable_escapes {
+            write_escaped_str(arg)
         } else {
-            vibix_print(arg);
+            runtime::write_stdout(arg.as_bytes())
+        };
+        if result.is_err() {
+            return 1;
         }
     }
 
-    if newline {
-        vibix_print("\n");
+    if newline && runtime::write_stdout(b"\n").is_err() {
+        return 1;
     }
 
     0
 }
 
 /// Write `s` to stdout, decoding `\n`, `\t`, `\r`, `\\`, `\0NNN` escapes.
-fn write_escaped_str(s: &str) {
+fn write_escaped_str(s: &str) -> runtime::SysResult<()> {
     let bytes = s.as_bytes();
     let mut i = 0;
     let len = bytes.len();
@@ -147,9 +155,7 @@ fn write_escaped_str(s: &str) {
 
         // Write literal segment
         if i > seg_start {
-            if let Ok(seg) = core::str::from_utf8(&bytes[seg_start..i]) {
-                vibix_print(seg);
-            }
+            runtime::write_stdout(&bytes[seg_start..i])?;
         }
 
         if i >= len {
@@ -157,17 +163,17 @@ fn write_escaped_str(s: &str) {
         }
 
         // We're at a backslash — decode the escape
-        i += 1; // skip '\'
+        i += 1;
         if i >= len {
-            vibix_putchar(b'\\');
+            runtime::write_stdout(b"\\")?;
             break;
         }
 
         match bytes[i] {
-            b'n' => vibix_putchar(b'\n'),
-            b't' => vibix_putchar(b'\t'),
-            b'r' => vibix_putchar(b'\r'),
-            b'\\' => vibix_putchar(b'\\'),
+            b'n' => runtime::write_stdout(b"\n")?,
+            b't' => runtime::write_stdout(b"\t")?,
+            b'r' => runtime::write_stdout(b"\r")?,
+            b'\\' => runtime::write_stdout(b"\\")?,
             b'0' => {
                 i += 1;
                 let mut octal: u8 = 0;
@@ -179,24 +185,17 @@ fn write_escaped_str(s: &str) {
                         break;
                     }
                 }
-                // i is already past the octal digits; the loop increment will skip
-                // one extra, so we decrement by 1 to compensate for the +=1 below
-                // Actually, let me restructure:
-                // We've already consumed the '0' at i-1 and the octal digits.
-                // The outer loop will do i += 1 below. So we need i to point to
-                // the last consumed digit + 1 already after the loop, then the
-                // i += 1 at the bottom will be one too many.
-                // Let's handle this with continue to skip the bottom i += 1.
-                vibix_putchar(octal);
-                continue; // skip the i += 1 below since we advanced i manually
+                runtime::write_all(runtime::Fd::STDOUT, &[octal])?;
+                continue;
             }
             c => {
-                vibix_putchar(b'\\');
-                vibix_putchar(c);
+                runtime::write_stdout(b"\\")?;
+                runtime::write_all(runtime::Fd::STDOUT, &[c])?;
             }
         }
         i += 1;
     }
+    Ok(())
 }
 
 /// `yes` — repeatedly output a string (default "y") until killed.
