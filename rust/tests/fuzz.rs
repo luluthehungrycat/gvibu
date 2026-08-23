@@ -33,12 +33,9 @@ fn run_with_stdin(args: &[&str], stdin: &str) -> (i32, String, String) {
         .spawn()
         .expect("failed to run gvibu");
     use std::io::Write;
-    child
-        .stdin
-        .take()
-        .unwrap()
-        .write_all(stdin.as_bytes())
-        .expect("failed to write stdin");
+    let mut stdin_pipe = child.stdin.take().unwrap();
+    let _ = stdin_pipe.write_all(stdin.as_bytes());
+    drop(stdin_pipe);
     let output = child.wait_with_output().expect("failed to read output");
     (
         output.status.code().unwrap_or(-1),
