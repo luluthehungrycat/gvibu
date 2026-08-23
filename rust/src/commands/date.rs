@@ -335,9 +335,12 @@ mod tests {
     #[test]
     fn test_date_with_d_flag_iso() {
         let mut buf = Vec::new();
-        assert_eq!(run(&mut buf, &["-d".into(), "2024-01-01".into()]), 0);
+        assert_eq!(
+            run(&mut buf, &["-d".into(), "2024-01-01".into(), "+%Y-%m-%d".into()]),
+            0
+        );
         let out = String::from_utf8_lossy(&buf).trim().to_string();
-        assert!(out.contains("2024") && out.contains("01"), "should contain 2024-01, got: {}", out);
+        assert_eq!(out, "2024-01-01", "should format the requested ISO date");
     }
 
     #[test]
