@@ -52,7 +52,7 @@ fn expand_content(input: &str, stops: Option<&[usize]>, initial_only: bool) -> S
             }
             '\t' if !initial_only || at_line_start => {
                 let spaces = spaces_to_next_tab(column, stops);
-                output.extend(std::iter::repeat_n(' ', spaces));
+                output.extend(std::iter::repeat(' ').take(spaces));
                 column += spaces;
             }
             '\t' => output.push(ch),
