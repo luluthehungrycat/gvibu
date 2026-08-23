@@ -93,88 +93,33 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         }
 
         if show_inodes {
-            match get_fs_stats(&mount.mount_point) {
-                Some((total_1k, used_1k, avail_1k, use_pct)) => {
-                    match get_inode_stats(&mount.mount_point) {
-                        Some((total_inodes, used_inodes, free_inodes, inode_use_pct)) => {
-                            if show_type {
-                                if human {
-                                    let total_h = human_size(total_1k * 1024);
-                                    let used_h = human_size(used_1k * 1024);
-                                    let avail_h = human_size(avail_1k * 1024);
-                                    let _ = writeln!(
-                                        w,
-                                        "{:<14} {:<11} {:>8} {:>8} {:>8} {:>3}% {:>8} {:>8} {:>8} {:>3}% {}",
-                                        mount.fs_file,
-                                        mount.fs_type,
-                                        total_h,
-                                        used_h,
-                                        avail_h,
-                                        use_pct,
-                                        total_inodes,
-                                        used_inodes,
-                                        free_inodes,
-                                        inode_use_pct,
-                                        mount.mount_point
-                                    );
-                                } else {
-                                    let _ = writeln!(
-                                        w,
-                                        "{:<14} {:<11} {:>8} {:>8} {:>8} {:>3}% {:>8} {:>8} {:>8} {:>3}% {}",
-                                        mount.fs_file,
-                                        mount.fs_type,
-                                        total_1k,
-                                        used_1k,
-                                        avail_1k,
-                                        use_pct,
-                                        total_inodes,
-                                        used_inodes,
-                                        free_inodes,
-                                        inode_use_pct,
-                                        mount.mount_point
-                                    );
-                                }
-                            } else {
-                                if human {
-                                    let total_h = human_size(total_1k * 1024);
-                                    let used_h = human_size(used_1k * 1024);
-                                    let avail_h = human_size(avail_1k * 1024);
-                                    let _ = writeln!(
-                                        w,
-                                        "{:<14} {:>8} {:>8} {:>8} {:>3}% {:>8} {:>8} {:>8} {:>3}% {}",
-                                        mount.fs_file,
-                                        total_h,
-                                        used_h,
-                                        avail_h,
-                                        use_pct,
-                                        total_inodes,
-                                        used_inodes,
-                                        free_inodes,
-                                        inode_use_pct,
-                                        mount.mount_point
-                                    );
-                                } else {
-                                    let _ = writeln!(
-                                        w,
-                                        "{:<14} {:>8} {:>8} {:>8} {:>3}% {:>8} {:>8} {:>8} {:>3}% {}",
-                                        mount.fs_file,
-                                        total_1k,
-                                        used_1k,
-                                        avail_1k,
-                                        use_pct,
-                                        total_inodes,
-                                        used_inodes,
-                                        free_inodes,
-                                        inode_use_pct,
-                                        mount.mount_point
-                                    );
-                                }
-                            }
-                        }
-                        None => {}
-                    }
+            if let Some((total_inodes, used_inodes, free_inodes, inode_use_pct)) =
+                get_inode_stats(&mount.mount_point)
+            {
+                if show_type {
+                    let _ = writeln!(
+                        w,
+                        "{:<14} {:<11} {:>8} {:>8} {:>8} {:>3}% {}",
+                        mount.fs_file,
+                        mount.fs_type,
+                        total_inodes,
+                        used_inodes,
+                        free_inodes,
+                        inode_use_pct,
+                        mount.mount_point
+                    );
+                } else {
+                    let _ = writeln!(
+                        w,
+                        "{:<14} {:>8} {:>8} {:>8} {:>3}% {}",
+                        mount.fs_file,
+                        total_inodes,
+                        used_inodes,
+                        free_inodes,
+                        inode_use_pct,
+                        mount.mount_point
+                    );
                 }
-                None => {}
             }
         } else {
             match get_fs_stats(&mount.mount_point) {

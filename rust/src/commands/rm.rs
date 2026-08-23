@@ -53,10 +53,11 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
         return 1;
     }
 
-    // Check for root removal with preserve_root
+    // Check for root removal with preserve_root after resolving path aliases.
     if preserve_root {
         for target in &targets {
-            if Path::new(target) == Path::new("/") {
+            let resolved = fs::canonicalize(target).unwrap_or_else(|_| Path::new(target).to_path_buf());
+            if resolved == Path::new("/") {
                 eprintln!("rm: it is dangerous to operate recursively on '/'");
                 eprintln!("rm: use --no-preserve-root to override this failsafe");
                 return 1;
@@ -153,6 +154,11 @@ mod tests {
     #[test]
     fn test_rm_preserve_root() {
         assert_eq!(run(&mut std::io::sink(), &["/".into()]), 1);
+    }
+
+    #[test]
+    fn test_rm_preserve_root_alias() {
+        assert_eq!(run(&mut std::io::sink(), &["-r".into(), "/tmp/..".into()]), 1);
     }
 
     #[test]

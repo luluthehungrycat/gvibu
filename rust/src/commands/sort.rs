@@ -1,5 +1,6 @@
 /// sort: sort lines of text files.
-/// Supports: -r (reverse), -n (numeric), -u (unique), -f (fold case),
+/// Supports: -r (reverse), -n (numeric), -V (version), -M (month),
+/// -c (check), -u (unique), -f (fold case),
 /// -k POS1[,POS2] (key sort with optional n/r modifiers)
 use std::fs;
 use std::io::{self, BufRead, Write};
@@ -72,6 +73,164 @@ fn numeric_prefix(s: &str) -> Option<f64> {
     }
     s[..i].parse::<f64>().ok()
 }
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum SortMode {
+    Lexical,
+    Numeric,
+    Version,
+    Month,
+}
+
+fn lexical_cmp(a: &str, b: &str, fold_case: bool) -> std::cmp::Ordering {
+    if fold_case {
+        a.to_lowercase().cmp(&b.to_lowercase())
+    } else {
+        a.cmp(b)
+    }
+}
+
+fn numeric_cmp(a: &str, b: &str, fold_case: bool) -> std::cmp::Ordering {
+    match (numeric_prefix(a), numeric_prefix(b)) {
+        (Some(na), Some(nb)) => na.partial_cmp(&nb).unwrap_or(std::cmp::Ordering::Equal),
+        (Some(_), None) => std::cmp::Ordering::Less,
+        (None, Some(_)) => std::cmp::Ordering::Greater,
+        (None, None) => lexical_cmp(a, b, fold_case),
+    }
+}
+
+fn month_number(s: &str) -> u8 {
+    let prefix: String = s
+        .trim_start()
+        .chars()
+        .take(3)
+        .collect::<String>()
+        .to_ascii_lowercase();
+    match prefix.as_str() {
+        "jan" => 1,
+        "feb" => 2,
+        "mar" => 3,
+        "apr" => 4,
+        "may" => 5,
+        "jun" => 6,
+        "jul" => 7,
+        "aug" => 8,
+        "sep" => 9,
+        "oct" => 10,
+        "nov" => 11,
+        "dec" => 12,
+        _ => 0,
+    }
+}
+
+fn month_cmp(a: &str, b: &str, fold_case: bool) -> std::cmp::Ordering {
+    let month_cmp = month_number(a).cmp(&month_number(b));
+    if month_cmp == std::cmp::Ordering::Equal {
+        lexical_cmp(a, b, fold_case)
+    } else {
+        month_cmp
+    }
+}
+
+fn version_char_cmp(a: char, b: char) -> std::cmp::Ordering {
+    match (a, b) {
+        ('~', '~') => std::cmp::Ordering::Equal,
+        ('~', _) => std::cmp::Ordering::Less,
+        (_, '~') => std::cmp::Ordering::Greater,
+        _ => a.cmp(&b),
+    }
+}
+
+fn version_cmp(a: &str, b: &str, fold_case: bool) -> std::cmp::Ordering {
+    let a_folded;
+    let b_folded;
+    let a = if fold_case {
+        a_folded = a.to_lowercase();
+        a_folded.as_str()
+    } else {
+        a
+    };
+    let b = if fold_case {
+        b_folded = b.to_lowercase();
+        b_folded.as_str()
+    } else {
+        b
+    };
+    let a_chars: Vec<char> = a.chars().collect();
+    let b_chars: Vec<char> = b.chars().collect();
+    let mut ai = 0;
+    let mut bi = 0;
+
+    while ai < a_chars.len() && bi < b_chars.len() {
+        if a_chars[ai].is_ascii_digit() && b_chars[bi].is_ascii_digit() {
+            let a_start = ai;
+            let b_start = bi;
+            while ai < a_chars.len() && a_chars[ai].is_ascii_digit() {
+                ai += 1;
+            }
+            while bi < b_chars.len() && b_chars[bi].is_ascii_digit() {
+                bi += 1;
+            }
+
+            let a_significant_start = (a_start..ai)
+                .find(|&index| a_chars[index] != '0')
+                .unwrap_or(ai.saturating_sub(1));
+            let b_significant_start = (b_start..bi)
+                .find(|&index| b_chars[index] != '0')
+                .unwrap_or(bi.saturating_sub(1));
+            let a_significant_len = ai - a_significant_start;
+            let b_significant_len = bi - b_significant_start;
+            if a_significant_len != b_significant_len {
+                return a_significant_len.cmp(&b_significant_len);
+            }
+            for offset in 0..a_significant_len {
+                let cmp = a_chars[a_significant_start + offset]
+                    .cmp(&b_chars[b_significant_start + offset]);
+                if cmp != std::cmp::Ordering::Equal {
+                    return cmp;
+                }
+            }
+
+            // Equal numeric values sort by the number of leading zeroes,
+            // with the longer original run first (e.g. 01 before 1).
+            let run_cmp = (ai - a_start).cmp(&(bi - b_start));
+            if run_cmp != std::cmp::Ordering::Equal {
+                return run_cmp.reverse();
+            }
+            continue;
+        }
+
+        let cmp = version_char_cmp(a_chars[ai], b_chars[bi]);
+        if cmp != std::cmp::Ordering::Equal {
+            return cmp;
+        }
+        ai += 1;
+        bi += 1;
+    }
+
+    if ai == a_chars.len() && bi == b_chars.len() {
+        std::cmp::Ordering::Equal
+    } else if ai == a_chars.len() {
+        if b_chars[bi] == '~' {
+            std::cmp::Ordering::Greater
+        } else {
+            std::cmp::Ordering::Less
+        }
+    } else if a_chars[ai] == '~' {
+        std::cmp::Ordering::Less
+    } else {
+        std::cmp::Ordering::Greater
+    }
+}
+
+fn compare_values(a: &str, b: &str, mode: SortMode, fold_case: bool) -> std::cmp::Ordering {
+    match mode {
+        SortMode::Lexical => lexical_cmp(a, b, fold_case),
+        SortMode::Numeric => numeric_cmp(a, b, fold_case),
+        SortMode::Version => version_cmp(a, b, fold_case),
+        SortMode::Month => month_cmp(a, b, fold_case),
+    }
+}
+
 
 /// A key specification for -k sorting.
 #[derive(Clone, Debug)]
@@ -210,6 +369,9 @@ fn extract_key(line: &str, spec: &KeySpec) -> String {
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut reverse = false;
     let mut numeric = false;
+    let mut version_sort = false;
+    let mut month_sort = false;
+    let mut check = false;
     let mut unique = false;
     let mut fold_case = false;
     let mut key_specs: Vec<KeySpec> = Vec::new();
@@ -218,11 +380,24 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { break; }
+        if arg == "--" {
+            files.extend(args[i + 1..].iter().cloned());
+            break;
+        }
         if arg == "-r" {
             reverse = true;
         } else if arg == "-n" {
             numeric = true;
+        } else if arg == "-V" || arg == "--version-sort" {
+            version_sort = true;
+        } else if arg == "-M" || arg == "--month-sort" {
+            month_sort = true;
+        } else if arg == "-c"
+            || arg == "--check"
+            || arg == "--check=quiet"
+            || arg == "--check=diagnose-first"
+        {
+            check = true;
         } else if arg == "-u" {
             unique = true;
         } else if arg == "-f" {
@@ -240,16 +415,21 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                     return 1;
                 }
             }
+        } else if arg.starts_with("--") {
+            eprintln!("sort: invalid option: {}", arg);
+            return 1;
         } else if arg.starts_with('-') && arg.len() > 1 {
             for ch in arg[1..].chars() {
                 match ch {
                     'r' => reverse = true,
                     'n' => numeric = true,
+                    'V' => version_sort = true,
+                    'M' => month_sort = true,
+                    'c' => check = true,
                     'u' => unique = true,
                     'f' => fold_case = true,
                     'k' => {
                         // Combined like -k2 (no space before value)
-                        // safe: arg contains 'k' because we matched on it at the 'k' arm
                         let spec = &arg[arg.find('k').expect("sort -k: 'k' not found in arg") + 1..];
                         if spec.is_empty() {
                             eprintln!("sort: option requires an argument: -k");
@@ -262,7 +442,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                                 return 1;
                             }
                         }
-                        break; // -k is the last meaningful char in combined flags
+                        break;
                     }
                     _ => {
                         eprintln!("sort: invalid option: -{}", ch);
@@ -277,17 +457,20 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     }
 
     let lines = read_lines(&files);
-
-    // Build the sort key for a line: (key_values..., whole_line)
-    let make_sort_key = |line: &str| -> Vec<String> {
-        let mut keys = Vec::new();
-        for ks in &key_specs {
-            keys.push(extract_key(line, ks));
-        }
-        keys
+    let global_mode = if version_sort {
+        SortMode::Version
+    } else if month_sort {
+        SortMode::Month
+    } else if numeric {
+        SortMode::Numeric
+    } else {
+        SortMode::Lexical
     };
 
-    let mut sorted: Vec<(Vec<String>, String)> = lines
+    let make_sort_key = |line: &str| -> Vec<String> {
+        key_specs.iter().map(|ks| extract_key(line, ks)).collect()
+    };
+    let mut entries: Vec<(Vec<String>, String)> = lines
         .into_iter()
         .map(|line| {
             let keys = make_sort_key(&line);
@@ -295,83 +478,45 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         })
         .collect();
 
-    sorted.sort_by(|a, b| {
-        for (i, ks) in key_specs.iter().enumerate() {
-            let a_key = &a.0[i];
-            let b_key = &b.0[i];
-
-            let use_numeric = ks.numeric || numeric;
-            let use_reverse = ks.reverse || reverse;
-
-            let cmp = if use_numeric {
-                let an = numeric_prefix(a_key);
-                let bn = numeric_prefix(b_key);
-                match (an, bn) {
-                    (Some(na), Some(nb)) => na.partial_cmp(&nb).unwrap_or(std::cmp::Ordering::Equal),
-                    (Some(_), None) => std::cmp::Ordering::Less,
-                    (None, Some(_)) => std::cmp::Ordering::Greater,
-                    (None, None) => {
-                        if fold_case {
-                            a_key.to_lowercase().cmp(&b_key.to_lowercase())
-                        } else {
-                            a_key.cmp(b_key)
-                        }
-                    }
-                }
+    let compare_entries = |a: &(Vec<String>, String), b: &(Vec<String>, String)| {
+        for (index, ks) in key_specs.iter().enumerate() {
+            let mode = if ks.numeric {
+                SortMode::Numeric
             } else {
-                if fold_case {
-                    a_key.to_lowercase().cmp(&b_key.to_lowercase())
-                } else {
-                    a_key.cmp(b_key)
-                }
+                global_mode
             };
-
+            let mut cmp = compare_values(&a.0[index], &b.0[index], mode, fold_case);
             if cmp != std::cmp::Ordering::Equal {
-                if use_reverse {
-                    return cmp.reverse();
-                } else {
-                    return cmp;
+                if ks.reverse || reverse {
+                    cmp = cmp.reverse();
                 }
+                return cmp;
             }
         }
 
-        // Fall back to whole line comparison
-        let cmp = if numeric {
-            let an = numeric_prefix(&a.1);
-            let bn = numeric_prefix(&b.1);
-            match (an, bn) {
-                (Some(na), Some(nb)) => na.partial_cmp(&nb).unwrap_or(std::cmp::Ordering::Equal),
-                (Some(_), None) => std::cmp::Ordering::Less,
-                (None, Some(_)) => std::cmp::Ordering::Greater,
-                (None, None) => {
-                    if fold_case {
-                        a.1.to_lowercase().cmp(&b.1.to_lowercase())
-                    } else {
-                        a.1.cmp(&b.1)
-                    }
-                }
-            }
-        } else if fold_case {
-            a.1.to_lowercase().cmp(&b.1.to_lowercase())
-        } else {
-            a.1.cmp(&b.1)
-        };
+        let mut cmp = compare_values(&a.1, &b.1, global_mode, fold_case);
         if reverse {
-            cmp.reverse()
-        } else {
-            cmp
+            cmp = cmp.reverse();
         }
-    });
+        cmp
+    };
 
-    // Extract sorted lines
-    let mut result: Vec<String> = sorted.into_iter().map(|(_, line)| line).collect();
+    if check {
+        for pair in entries.windows(2) {
+            if compare_entries(&pair[0], &pair[1]) == std::cmp::Ordering::Greater {
+                return 1;
+            }
+        }
+        return 0;
+    }
 
-    // Unique: remove consecutive duplicates
+    entries.sort_by(|a, b| compare_entries(a, b));
+    let mut result: Vec<String> = entries.into_iter().map(|(_, line)| line).collect();
+
     if unique {
         result.dedup();
     }
 
-    // Output
     for line in &result {
         pwriteln!(w, "{}", line);
     }
@@ -510,5 +655,46 @@ mod tests {
     #[test]
     fn test_sort_key_missing_arg() {
         assert_eq!(run(&mut std::io::sink(), &["-k".into()]), 1);
+    }
+    fn run_with_input(input: &str, options: &[&str]) -> (i32, String) {
+        let path = std::env::temp_dir().join(format!(
+            "gvibu-sort-test-{}-{}",
+            std::process::id(),
+            options.join("-").replace('/', "_")
+        ));
+        std::fs::write(&path, input).unwrap();
+
+        let mut args: Vec<String> = options.iter().map(|arg| (*arg).to_string()).collect();
+        args.push(path.to_string_lossy().into_owned());
+        let mut output = Vec::new();
+        let status = run(&mut output, &args);
+
+        std::fs::remove_file(path).unwrap();
+        (status, String::from_utf8(output).unwrap())
+    }
+
+    #[test]
+    fn test_version_sort_flag() {
+        let (status, output) = run_with_input("pkg10\npkg2\npkg1\n", &["-V"]);
+        assert_eq!(status, 0);
+        assert_eq!(output, "pkg1\npkg2\npkg10\n");
+    }
+
+    #[test]
+    fn test_month_sort_long_flag() {
+        let (status, output) = run_with_input("Dec\nfoo\nJan\nFeb\n", &["--month-sort"]);
+        assert_eq!(status, 0);
+        assert_eq!(output, "foo\nJan\nFeb\nDec\n");
+    }
+
+    #[test]
+    fn test_check_flag_reports_disorder_without_output() {
+        let (status, output) = run_with_input("a\nb\n", &["-c"]);
+        assert_eq!(status, 0);
+        assert!(output.is_empty());
+
+        let (status, output) = run_with_input("b\na\n", &["--check"]);
+        assert_ne!(status, 0);
+        assert!(output.is_empty());
     }
 }

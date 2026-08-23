@@ -69,3 +69,32 @@ def test_multi_key():
     rc = run(["-k1,1", "-k2,2n", fname])
     assert rc == 0
     os.unlink(fname)
+def test_version_sort_flag(tmp_path, capsys):
+    path = tmp_path / "versions"
+    path.write_text("pkg10\npkg2\npkg1\n")
+
+    assert run(["-V", str(path)]) == 0
+
+    assert capsys.readouterr().out == "pkg1\npkg2\npkg10\n"
+
+
+def test_month_sort_long_flag(tmp_path, capsys):
+    path = tmp_path / "months"
+    path.write_text("Dec\nfoo\nJan\nFeb\n")
+
+    assert run(["--month-sort", str(path)]) == 0
+
+    assert capsys.readouterr().out == "foo\nJan\nFeb\nDec\n"
+
+
+def test_check_flag_reports_disorder_without_output(tmp_path, capsys):
+    ordered = tmp_path / "ordered"
+    ordered.write_text("a\nb\n")
+    unordered = tmp_path / "unordered"
+    unordered.write_text("b\na\n")
+
+    assert run(["-c", str(ordered)]) == 0
+    assert capsys.readouterr().out == ""
+
+    assert run(["--check", str(unordered)]) != 0
+    assert capsys.readouterr().out == ""

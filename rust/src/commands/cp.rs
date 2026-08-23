@@ -18,6 +18,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut no_clobber = false;
     let mut update = false;
     let mut recursive = false;
+    let mut archive = false;
     let mut sources: Vec<&str> = Vec::new();
 
     let mut i = 0;
@@ -30,6 +31,10 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
             "-n" | "--no-clobber" => no_clobber = true,
             "-u" | "--update" => update = true,
             "-r" | "-R" | "--recursive" => recursive = true,
+            "-a" | "--archive" => {
+                archive = true;
+                recursive = true;
+            }
             "--" => { break; }
             s if s.starts_with('-') && s.len() > 1 => {
                 eprintln!("cp: invalid option: {}", s);
@@ -72,7 +77,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
 
         exit_code |= copy_one(
             w, src, &dest_path,
-            interactive, force, verbose, no_clobber, update, recursive,
+            interactive, force, verbose, no_clobber, update, recursive, archive,
         );
     }
 
@@ -87,8 +92,9 @@ fn copy_one(
     force: bool,
     verbose: bool,
     no_clobber: bool,
-    recursive: bool,
     update: bool,
+    recursive: bool,
+    archive: bool,
 ) -> i32 {
     let src_meta = match fs::symlink_metadata(src) {
         Ok(m) => m,
@@ -103,7 +109,7 @@ fn copy_one(
             eprintln!("cp: -r not specified; omitting directory '{}'", src);
             return 1;
         }
-        return copy_dir(w, src, dst, interactive, force, verbose, no_clobber, update);
+        return copy_dir(w, src, dst, interactive, force, verbose, no_clobber, update, archive);
     }
 
     // Update check: only copy if source is newer than destination
@@ -154,6 +160,12 @@ fn copy_one(
 
     match fs::copy(src, dst) {
         Ok(_) => {
+            if archive {
+                if let Err(e) = fs::set_permissions(dst, src_meta.permissions()) {
+                    eprintln!("cp: cannot preserve mode for '{}': {}", dst, e);
+                    return 1;
+                }
+            }
             if verbose {
                 pwriteln!(w, "'{}' -> '{}'", src, dst);
             }
@@ -175,6 +187,7 @@ fn copy_dir(
     verbose: bool,
     no_clobber: bool,
     update: bool,
+    archive: bool,
 ) -> i32 {
     // Create destination directory
     if let Err(e) = fs::create_dir_all(dst) {
@@ -223,13 +236,21 @@ fn copy_dir(
         if ft.is_dir() {
             exit_code |= copy_dir(
                 w, &src_str, &dst_path,
-                interactive, force, verbose, no_clobber, update,
+                interactive, force, verbose, no_clobber, update, archive,
             );
         } else {
             exit_code |= copy_one(
                 w, &src_str, &dst_path,
-                interactive, force, verbose, no_clobber, update, true,
+                interactive, force, verbose, no_clobber, update, true, archive,
             );
+        }
+    }
+    if archive {
+        if let Ok(meta) = fs::symlink_metadata(src) {
+            if let Err(e) = fs::set_permissions(dst, meta.permissions()) {
+                eprintln!("cp: cannot preserve mode for '{}': {}", dst, e);
+                exit_code = 1;
+            }
         }
     }
 
@@ -286,16 +307,24 @@ mod tests {
         assert_eq!(basename("bar"), "bar");
         assert_eq!(basename("/foo/bar/"), "bar");
         assert_eq!(basename("/"), "");
-
+    }
 
     #[test]
     fn test_cp_archive_flag() {
-        // Test that -a flag is recognized and sets archive = true
-        // This tests the argument parsing at least
-        assert_eq!(
-            run(&mut std::io::sink(), &["-a".into(), "a".into(), "b".into()]),
-            1
+        let root = std::env::temp_dir().join(format!("gvibu_cp_archive_{}", std::process::id()));
+        let src = root.join("src");
+        let nested = src.join("nested");
+        let dst = root.join("dst");
+        std::fs::create_dir_all(&nested).unwrap();
+        std::fs::write(nested.join("file"), "archive content").unwrap();
+
+        let result = run(
+            &mut std::io::sink(),
+            &["-a".into(), src.to_string_lossy().into_owned(), dst.to_string_lossy().into_owned()],
         );
-    }
+
+        assert_eq!(result, 0);
+        assert_eq!(std::fs::read_to_string(dst.join("nested/file")).unwrap(), "archive content");
+        let _ = std::fs::remove_dir_all(root);
     }
 }

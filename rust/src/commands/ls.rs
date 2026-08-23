@@ -155,9 +155,9 @@ fn list_directory(
                         continue;
                     }
                 }
-                match e.metadata() {
+                match e.path().symlink_metadata() {
                     Ok(m) => items.push((name, m)),
-                    Err(_) => items.push((name, unsafe { std::mem::zeroed() })),
+                    Err(_) => {}
                 }
             }
             Err(_) => {}

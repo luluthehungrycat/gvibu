@@ -54,6 +54,7 @@ impl Default for GrepConfig {
 
 enum Matcher {
     Regex(Regex),
+    RegexWord(Regex),
     Literal {
         pattern: String,
         ignore_case: bool,
@@ -74,10 +75,10 @@ impl Matcher {
             if cfg.ignore_case {
                 regex_str.push_str("(?i)");
             }
-            regex_str.push_str(r"(?<![a-zA-Z0-9_])");
             regex_str.push_str(pattern);
-            regex_str.push_str(r"(?![a-zA-Z0-9_])");
-            Regex::new(&regex_str).map(Matcher::Regex).map_err(|e| e.to_string())
+            Regex::new(&regex_str)
+                .map(Matcher::RegexWord)
+                .map_err(|e| e.to_string())
         } else {
             let mut regex_str = String::new();
             if cfg.ignore_case {
@@ -91,6 +92,9 @@ impl Matcher {
     fn is_match(&self, line: &str) -> bool {
         match self {
             Matcher::Regex(re) => re.is_match(line),
+            Matcher::RegexWord(re) => re
+                .find_iter(line)
+                .any(|m| check_word_bounds(line, m.start(), m.end())),
             Matcher::Literal { pattern, ignore_case, whole_word } => {
                 if *ignore_case {
                     let line_lower = line.to_lowercase();
@@ -107,6 +111,12 @@ impl Matcher {
         match self {
             Matcher::Regex(re) => re
                 .find_iter(line)
+                .map(|m| m.as_str())
+                .filter(|s| !s.is_empty())
+                .collect(),
+            Matcher::RegexWord(re) => re
+                .find_iter(line)
+                .filter(|m| check_word_bounds(line, m.start(), m.end()))
                 .map(|m| m.as_str())
                 .filter(|s| !s.is_empty())
                 .collect(),

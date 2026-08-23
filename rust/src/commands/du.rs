@@ -97,9 +97,12 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
 
     for path_str in &paths {
         let path = Path::new(path_str);
-        match du_walk(path, summary, max_depth) {
+        match du_walk(path, summary, 0) {
             Ok(entries) => {
                 for (size, p, depth) in &entries {
+                    if max_depth.is_some_and(|max| *depth > max) {
+                        continue;
+                    }
                     let display = if *p == "." { "." } else { p };
                     if human {
                         pwriteln!(w, "{}\t{}", human_size(*size), display);
@@ -129,7 +132,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     exit_code
 }
 
-fn du_walk(path: &Path, summary: bool, max_depth: Option<usize>) -> Result<Vec<(u64, String, usize)>, String> {
+fn du_walk(path: &Path, summary: bool, depth: usize) -> Result<Vec<(u64, String, usize)>, String> {
     let meta = fs::symlink_metadata(path).map_err(|e| format!("{}", e))?;
 
     if meta.is_dir() && !summary {
@@ -141,50 +144,41 @@ fn du_walk(path: &Path, summary: bool, max_depth: Option<usize>) -> Result<Vec<(
             let sub_path = entry.path();
             let sub_meta = fs::symlink_metadata(&sub_path).map_err(|e| format!("{}", e))?;
 
-            // Skip symlinks to avoid counting them multiple times
             if sub_meta.file_type().is_symlink() {
                 continue;
             }
 
             if sub_meta.is_dir() {
-                // Check depth limit
-                let current_depth = count_path_depth(&sub_path, path);
-                if let Some(max) = max_depth {
-                    if current_depth > max {
-                        continue;
-                    }
-                }
-                let sub_entries = du_walk(&sub_path, false, max_depth)?;
+                let sub_entries = du_walk(&sub_path, false, depth + 1)?;
                 entries.extend(sub_entries);
             } else {
-                entries.push((sub_meta.len(), sub_path.to_string_lossy().to_string(), 0));
+                entries.push((sub_meta.len(), sub_path.to_string_lossy().to_string(), depth + 1));
             }
         }
 
-        // Sort by path for deterministic output
         entries.sort_by(|a, b| a.1.cmp(&b.1));
 
         let dir_size: u64 = entries.iter().map(|(s, _, _)| s).sum();
-        let depth = count_path_depth(path, path);
         entries.push((dir_size, path.to_string_lossy().to_string(), depth));
         Ok(entries)
     } else {
         let size = meta.len();
-        Ok(vec![(size, path.to_string_lossy().to_string(), 0)])
+        Ok(vec![(size, path.to_string_lossy().to_string(), depth)])
     }
 }
 
 fn count_path_depth(path: &Path, base: &Path) -> usize {
     let path_str = path.to_string_lossy();
     let base_str = base.to_string_lossy();
-    
     if path_str == base_str {
-        return 0;
+        0
+    } else {
+        path_str
+            .split('/')
+            .count()
+            .saturating_sub(base_str.split('/').count())
     }
-    
-    path_str.split('/').count().saturating_sub(base_str.split('/').count())
 }
-
 fn human_size(bytes: u64) -> String {
     const UNITS: &[&str] = &["", "K", "M", "G", "T", "P"];
     let mut size = bytes as f64;
