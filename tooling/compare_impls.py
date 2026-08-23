@@ -36,6 +36,8 @@ def load_test_cases(command: str) -> list[dict]:
 
 def output_matches(actual: str, expected: str, substring: bool = False) -> bool:
     """Match exact modern cases and substring-based legacy diagnostics."""
+    if expected == "$PWD\n":
+        return actual == f"{os.getcwd()}\n"
     if expected == "*":
         return True
     if substring:
