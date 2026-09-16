@@ -17,6 +17,7 @@ def _print_bytes(data: bytes, num_bytes: int) -> None:
 def run(args: list[str]) -> int:
     num_lines = 10
     num_bytes: int | None = None
+    quiet = False
     files: list[str] = []
     i = 0
 
@@ -36,6 +37,8 @@ def run(args: list[str]) -> int:
             except ValueError:
                 print(f"head: invalid number of lines: {args[i]}", file=sys.stderr)
                 return 1
+        elif arg == "-q":
+            quiet = True
         elif arg == "-c":
             i += 1
             if i >= len(args):
@@ -78,7 +81,7 @@ def run(args: list[str]) -> int:
         return 0
 
     for idx, fname in enumerate(files):
-        if len(files) > 1:
+        if len(files) > 1 and not quiet:
             if idx > 0:
                 sys.stdout.write("\n")
             sys.stdout.write(f"==> {fname} <==\n")

@@ -2,13 +2,14 @@
 
 Overview
 - Output the first part of files.
-- Supports `-n` (line count) and `-c` (byte count) options.
+- Supports `-n` (line count), `-c` (byte count), and `-q` (quiet mode) options.
 
 Behavior
 - Invocation: `gvibu head [OPTION]... [FILE]...`
 - Options:
   - `-n N`: print the first N lines (default: 10)
   - `-c N`: print the first N bytes
+  - `-q`: never print file-name headers when reading multiple files
 - `-n` and `-c` take a positive integer as their argument. N must be >= 0.
   - If N=0, print nothing.
   - If the file has fewer than N lines/bytes, print all content.
