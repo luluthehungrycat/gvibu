@@ -701,7 +701,7 @@ fn seq_equal_width() {
 fn seq_w_and_s() {
     let (code, out, _err) = run(&["seq", "-w", "-s", " ", "3"]);
     assert_eq!(code, 0);
-    assert_eq!(out, "01 02 03\n");
+    assert_eq!(out, "1 2 3\n");
 }
 
 #[test]
@@ -1749,8 +1749,7 @@ fn fold_width_10() {
         "hello world this is a long line",
     );
     assert_eq!(code, 0, "stderr: {}", err);
-    // GNU fold counts every byte and preserves the final ten-byte chunk.
-    assert_eq!(out, "hello worl\nd this is\na long lin\ne\n");
+    assert_eq!(out, "hello worl\nd this is \na long lin\ne\n");
     assert_eq!(err, "");
 }
 

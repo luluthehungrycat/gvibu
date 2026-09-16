@@ -66,8 +66,9 @@ def run(args: list[str]) -> int:
         if not set2_list and set1:
             set2_list = [sorted(set1)[-1]] * len(set1)
         translate_map = {}
-        for idx, c in enumerate(sorted(set1)):
-            translate_map[c] = set2_list[idx % len(set2_list)] if set2_list else c
+        if len(sets) > 1:
+            for idx, c in enumerate(sorted(set1)):
+                translate_map[c] = set2_list[idx % len(set2_list)] if set2_list else c
         delete_set = set()
 
     input_data = sys.stdin.buffer.read()
