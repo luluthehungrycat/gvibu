@@ -3,7 +3,10 @@ use std::env;
 use std::io;
 use std::process;
 
-fn resolve_command<'a>(argv0_basename: &'a str, args: &'a [String]) -> Option<(&'a str, &'a [String])> {
+fn resolve_command<'a>(
+    argv0_basename: &'a str,
+    args: &'a [String],
+) -> Option<(&'a str, &'a [String])> {
     // Symlink mode: argv0 basename is the command name
     if commands::lookup(argv0_basename).is_some() {
         return Some((argv0_basename, &args[1..]));
@@ -38,6 +41,12 @@ fn main() {
     };
 
     if let Some(cmd) = commands::lookup(cmd_name) {
+        if cmd_name == "[" {
+            let mut bracket_args = vec!["[".to_string()];
+            bracket_args.extend_from_slice(run_args);
+            let exit_code = (cmd.run)(&mut io::stdout(), &bracket_args);
+            process::exit(exit_code);
+        }
         let exit_code = (cmd.run)(&mut io::stdout(), run_args);
         process::exit(exit_code);
     } else {

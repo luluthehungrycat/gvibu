@@ -22,7 +22,7 @@ def _parse_args(args: list[str]):
                 return None
             separator = args[i]
             i += 1
-        elif arg.startswith("-") and len(arg) > 1:
+        elif arg.startswith("-") and len(arg) > 1 and not arg[1:].isdigit():
             # Combined flags
             for j, ch in enumerate(arg[1:]):
                 if ch == "w":
@@ -97,7 +97,7 @@ def _format_numbers(nums: list[int], separator: str, equal_width: bool) -> str:
         return ""
 
     if equal_width:
-        width = max(len(str(n)) for n in nums)
+        width = max(2, max(len(str(n)) for n in nums))
         strs = [str(n).zfill(width) for n in nums]
     else:
         strs = [str(n) for n in nums]

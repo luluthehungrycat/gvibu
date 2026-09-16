@@ -59,7 +59,9 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { break; }
+        if arg == "--" {
+            break;
+        }
         if arg == "-d" {
             delete = true;
         } else if arg == "-s" {
@@ -79,7 +81,7 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
         eprintln!("tr: missing operand");
         return 1;
     }
-    if !delete && sets.len() < 2 {
+    if !delete && ((!squeeze && sets.len() < 2) || (squeeze && sets.is_empty())) {
         eprintln!("tr: missing operand");
         return 1;
     }

@@ -1,7 +1,7 @@
+use crate::pwriteln;
 /// du: estimate file space usage.
 use std::fs;
 use std::io::Write;
-use crate::pwriteln;
 use std::path::Path;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
@@ -14,7 +14,9 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         match args[i].as_str() {
             "-h" => human = true,
             "-s" => summary = true,
-            "--" => { break; }
+            "--" => {
+                break;
+            }
             arg if arg.starts_with('-') && arg.len() > 1 => {
                 // Handle bundled flags: -hs, -sh
                 for c in arg[1..].chars() {
@@ -22,7 +24,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                         'h' => human = true,
                         's' => summary = true,
                         _ => {
-                            pwriteln!(w, "du: invalid option: -{}", c);
+                            eprintln!("du: invalid option: -{}", c);
                             return 1;
                         }
                     }
@@ -57,7 +59,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                 }
             }
             Err(e) => {
-                pwriteln!(w, "du: {}: {}", path_str, e);
+                eprintln!("du: {}: {}", path_str, e);
                 exit_code = 1;
             }
         }
@@ -138,7 +140,10 @@ mod tests {
 
     #[test]
     fn test_human_readable_dev_null() {
-        assert_eq!(run(&mut std::io::sink(), &["-h".into(), "/dev/null".into()]), 0);
+        assert_eq!(
+            run(&mut std::io::sink(), &["-h".into(), "/dev/null".into()]),
+            0
+        );
     }
 
     #[test]
@@ -148,7 +153,10 @@ mod tests {
 
     #[test]
     fn test_bundled_flags() {
-        assert_eq!(run(&mut std::io::sink(), &["-hs".into(), "/dev/null".into()]), 0);
+        assert_eq!(
+            run(&mut std::io::sink(), &["-hs".into(), "/dev/null".into()]),
+            0
+        );
     }
 
     #[test]

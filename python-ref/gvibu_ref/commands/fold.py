@@ -56,8 +56,8 @@ def run(args: list[str]) -> int:
             chunk = remaining[:split]
             rest = remaining[split:]
 
+            chunk = chunk.rstrip()
             if break_spaces:
-                chunk = chunk.rstrip()
                 rest = rest.lstrip()
 
             print(chunk)

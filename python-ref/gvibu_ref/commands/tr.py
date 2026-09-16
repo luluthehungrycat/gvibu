@@ -52,7 +52,7 @@ def run(args: list[str]) -> int:
             sets.append(arg)
         i += 1
 
-    if (delete and len(sets) < 1) or (not delete and len(sets) < 2):
+    if (delete and len(sets) < 1) or (not delete and ((squeeze and len(sets) < 1) or (not squeeze and len(sets) < 2))):
         print("tr: missing operand", file=sys.stderr)
         return 1
 

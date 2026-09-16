@@ -1749,7 +1749,8 @@ fn fold_width_10() {
         "hello world this is a long line",
     );
     assert_eq!(code, 0, "stderr: {}", err);
-    assert_eq!(out, "hello worl\nd this is\na long li\nne\n");
+    // GNU fold counts every byte and preserves the final ten-byte chunk.
+    assert_eq!(out, "hello worl\nd this is\na long lin\ne\n");
     assert_eq!(err, "");
 }
 

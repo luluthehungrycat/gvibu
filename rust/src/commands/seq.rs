@@ -8,7 +8,9 @@ fn parse_args(args: &[String]) -> Result<(i64, i64, i64, String, bool), i32> {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { break; }
+        if arg == "--" {
+            break;
+        }
         if arg == "-w" {
             equal_width = true;
             i += 1;
@@ -144,6 +146,7 @@ fn format_numbers(nums: &[i64], separator: &str, equal_width: bool) -> String {
             .map(|n| n.to_string().len())
             .max()
             .unwrap_or(1)
+            .max(2)
     } else {
         0
     };
@@ -238,6 +241,11 @@ mod tests {
     }
 
     #[test]
+    fn test_format_numbers_short_equal_width_is_zero_padded() {
+        assert_eq!(format_numbers(&[1, 2, 3], " ", true), "01 02 03\n");
+    }
+
+    #[test]
     fn test_generate_numbers_positive() {
         assert_eq!(generate_numbers(1, 1, 5), vec![1, 2, 3, 4, 5]);
     }
@@ -269,7 +277,10 @@ mod tests {
 
     #[test]
     fn test_seq_full() {
-        assert_eq!(run(&mut std::io::sink(), &["2".into(), "3".into(), "14".into()]), 0);
+        assert_eq!(
+            run(&mut std::io::sink(), &["2".into(), "3".into(), "14".into()]),
+            0
+        );
     }
 
     #[test]
@@ -279,12 +290,21 @@ mod tests {
 
     #[test]
     fn test_seq_negative_step() {
-        assert_eq!(run(&mut std::io::sink(), &["10".into(), "-2".into(), "4".into()]), 0);
+        assert_eq!(
+            run(
+                &mut std::io::sink(),
+                &["10".into(), "-2".into(), "4".into()]
+            ),
+            0
+        );
     }
 
     #[test]
     fn test_seq_step_zero() {
-        assert_eq!(run(&mut std::io::sink(), &["1".into(), "0".into(), "5".into()]), 1);
+        assert_eq!(
+            run(&mut std::io::sink(), &["1".into(), "0".into(), "5".into()]),
+            1
+        );
     }
 
     #[test]
@@ -299,6 +319,9 @@ mod tests {
 
     #[test]
     fn test_seq_with_separator() {
-        assert_eq!(run(&mut std::io::sink(), &["-s".into(), ",".into(), "3".into()]), 0);
+        assert_eq!(
+            run(&mut std::io::sink(), &["-s".into(), ",".into(), "3".into()]),
+            0
+        );
     }
 }
