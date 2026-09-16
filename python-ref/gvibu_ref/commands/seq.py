@@ -97,7 +97,7 @@ def _format_numbers(nums: list[int], separator: str, equal_width: bool) -> str:
         return ""
 
     if equal_width:
-        width = max(2, max(len(str(n)) for n in nums))
+        width = max(len(str(n)) for n in nums)
         strs = [str(n).zfill(width) for n in nums]
     else:
         strs = [str(n) for n in nums]

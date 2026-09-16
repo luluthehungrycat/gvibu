@@ -142,11 +142,7 @@ fn format_numbers(nums: &[i64], separator: &str, equal_width: bool) -> String {
     }
 
     let width = if equal_width {
-        nums.iter()
-            .map(|n| n.to_string().len())
-            .max()
-            .unwrap_or(1)
-            .max(2)
+        nums.iter().map(|n| n.to_string().len()).max().unwrap_or(1)
     } else {
         0
     };

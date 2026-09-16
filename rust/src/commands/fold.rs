@@ -67,13 +67,9 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                     };
 
                     let (chunk, rest) = remaining.split_at(split);
-                    pwriteln!(w, "{}", chunk.trim_end());
+                    pwriteln!(w, "{}", chunk);
 
-                    remaining = if break_spaces {
-                        rest.trim_start()
-                    } else {
-                        rest
-                    };
+                    remaining = if break_spaces { rest.trim_start() } else { rest };
                 }
             }
             Err(e) => {
