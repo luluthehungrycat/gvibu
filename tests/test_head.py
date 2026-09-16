@@ -1,3 +1,5 @@
+import os
+
 from gvibu_ref.commands.head import run as head_run
 
 
@@ -67,4 +69,19 @@ def test_head_quiet_multi_file(capfd):
     assert code == 0
     out, err = capfd.readouterr()
     assert out == ""
+    assert err == ""
+
+
+def test_head_quiet_multi_file_emits_content_without_headers(tmp_path, capfd):
+    first = tmp_path / "first.txt"
+    second = tmp_path / "second.txt"
+    first.write_text("first file\n")
+    second.write_text("second file\n")
+
+    code = head_run(["-q", os.fspath(first), os.fspath(second)])
+
+    assert code == 0
+    out, err = capfd.readouterr()
+    assert out == "first file\nsecond file\n"
+    assert "==>" not in out
     assert err == ""

@@ -460,6 +460,29 @@ fn head_multi_file_dev_null() {
 }
 
 #[test]
+fn head_quiet_multi_file_emits_content_without_headers() {
+    let dir = std::env::temp_dir().join(format!("gvibu_head_quiet_{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let first = dir.join("first.txt");
+    let second = dir.join("second.txt");
+    std::fs::write(&first, "first file\n").unwrap();
+    std::fs::write(&second, "second file\n").unwrap();
+
+    let (code, out, err) = run(&[
+        "head",
+        "-q",
+        first.to_str().unwrap(),
+        second.to_str().unwrap(),
+    ]);
+
+    assert_eq!(code, 0);
+    assert_eq!(out, "first file\nsecond file\n");
+    assert!(!out.contains("==>"));
+    assert_eq!(err, "");
+    let _ = std::fs::remove_dir_all(dir);
+}
+
+#[test]
 fn head_c_flag_dev_null() {
     let (code, out, err) = run(&["head", "-c", "5", "/dev/null"]);
     assert_eq!(code, 0);
