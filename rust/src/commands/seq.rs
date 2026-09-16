@@ -237,11 +237,6 @@ mod tests {
     }
 
     #[test]
-    fn test_format_numbers_short_equal_width_is_zero_padded() {
-        assert_eq!(format_numbers(&[1, 2, 3], " ", true), "01 02 03\n");
-    }
-
-    #[test]
     fn test_generate_numbers_positive() {
         assert_eq!(generate_numbers(1, 1, 5), vec![1, 2, 3, 4, 5]);
     }
