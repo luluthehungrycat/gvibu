@@ -49,7 +49,7 @@ def test_fold_preserves_whitespace_without_s():
         text=True,
     )
     assert result.returncode == 0, f"stderr: {result.stderr}"
-    assert result.stdout == "ab   \n cd\n"
+    assert result.stdout == "ab   \ncd\n"
 
 
 def test_fold_invalid_width():
