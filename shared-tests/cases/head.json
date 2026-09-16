@@ -73,6 +73,13 @@
       "stdout": "",
       "stderr": "*",
       "exit_code": 1
+    },
+    {
+      "name": "quiet_multi_file_dev_null",
+      "args": ["-q", "/dev/null", "/dev/null"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
     }
   ]
 }

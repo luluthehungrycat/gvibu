@@ -60,3 +60,11 @@ def test_head_multi_file(capfd):
     out, err = capfd.readouterr()
     assert "==> /dev/null <==" in out
     assert err == ""
+
+
+def test_head_quiet_multi_file(capfd):
+    code = head_run(["-q", "/dev/null", "/dev/null"])
+    assert code == 0
+    out, err = capfd.readouterr()
+    assert out == ""
+    assert err == ""
