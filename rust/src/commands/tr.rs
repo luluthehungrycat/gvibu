@@ -91,7 +91,7 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
 
     let set1 = build_char_set(set1_str, complement);
 
-    let set2: Vec<u8> = if delete {
+    let set2: Vec<u8> = if delete || (squeeze && sets.len() == 1) {
         Vec::new()
     } else {
         let expanded = expand_set(set2_str);

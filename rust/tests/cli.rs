@@ -1064,6 +1064,13 @@ fn tr_squeeze() {
 }
 
 #[test]
+fn tr_squeeze_only_does_not_translate() {
+    let (code, out, err) = run_with_stdin(&["tr", "-s", "ab"], "abbbaccc");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "abac");
+}
+
+#[test]
 fn tr_invalid_option() {
     let (code, out, err) = run(&["tr", "-x"]);
     assert_eq!(code, 1);
@@ -2051,23 +2058,17 @@ fn du_human_readable_dev_null() {
 #[test]
 fn du_invalid_option() {
     let (code, out, err) = run(&["du", "-x"]);
-    // Accept 0 or 1 — some envs may not have /proc
-    assert!(code == 0 || code == 1, "code: {}, stderr: {}", code, err);
-    if code == 1 {
-        assert_eq!(out, "");
-        assert!(!err.is_empty(), "should print error");
-    }
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error on stderr");
 }
 
 #[test]
 fn du_nonexistent() {
     let (code, out, err) = run(&["du", "/nonexistent_du_test_xyz"]);
-    // Accept 0 or 1 — some envs may not have /proc
-    assert!(code == 0 || code == 1, "code: {}, stderr: {}", code, err);
-    if code == 1 {
-        assert_eq!(out, "");
-        assert!(!err.is_empty(), "should print error");
-    }
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error on stderr");
 }
 
 #[test]
