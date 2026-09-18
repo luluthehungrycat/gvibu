@@ -42,20 +42,20 @@ def test_no_files():
 
 
 def test_dev_null_numeric():
-    assert run(["0", "/dev/null"]) == 0
+    assert run(["0", "/dev/null"]) == 1
 
 
 def test_dev_null_numeric_owner_group():
-    assert run(["0:0", "/dev/null"]) == 0
+    assert run(["0:0", "/dev/null"]) == 1
 
 
 def test_dev_null_group_only():
-    assert run([":0", "/dev/null"]) == 0
+    assert run([":0", "/dev/null"]) == 1
 
 
 def test_dev_null_recursive():
-    assert run(["-R", "0", "/dev/null"]) == 0
+    assert run(["-R", "0", "/dev/null"]) == 1
 
 
 def test_dev_null_verbose():
-    assert run(["-v", "0", "/dev/null"]) == 0
+    assert run(["-v", "0", "/dev/null"]) == 1

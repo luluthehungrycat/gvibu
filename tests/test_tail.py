@@ -1,23 +1,28 @@
 """Tests for tail command."""
 
+import io
+import sys
+
 from gvibu_ref.commands import tail
 
-
-def test_no_args_stdin(capsys):
+def test_no_args_stdin(capsys, monkeypatch):
+    monkeypatch.setattr(sys, "stdin", io.StringIO("a\nb\nc\n"))
     ret = tail.run([])
     out, err = capsys.readouterr()
     assert ret == 0
     assert err == ""
 
 
-def test_n_flag_stdin(capsys):
+def test_n_flag_stdin(capsys, monkeypatch):
+    monkeypatch.setattr(sys, "stdin", io.StringIO("a\nb\nc\nd\n"))
     ret = tail.run(["-n", "3"])
     out, err = capsys.readouterr()
     assert ret == 0
     assert err == ""
 
 
-def test_c_flag_stdin(capsys):
+def test_c_flag_stdin(capsys, monkeypatch):
+    monkeypatch.setattr(sys, "stdin", io.TextIOWrapper(io.BytesIO(b"hello world")))
     ret = tail.run(["-c", "5"])
     out, err = capsys.readouterr()
     assert ret == 0
