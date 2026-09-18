@@ -1,15 +1,16 @@
+use crate::pwrite;
 /// cat: concatenate files and print to stdout.
 use std::fs::File;
-use std::io::{self, BufRead, BufReader, Write};
-use crate::pwrite;
-use crate::pwriteln;
+use std::io::{self, BufReader, Read, Write};
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut number_lines = false;
     let mut files: Vec<&str> = Vec::new();
 
     for arg in args {
-        if arg == "--" { break; }
+        if arg == "--" {
+            break;
+        }
         if arg == "-n" {
             number_lines = true;
         } else if arg.starts_with('-') && arg.len() > 1 {
@@ -35,8 +36,13 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         } else {
             match File::open(filename) {
                 Ok(file) => {
-                    exit_code |=
-                        print_lines(w, BufReader::new(file), number_lines, &mut line_num, filename);
+                    exit_code |= print_lines(
+                        w,
+                        BufReader::new(file),
+                        number_lines,
+                        &mut line_num,
+                        filename,
+                    );
                 }
                 Err(e) => {
                     eprintln!("cat: {}: {}", filename, e);
@@ -49,20 +55,29 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     exit_code
 }
 
-fn print_lines<R: BufRead>(w: &mut dyn Write, reader: R, number: bool, line_num: &mut usize, _src: &str) -> i32 {
-    for line in reader.lines() {
-        match line {
-            Ok(l) => {
-                if number {
-                    pwrite!(w, "{:>6}\t", line_num);
-                    *line_num += 1;
-                }
-                pwriteln!(w, "{}", l);
+fn print_lines<R: Read>(
+    w: &mut dyn Write,
+    mut reader: R,
+    number: bool,
+    line_num: &mut usize,
+    src: &str,
+) -> i32 {
+    let mut contents = Vec::new();
+    if let Err(e) = reader.read_to_end(&mut contents) {
+        eprintln!("cat: {}: read error: {}", src, e);
+        return 1;
+    }
+
+    for (index, byte) in contents.iter().enumerate() {
+        if number && (index == 0 || contents[index - 1] == b'\n') {
+            pwrite!(w, "{:>6}\t", line_num);
+            *line_num += 1;
+        }
+        if let Err(e) = w.write_all(std::slice::from_ref(byte)) {
+            if e.kind() == io::ErrorKind::BrokenPipe {
+                return 0;
             }
-            Err(e) => {
-                eprintln!("cat: {}: read error: {}", _src, e);
-                return 1;
-            }
+            return 1;
         }
     }
     0
@@ -89,6 +104,17 @@ mod tests {
 
     #[test]
     fn test_cat_n_flag_dev_null() {
-        assert_eq!(run(&mut std::io::sink(), &["-n".into(), "/dev/null".into()]), 0);
+        assert_eq!(
+            run(&mut std::io::sink(), &["-n".into(), "/dev/null".into()]),
+            0
+        );
+    }
+
+    #[test]
+    fn test_cat_preserves_unterminated_line() {
+        let mut output = Vec::new();
+        let input = std::io::Cursor::new(b"a".to_vec());
+        assert_eq!(print_lines(&mut output, input, false, &mut 1, "-"), 0);
+        assert_eq!(output, b"a");
     }
 }
