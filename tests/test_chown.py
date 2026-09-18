@@ -1,4 +1,6 @@
 """Tests for chown command."""
+import os
+
 import pytest
 from gvibu_ref.commands.chown import (
     run, _parse_owner, _lookup_user, _lookup_group
@@ -41,21 +43,39 @@ def test_no_files():
     assert run(["root"]) == 1
 
 
-def test_dev_null_numeric():
-    assert run(["0", "/dev/null"]) == 1
+def test_regular_file_numeric_owner(tmp_path):
+    path = tmp_path / "file"
+    path.write_text("content")
+    uid = os.getuid()
+    gid = os.getgid()
+    assert run([str(uid), str(path)]) == 0
+    assert path.stat().st_uid == uid
+    assert run([f"{uid}:{gid}", str(path)]) == 0
+    assert path.stat().st_gid == gid
 
 
-def test_dev_null_numeric_owner_group():
-    assert run(["0:0", "/dev/null"]) == 1
+def test_regular_file_group_only(tmp_path):
+    path = tmp_path / "file"
+    path.write_text("content")
+    gid = os.getgid()
+    assert run([f":{gid}", str(path)]) == 0
+    assert path.stat().st_gid == gid
 
 
-def test_dev_null_group_only():
-    assert run([":0", "/dev/null"]) == 1
+def test_regular_directory_recursive(tmp_path):
+    nested = tmp_path / "nested"
+    nested.mkdir()
+    child = nested / "file"
+    child.write_text("content")
+    uid = os.getuid()
+    assert run(["-R", str(uid), str(nested)]) == 0
+    assert nested.stat().st_uid == uid
+    assert child.stat().st_uid == uid
 
 
-def test_dev_null_recursive():
-    assert run(["-R", "0", "/dev/null"]) == 1
-
-
-def test_dev_null_verbose():
-    assert run(["-v", "0", "/dev/null"]) == 1
+def test_regular_file_verbose(tmp_path, capsys):
+    path = tmp_path / "file"
+    path.write_text("content")
+    uid = os.getuid()
+    assert run(["-v", str(uid), str(path)]) == 0
+    assert str(path) in capsys.readouterr().out
