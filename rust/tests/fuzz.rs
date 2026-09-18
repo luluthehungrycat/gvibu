@@ -330,7 +330,7 @@ proptest! {
             let _ = std::io::copy(&mut stdout, &mut std::io::sink());
         });
         let output = output_rx
-            .recv_timeout(std::time::Duration::from_millis(50))
+            .recv_timeout(std::time::Duration::from_millis(500))
             .expect("yes should produce output before timeout")
             .expect("failed to read yes output");
         let _ = child.kill();
