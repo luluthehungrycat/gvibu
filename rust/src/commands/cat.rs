@@ -62,6 +62,17 @@ fn print_lines<R: Read>(
     line_num: &mut usize,
     src: &str,
 ) -> i32 {
+    if !number {
+        return match io::copy(&mut reader, w) {
+            Ok(_) => 0,
+            Err(e) if e.kind() == io::ErrorKind::BrokenPipe => 0,
+            Err(e) => {
+                eprintln!("cat: {}: write error: {}", src, e);
+                1
+            }
+        };
+    }
+
     let mut contents = Vec::new();
     if let Err(e) = reader.read_to_end(&mut contents) {
         eprintln!("cat: {}: read error: {}", src, e);

@@ -1,3 +1,5 @@
+import os
+
 from gvibu_ref.commands.head import run as head_run
 
 
