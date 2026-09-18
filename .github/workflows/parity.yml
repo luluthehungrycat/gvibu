@@ -19,7 +19,9 @@ jobs:
           python-version: '3.11'
 
       - name: Install Python dependencies (if any)
-        run: python -m pip install --upgrade pip
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@v1
@@ -51,10 +53,10 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
-          targets: wasm32-wasi,wasm32-unknown-unknown
+          targets: wasm32-wasip1,wasm32-unknown-unknown
 
       - name: Build WASM binary (wasmtime)
-        run: (cd rust && cargo build --release --target wasm32-wasi)
+        run: (cd rust && cargo build --release --target wasm32-wasip1)
 
       - name: Install wasmtime
         run: curl -fsSL https://wasmtime.dev/install.sh | bash
@@ -63,9 +65,9 @@ jobs:
       - name: Test WASM binary via wasmtime
         run: |
           export PATH="$HOME/.wasmtime/bin:$PATH"
-          wasmtime rust/target/wasm32-wasi/release/gvibu.wasm true && echo "PASS: true" || echo "FAIL: true"
-          wasmtime rust/target/wasm32-wasi/release/gvibu.wasm echo hello | grep -q hello && echo "PASS: echo" || echo "FAIL: echo"
-          wasmtime rust/target/wasm32-wasi/release/gvibu.wasm false && echo "FAIL: false (should exit 1)" || echo "PASS: false"
+          wasmtime rust/target/wasm32-wasip1/release/gvibu.wasm true && echo "PASS: true" || echo "FAIL: true"
+          wasmtime rust/target/wasm32-wasip1/release/gvibu.wasm echo hello | grep -q hello && echo "PASS: echo" || echo "FAIL: echo"
+          wasmtime rust/target/wasm32-wasip1/release/gvibu.wasm false && echo "FAIL: false (should exit 1)" || echo "PASS: false"
 
       - name: Install wasm-pack
         run: cargo install wasm-pack
