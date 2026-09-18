@@ -11,42 +11,60 @@
     },
     {
       "name": "invalid_option",
-      "args": ["-x", "/dev/null"],
+      "args": [
+        "-x",
+        "/dev/null"
+      ],
       "stdout": "",
       "stderr": "*",
       "exit_code": 1
     },
     {
       "name": "dev_null",
-      "args": ["/dev/null"],
+      "args": [
+        "/tmp/gvibu-parity-touch"
+      ],
       "stdout": "",
       "stderr": "",
       "exit_code": 0
     },
     {
       "name": "access_only",
-      "args": ["-a", "/dev/null"],
+      "args": [
+        "-a",
+        "/tmp/gvibu-parity-touch"
+      ],
       "stdout": "",
       "stderr": "",
       "exit_code": 0
-    },
-    {
+      },
+      {
       "name": "mod_only",
-      "args": ["-m", "/dev/null"],
+      "args": [
+        "-m",
+        "/tmp/gvibu-parity-touch"
+      ],
       "stdout": "",
       "stderr": "",
       "exit_code": 0
-    },
-    {
+      },
+      {
       "name": "both_flags",
-      "args": ["-am", "/dev/null"],
+      "args": [
+        "-am",
+        "/tmp/gvibu-parity-touch"
+      ],
       "stdout": "",
       "stderr": "",
       "exit_code": 0
     },
     {
       "name": "separate_flags",
-      "args": ["-a", "-m", "/dev/null"],
+      "args": [
+        "-a",
+        "-m",
+        "/tmp/gvibu-parity-touch"
+      ],
       "stdout": "",
       "stderr": "",
       "exit_code": 0

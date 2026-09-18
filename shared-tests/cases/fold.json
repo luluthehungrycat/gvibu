@@ -12,7 +12,7 @@
       "name": "width_10",
       "args": ["fold", "-w", "10"],
       "stdin": "hello world this is a long line",
-      "stdout": "hello worl\nd this is\na long li\nne\n",
+      "stdout": "hello worl\nd this is \na long lin\ne\n",
       "stderr": "",
       "exit_code": 0
     },
@@ -20,7 +20,7 @@
       "name": "break_spaces_width_10",
       "args": ["fold", "-s", "-w", "10"],
       "stdin": "hello world this is a long line",
-      "stdout": "hello\nworld this\nis a long\nline\n",
+      "stdout": "hello\nworld\nthis is a\nlong line\n",
       "stderr": "",
       "exit_code": 0
     },

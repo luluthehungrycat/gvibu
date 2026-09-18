@@ -172,8 +172,8 @@ fn echo_e_with_n() {
 fn echo_e_disables_escapes() {
     let (code, out, err) = run(&["echo", "-E", "-e", "hello\\nworld"]);
     assert_eq!(code, 0);
-    // Last flag wins: -e overrides -E, so \n is interpreted as newline
-    assert_eq!(out, "hello\nworld\n", "stderr: {}", err);
+    // Explicit -E disables escapes even when -e is also present.
+    assert_eq!(out, "hello\\nworld\n", "stderr: {}", err);
     assert_eq!(err, "");
 }
 

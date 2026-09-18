@@ -3,7 +3,7 @@
     {
       "name": "dev_null",
       "args": ["/dev/null"],
-      "stdout": "null",
+      "stdout": "null\n",
       "stderr": "",
       "exit_code": 0
     },

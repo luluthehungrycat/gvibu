@@ -52,19 +52,19 @@ def _interpret_escapes(s: str) -> str:
 
 def run(args: list[str]) -> int:
     newline = True
-    enable_escapes = False
+    escape_requested = False
+    escape_disabled = False
 
     while args and args[0] in ("-n", "-e", "-E"):
         if args[0] == "-n":
             newline = False
-            args = args[1:]
         elif args[0] == "-e":
-            enable_escapes = True
-            args = args[1:]
+            escape_requested = True
         elif args[0] == "-E":
-            enable_escapes = False
-            args = args[1:]
+            escape_disabled = True
+        args = args[1:]
 
+    enable_escapes = escape_requested and not escape_disabled
     if enable_escapes:
         parts = [_interpret_escapes(a) for a in args]
     else:
