@@ -1,6 +1,6 @@
+use crate::pwriteln;
 /// fold: wrap each input line to fit in specified width.
 use std::io::{self, BufRead, Write};
-use crate::pwriteln;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut width: usize = 80;
@@ -9,7 +9,9 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { break; }
+        if arg == "--" {
+            break;
+        }
         if arg == "-w" {
             i += 1;
             if i >= args.len() {
@@ -65,18 +67,9 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                     };
 
                     let (chunk, rest) = remaining.split_at(split);
-                    let trimmed_chunk = if break_spaces {
-                        chunk.trim_end()
-                    } else {
-                        chunk
-                    };
-                    pwriteln!(w, "{}", trimmed_chunk);
+                    pwriteln!(w, "{}", chunk);
 
-                    remaining = if break_spaces {
-                        rest.trim_start()
-                    } else {
-                        rest
-                    };
+                    remaining = if break_spaces { rest.trim_start() } else { rest };
                 }
             }
             Err(e) => {

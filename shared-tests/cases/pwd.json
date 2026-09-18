@@ -3,7 +3,7 @@
     {
       "name": "no_args",
       "args": [],
-      "stdout": "/home/moritz/agent/repos/gvibu-ai-lab\n",
+      "stdout": "$PWD\n",
       "stderr": "",
       "exit_code": 0
     },

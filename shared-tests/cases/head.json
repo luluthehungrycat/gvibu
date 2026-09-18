@@ -73,6 +73,20 @@
       "stdout": "",
       "stderr": "*",
       "exit_code": 1
+    },
+    {
+      "name": "quiet_multi_file_dev_null",
+      "args": ["-q", "/dev/null", "/dev/null"],
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "quiet_multi_file_content_without_headers",
+      "args": ["-q", "shared-tests/fixtures/head_quiet_first.txt", "shared-tests/fixtures/head_quiet_second.txt"],
+      "stdout": "first shared file\nsecond shared file\n",
+      "stderr": "",
+      "exit_code": 0
     }
   ]
 }

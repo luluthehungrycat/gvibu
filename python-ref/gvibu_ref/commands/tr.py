@@ -52,7 +52,7 @@ def run(args: list[str]) -> int:
             sets.append(arg)
         i += 1
 
-    if (delete and len(sets) < 1) or (not delete and len(sets) < 2):
+    if (delete and len(sets) < 1) or (not delete and ((squeeze and len(sets) < 1) or (not squeeze and len(sets) < 2))):
         print("tr: missing operand", file=sys.stderr)
         return 1
 
@@ -66,8 +66,9 @@ def run(args: list[str]) -> int:
         if not set2_list and set1:
             set2_list = [sorted(set1)[-1]] * len(set1)
         translate_map = {}
-        for idx, c in enumerate(sorted(set1)):
-            translate_map[c] = set2_list[idx % len(set2_list)] if set2_list else c
+        if len(sets) > 1:
+            for idx, c in enumerate(sorted(set1)):
+                translate_map[c] = set2_list[idx % len(set2_list)] if set2_list else c
         delete_set = set()
 
     input_data = sys.stdin.buffer.read()

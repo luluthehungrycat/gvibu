@@ -22,7 +22,7 @@ def _parse_args(args: list[str]):
                 return None
             separator = args[i]
             i += 1
-        elif arg.startswith("-") and len(arg) > 1:
+        elif arg.startswith("-") and len(arg) > 1 and not arg[1:].isdigit():
             # Combined flags
             for j, ch in enumerate(arg[1:]):
                 if ch == "w":

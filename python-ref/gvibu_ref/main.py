@@ -172,9 +172,9 @@ def dispatch():
 
     if cmd_name in COMMANDS:
         if argv0 == cmd_name:
-            args = sys.argv[1:]
+            args = [cmd_name, *sys.argv[1:]] if cmd_name == "[" else sys.argv[1:]
         elif len(sys.argv) > 1 and sys.argv[1] == cmd_name:
-            args = sys.argv[2:]
+            args = [cmd_name, *sys.argv[2:]] if cmd_name == "[" else sys.argv[2:]
         else:
             args = sys.argv[1:]
 

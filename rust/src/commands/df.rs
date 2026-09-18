@@ -21,7 +21,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                         'h' => human = true,
                         'T' => show_type = true,
                         _ => {
-                            pwriteln!(w, "df: invalid option: -{}", c);
+                            eprintln!("df: invalid option: -{}", c);
                             return 1;
                         }
                     }

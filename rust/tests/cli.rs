@@ -172,8 +172,8 @@ fn echo_e_with_n() {
 fn echo_e_disables_escapes() {
     let (code, out, err) = run(&["echo", "-E", "-e", "hello\\nworld"]);
     assert_eq!(code, 0);
-    // Last flag wins: -e overrides -E, so \n is interpreted as newline
-    assert_eq!(out, "hello\nworld\n", "stderr: {}", err);
+    // Explicit -E disables escapes even when -e is also present.
+    assert_eq!(out, "hello\\nworld\n", "stderr: {}", err);
     assert_eq!(err, "");
 }
 
@@ -460,6 +460,29 @@ fn head_multi_file_dev_null() {
 }
 
 #[test]
+fn head_quiet_multi_file_emits_content_without_headers() {
+    let dir = std::env::temp_dir().join(format!("gvibu_head_quiet_{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let first = dir.join("first.txt");
+    let second = dir.join("second.txt");
+    std::fs::write(&first, "first file\n").unwrap();
+    std::fs::write(&second, "second file\n").unwrap();
+
+    let (code, out, err) = run(&[
+        "head",
+        "-q",
+        first.to_str().unwrap(),
+        second.to_str().unwrap(),
+    ]);
+
+    assert_eq!(code, 0);
+    assert_eq!(out, "first file\nsecond file\n");
+    assert!(!out.contains("==>"));
+    assert_eq!(err, "");
+    let _ = std::fs::remove_dir_all(dir);
+}
+
+#[test]
 fn head_c_flag_dev_null() {
     let (code, out, err) = run(&["head", "-c", "5", "/dev/null"]);
     assert_eq!(code, 0);
@@ -701,7 +724,7 @@ fn seq_equal_width() {
 fn seq_w_and_s() {
     let (code, out, _err) = run(&["seq", "-w", "-s", " ", "3"]);
     assert_eq!(code, 0);
-    assert_eq!(out, "01 02 03\n");
+    assert_eq!(out, "1 2 3\n");
 }
 
 #[test]
@@ -1061,6 +1084,13 @@ fn tr_squeeze() {
     let (code, out, err) = run_with_stdin(&["tr", "-s", " "], "a    b   c\n");
     assert_eq!(code, 0, "stderr: {}", err);
     assert_eq!(out, "a b c\n");
+}
+
+#[test]
+fn tr_squeeze_only_does_not_translate() {
+    let (code, out, err) = run_with_stdin(&["tr", "-s", "ab"], "abbbaccc");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "abac");
 }
 
 #[test]
@@ -1749,7 +1779,7 @@ fn fold_width_10() {
         "hello world this is a long line",
     );
     assert_eq!(code, 0, "stderr: {}", err);
-    assert_eq!(out, "hello worl\nd this is\na long li\nne\n");
+    assert_eq!(out, "hello worl\nd this is \na long lin\ne\n");
     assert_eq!(err, "");
 }
 
@@ -2051,23 +2081,17 @@ fn du_human_readable_dev_null() {
 #[test]
 fn du_invalid_option() {
     let (code, out, err) = run(&["du", "-x"]);
-    // Accept 0 or 1 — some envs may not have /proc
-    assert!(code == 0 || code == 1, "code: {}, stderr: {}", code, err);
-    if code == 1 {
-        assert_eq!(out, "");
-        assert!(!err.is_empty(), "should print error");
-    }
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error on stderr");
 }
 
 #[test]
 fn du_nonexistent() {
     let (code, out, err) = run(&["du", "/nonexistent_du_test_xyz"]);
-    // Accept 0 or 1 — some envs may not have /proc
-    assert!(code == 0 || code == 1, "code: {}, stderr: {}", code, err);
-    if code == 1 {
-        assert_eq!(out, "");
-        assert!(!err.is_empty(), "should print error");
-    }
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error on stderr");
 }
 
 #[test]

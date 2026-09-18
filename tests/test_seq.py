@@ -69,4 +69,4 @@ def test_seq_w_and_s(capsys):
     result = seq_run(["-w", "-s", " ", "3"])
     out, _ = capsys.readouterr()
     assert result == 0
-    assert out == "01 02 03\n"
+    assert out == "1 2 3\n"

@@ -2,6 +2,8 @@
 
 import os
 import sys
+import time
+
 
 
 def run(args: list[str]) -> int:
@@ -44,16 +46,17 @@ def run(args: list[str]) -> int:
             with open(fname, "a"):
                 pass
 
+            now = time.time()
             if flag_a and flag_m:
                 os.utime(fname, None)
             elif flag_a:
-                # Update access time only, preserve modification time
+                # Update access time only, preserve modification time.
                 mtime = os.path.getmtime(fname)
-                os.utime(fname, (None, mtime))
+                os.utime(fname, (now, mtime))
             elif flag_m:
-                # Update modification time only, preserve access time
+                # Update modification time only, preserve access time.
                 atime = os.path.getatime(fname)
-                os.utime(fname, (atime, None))
+                os.utime(fname, (atime, now))
         except OSError as e:
             print(f"touch: {fname}: {e}", file=sys.stderr)
             exit_code = 1
