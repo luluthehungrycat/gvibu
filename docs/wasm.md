@@ -66,6 +66,23 @@ wasm:
     - run: ls wasm-lib/pkg/gvibu_wasm.js wasm-lib/pkg/gvibu_wasm_bg.wasm
 ```
 
+## WASI CLI Target
+
+The browser build above targets `wasm32-unknown-unknown`. A separate exploratory
+build of the Rust CLI for `wasm32-wasip1` currently fails because the shared
+command implementations use Unix-only APIs, including `std::os::unix` and
+Unix-specific `libc` functions and metadata extensions. This is a platform
+compatibility limitation in the current GVIBU source; it does not indicate a
+failure of the documented browser WASM build. A WASI CLI build needs
+platform-specific implementations or conditional compilation for those
+commands.
+
+Reproduced with:
+
+```sh
+cargo build --locked --manifest-path rust/Cargo.toml --target wasm32-wasip1 --release
+```
+
 ## npm Package
 
 When a `v*` tag is pushed, the release workflow:

@@ -18,6 +18,14 @@ def gid_to_name(gid: int) -> str:
         return str(gid)
 
 
+def groups_with_primary(groups: list[int], primary: int) -> list[int]:
+    """Keep supplementary order and append the selected primary group if absent."""
+    result = list(groups)
+    if primary not in result:
+        result.append(primary)
+    return result
+
+
 def run(args: list[str]) -> int:
     flag_u = False
     flag_g = False
@@ -71,7 +79,8 @@ def run(args: list[str]) -> int:
             print(gid)
 
     if flag_groups:
-        groups = os.getgroups()
+        primary = os.getgid() if flag_real else os.getegid()
+        groups = groups_with_primary(os.getgroups(), primary)
         if flag_name:
             print(" ".join(gid_to_name(g) for g in groups))
         else:

@@ -33,6 +33,13 @@ fn get_groups() -> Vec<u32> {
     groups
 }
 
+fn groups_with_primary(mut groups: Vec<u32>, primary: u32) -> Vec<u32> {
+    if !groups.contains(&primary) {
+        groups.push(primary);
+    }
+    groups
+}
+
 fn uid_to_name(uid: u32) -> String {
     // Try reading /etc/passwd
     if let Ok(content) = std::fs::read_to_string("/etc/passwd") {
@@ -137,7 +144,8 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
 
     // Print supplementary groups
     if flag_groups {
-        let groups = get_groups();
+        let primary = if flag_real { get_gid() } else { get_egid() };
+        let groups = groups_with_primary(get_groups(), primary);
         if flag_name {
             let names: Vec<String> = groups.iter().map(|g| gid_to_name(*g)).collect();
             let _ = pwriteln!(stdout, "{}", names.join(" "));
@@ -153,6 +161,17 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn groups_include_primary_when_supplementary_groups_are_empty() {
+        assert_eq!(groups_with_primary(Vec::new(), 7), vec![7]);
+    }
+
+    #[test]
+    fn groups_keep_order_and_do_not_duplicate_primary() {
+        assert_eq!(groups_with_primary(vec![3, 7, 5], 7), vec![3, 7, 5]);
+        assert_eq!(groups_with_primary(vec![3, 5], 7), vec![3, 5, 7]);
+    }
 
     #[test]
     fn test_id_no_args() {
