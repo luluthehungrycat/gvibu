@@ -953,7 +953,8 @@ fn id_name_user() {
 fn id_supp_groups() {
     let (code, out, err) = run(&["id", "-G"]);
     assert_eq!(code, 0, "stderr: {}", err);
-    assert!(!out.trim().is_empty(), "should output group list");
+    let groups: Vec<u32> = out.split_whitespace().map(|g| g.parse().unwrap()).collect();
+    assert!(groups.contains(&unsafe { libc::getegid() }), "should include effective GID: {:?}", groups);
 }
 
 #[test]
@@ -962,6 +963,14 @@ fn id_real_user() {
     assert_eq!(code, 0, "stderr: {}", err);
     let val = out.trim().parse::<u32>().unwrap_or(0);
     assert!(val > 0, "real uid should be positive");
+}
+
+#[test]
+fn id_real_groups_include_real_gid() {
+    let (code, out, err) = run(&["id", "-rG"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    let groups: Vec<u32> = out.split_whitespace().map(|g| g.parse().unwrap()).collect();
+    assert!(groups.contains(&unsafe { libc::getgid() }), "should include real GID: {:?}", groups);
 }
 
 // ---------------------------------------------------------------------------
