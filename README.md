@@ -41,7 +41,7 @@ cargo build --release
 # Subcommand mode
 ./target/release/gvibu echo hello world
 
-# Symlink mode (all 58 commands)
+# Symlink mode (all 60 commands)
 make install
 gvibu-echo hello world
 

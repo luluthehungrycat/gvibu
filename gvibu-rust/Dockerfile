@@ -1,11 +1,12 @@
-FROM rust:1.70-slim AS build
-WORKDIR /usr/src/gvibu_rust
-COPY gvibu-rust/Cargo.toml ./
-COPY gvibu-rust/src ./src
-RUN cargo build --release
+FROM rust:stable-slim AS builder
+WORKDIR /build
+# `vish` dispatches through the main gvibu Rust library.
+COPY rust ./rust
+COPY vish ./vish
+RUN cargo build --release --manifest-path vish/Cargo.toml
 
 FROM debian:stable-slim
-COPY --from=build /usr/src/gvibu_rust/target/release/gvibu_rust /usr/local/bin/vish
+COPY --from=builder /build/vish/target/release/vish /usr/local/bin/vish
 RUN chmod +x /usr/local/bin/vish
-CMD ["vish", "help"]
-HEALTHCHECK --interval=5s --timeout=2s --start-period=1s CMD ["bash", "-lc", "vish gvibu help >/dev/null 2>&1 || true"]
+CMD ["vish"]
+HEALTHCHECK --interval=5s --timeout=2s --start-period=1s CMD ["vish", "help"]

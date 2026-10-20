@@ -11,7 +11,7 @@ pub fn set_wasm_stdin(input: Option<&str>) {
     WASM_STDIN.with(|buffer| *buffer.borrow_mut() = input.map(str::to_owned));
 }
 
-/// Return a copy of the current injected stdin buffer, if one was supplied.
+/// Return a copy of the current WASM stdin buffer, if one was supplied.
 pub fn get_wasm_stdin() -> Option<String> {
     WASM_STDIN.with(|buffer| buffer.borrow().clone())
 }
@@ -47,20 +47,19 @@ mod wasm_stdin_tests {
         let cases: &[(&str, &[&str], &str, &str)] = &[
             ("cat", &[], "alpha\n", "alpha\n"),
             ("cat", &["-"], "alpha\n", "alpha\n"),
+            ("expand", &[], "\talpha\n", "        alpha\n"),
+            ("expand", &["-"], "\tbeta\n", "        beta\n"),
+            ("rev", &[], "abc\nxy", "cba\nyx"),
+            ("rev", &["-"], "def\n", "fed\n"),
             ("comm", &["-", "-"], "alpha\n", "\t\talpha\n"),
             ("cut", &["-f2"], "a\tb\n", "b\n"),
             ("cut", &["-f2", "-"], "a\tb\n", "b\n"),
-            ("expand", &[], "\talpha\n", "        alpha\n"),
-            ("expand", &["-"], "\tbeta\n", "        beta\n"),
             ("fold", &["-w", "2"], "abc\n", "ab\nc\n"),
             ("grep", &["alpha"], "alpha\nbeta\n", "alpha\n"),
             ("grep", &["alpha", "-"], "alpha\nbeta\n", "alpha\n"),
-            ("grep", &["needle", "-"], "needle here\n", "needle here\n"),
             ("head", &["-n", "1"], "a\nb\n", "a\n"),
             ("head", &["-n", "1", "-"], "a\nb\n", "a\n"),
             ("nl", &[], "alpha\n", "     1\talpha\n"),
-            ("rev", &[], "abc\nxy", "cba\nyx"),
-            ("rev", &["-"], "def\n", "fed\n"),
             ("sort", &[], "b\na\n", "a\nb\n"),
             ("sort", &["-"], "b\na\n", "a\nb\n"),
             ("tail", &["-n", "1"], "a\nb\n", "b\n"),
@@ -69,7 +68,6 @@ mod wasm_stdin_tests {
             ("tee", &[], "alpha\n", "alpha\n"),
             ("tr", &["a-z", "A-Z"], "ab\n", "AB\n"),
             ("uniq", &[], "a\na\n", "a\n"),
-            ("wc", &["-l"], "one\ntwo\n", "      2\n"),
         ];
         for (name, args, input, expected) in cases {
             let command = commands::lookup(name).expect("command is registered");
@@ -79,7 +77,6 @@ mod wasm_stdin_tests {
             assert_eq!((command.run)(&mut output, &args), 0, "command {name}");
             assert_eq!(String::from_utf8(output).unwrap(), *expected, "command {name}");
         }
-
         let shuf = commands::lookup("shuf").expect("shuf is registered");
         let mut output = Vec::new();
         set_wasm_stdin(Some("a\nb\n"));
@@ -87,7 +84,6 @@ mod wasm_stdin_tests {
         let mut lines: Vec<_> = String::from_utf8(output).unwrap().lines().map(str::to_owned).collect();
         lines.sort();
         assert_eq!(lines, ["a", "b"]);
-
         clear_wasm_stdin();
     }
 }

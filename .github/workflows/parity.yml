@@ -108,16 +108,23 @@ jobs:
 
           const wasm = await readFile('./wasm-lib/pkg/gvibu_wasm_bg.wasm');
           await init(wasm);
-          const output = run_command('wc', ['-l'], 'one\ntwo\n');
-          if (output !== '      2\n') {
-            throw new Error(`stdin binding returned ${JSON.stringify(output)}`);
-          }
-          try {
-            run_command('ls', [], null);
-            throw new Error('ls unexpectedly succeeded in browser WASM');
-          } catch (error) {
-            if (!String(error).includes('not supported on WebAssembly')) {
-              throw error;
+          const expect = (actual, expected, label) => {
+            if (actual !== expected) {
+              throw new Error(`${label}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+            }
+          };
+          expect(run_command('wc', ['-l'], 'one\n'), '      1\n', 'first stdin call');
+          expect(run_command('wc', ['-l'], 'one\ntwo\n'), '      2\n', 'second stdin call');
+          expect(run_command('wc', ['-l'], null), '      0\n', 'missing stdin call');
+          for (const [name, args, message, label] of [
+            ['ls', [], 'not supported on WebAssembly', 'unsupported command'],
+            ['not-a-command', [], 'unknown command', 'unknown command'],
+          ]) {
+            try {
+              run_command(name, args, null);
+              throw new Error(`${label} unexpectedly succeeded`);
+            } catch (error) {
+              if (!String(error).includes(message)) throw error;
             }
           }
           NODE

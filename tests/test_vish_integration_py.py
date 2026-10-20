@@ -16,7 +16,7 @@ def test_integration_help():
     assert "GVIBU Python shell" in out
 
 
-def test_integration_gvibu_init():
-    out, code = run(["gvibu", "init"])
+def test_integration_command():
+    out, code = run(["echo", "hello"])
     assert code == 0
-    assert "GVIBU Python init" in out or "GVIBU init" in out
+    assert out == "hello"

@@ -30,11 +30,11 @@ fn same_source_and_destination(src: &str, dst: &str, archive: bool, src_meta: &f
     if Path::new(src) == Path::new(dst) {
         return true;
     }
-    let Ok(dst_lmeta) = fs::symlink_metadata(dst) else {
-        return false;
-    };
     #[cfg(unix)]
     {
+        let Ok(dst_lmeta) = fs::symlink_metadata(dst) else {
+            return false;
+        };
         use std::os::unix::fs::MetadataExt;
         if src_meta.dev() == dst_lmeta.dev() && src_meta.ino() == dst_lmeta.ino() {
             return true;
