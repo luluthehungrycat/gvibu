@@ -7,6 +7,7 @@ use std::process;
 
 pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let mut ignore_env = false;
+    let mut null_delimited = false;
     let mut unset_vars: Vec<String> = Vec::new();
     let mut set_vars: BTreeMap<String, String> = BTreeMap::new();
     let mut cmd_and_args: Vec<String> = Vec::new();
@@ -19,6 +20,8 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
             break;
         } else if arg == "-i" || arg == "--ignore-environment" {
             ignore_env = true;
+        } else if arg == "-0" || arg == "--null" {
+            null_delimited = true;
         } else if arg == "-u" || arg == "--unset" {
             i += 1;
             if i >= args.len() {
@@ -64,9 +67,14 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
 
     if cmd_and_args.is_empty() {
         for (key, value) in &final_env {
-            writeln!(stdout, "{}={}", key, value).ok();
+            let separator = if null_delimited { '\0' } else { '\n' };
+            write!(stdout, "{}={}{}", key, value, separator).ok();
         }
         return 0;
+    }
+    if null_delimited {
+        eprintln!("env: cannot specify --null (-0) with command");
+        return 125;
     }
 
     #[cfg(target_arch = "wasm32")]
@@ -110,5 +118,24 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::run;
+
+    #[test]
+    fn null_delimited_output_uses_nul_separator() {
+        let mut output = Vec::new();
+        let args = vec!["-i".into(), "-0".into(), "K=V".into()];
+        assert_eq!(run(&mut output, &args), 0);
+        assert_eq!(output, b"K=V\0");
+    }
+
+    #[test]
+    fn null_delimited_output_cannot_launch_command() {
+        let args = vec!["-0".into(), "true".into()];
+        assert_eq!(run(&mut std::io::sink(), &args), 125);
     }
 }

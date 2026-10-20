@@ -53,3 +53,18 @@ def test_env_no_args():
     """Smoke test for environment printing — just ensure no crash."""
     result = env_cmd.run([])
     assert result == 0
+
+
+def test_env_null_delimited_print(capsys):
+    result = env_cmd.run(["-i", "-0", "K=V"])
+    out, err = capsys.readouterr()
+    assert result == 0
+    assert out == "K=V\0"
+    assert err == ""
+
+
+def test_env_null_delimited_rejects_command(capsys):
+    result = env_cmd.run(["-0", "true"])
+    _, err = capsys.readouterr()
+    assert result == 125
+    assert "cannot specify --null" in err

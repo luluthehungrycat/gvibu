@@ -59,6 +59,9 @@ def run(args: list[str]) -> int:
         separator = "\0" if null_delimited else "\n"
         sys.stdout.write("".join(f"{key}={value}{separator}" for key, value in sorted(env.items())))
         return 0
+    if null_delimited:
+        print("env: cannot specify --null (-0) with command", file=sys.stderr)
+        return 125
 
     # Run command
     try:
