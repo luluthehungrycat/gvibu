@@ -2,14 +2,18 @@
   "cases": [
     {
       "name": "found_sh",
-      "args": ["sh"],
+      "args": [
+        "sh"
+      ],
       "stdout": "*",
       "stderr": "",
       "exit_code": 0
     },
     {
       "name": "not_found",
-      "args": ["nonexistent_cmd_xyz"],
+      "args": [
+        "nonexistent_cmd_xyz"
+      ],
       "stdout": "",
       "stderr": "",
       "exit_code": 1
@@ -23,7 +27,10 @@
     },
     {
       "name": "multiple_args",
-      "args": ["sh", "ls"],
+      "args": [
+        "sh",
+        "ls"
+      ],
       "stdout": "*",
       "stderr": "",
       "exit_code": 0

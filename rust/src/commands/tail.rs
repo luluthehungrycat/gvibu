@@ -80,8 +80,10 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                 eprintln!("tail: cannot follow standard input");
                 return 1;
             }
-            let status = tail_stdin(w, num_lines, num_bytes, crate::get_wasm_stdin());
-            if status != 0 { return status; }
+            let result = tail_stdin(w, num_lines, num_bytes, crate::get_wasm_stdin());
+            if result != 0 {
+                exit_code = result;
+            }
         } else {
             match File::open(fname) {
                 Ok(file) => {
@@ -117,34 +119,6 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     }
 
     exit_code
-}
-
-fn tail_stdin(w: &mut dyn Write, num_lines: usize, num_bytes: Option<usize>, input: Option<String>) -> i32 {
-    if let Some(input) = input {
-        tail_reader(w, io::Cursor::new(input.into_bytes()), num_lines, num_bytes)
-    } else {
-        let stdin = io::stdin();
-        tail_reader(w, stdin.lock(), num_lines, num_bytes)
-    }
-}
-
-fn tail_reader<R: Read>(w: &mut dyn Write, reader: R, num_lines: usize, num_bytes: Option<usize>) -> i32 {
-    if let Some(nbytes) = num_bytes {
-        let data = read_last_bytes_reader(reader, nbytes);
-        match w.write_all(&data) {
-            Ok(()) => 0,
-            Err(e) if e.kind() == std::io::ErrorKind::BrokenPipe => 0,
-            Err(_) => 1,
-        }
-    } else {
-        let lines = read_last_lines_reader(BufReader::new(reader), num_lines);
-        for line in &lines {
-            if let Err(e) = write!(w, "{}", line) {
-                return if e.kind() == std::io::ErrorKind::BrokenPipe { 0 } else { 1 };
-            }
-        }
-        0
-    }
 }
 
 fn tail_follow<W: Write + ?Sized>(w: &mut W, file: File, num_lines: usize, num_bytes: Option<usize>) -> io::Result<()> {
@@ -194,6 +168,32 @@ fn tail_follow<W: Write + ?Sized>(w: &mut W, file: File, num_lines: usize, num_b
 fn read_last_lines_file(file: File, num_lines: usize) -> Vec<String> {
     let reader = BufReader::new(file);
     read_last_lines_reader(reader, num_lines)
+}
+
+fn tail_stdin(
+    w: &mut dyn Write,
+    num_lines: usize,
+    num_bytes: Option<usize>,
+    input: Option<String>,
+) -> i32 {
+    let reader: Box<dyn BufRead> = match input {
+        Some(text) => Box::new(BufReader::new(io::Cursor::new(text.into_bytes()))),
+        None => Box::new(BufReader::new(io::stdin())),
+    };
+    if let Some(nbytes) = num_bytes {
+        let data = read_last_bytes_reader(reader, nbytes);
+        if let Err(error) = w.write_all(&data) {
+            return if error.kind() == std::io::ErrorKind::BrokenPipe { 0 } else { 1 };
+        }
+    } else {
+        let lines = read_last_lines_reader(reader, num_lines);
+        for line in &lines {
+            if let Err(error) = write!(w, "{}", line) {
+                return if error.kind() == std::io::ErrorKind::BrokenPipe { 0 } else { 1 };
+            }
+        }
+    }
+    0
 }
 
 fn read_last_lines_reader<R: BufRead>(reader: R, num_lines: usize) -> Vec<String> {

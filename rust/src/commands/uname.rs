@@ -125,3 +125,22 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let _ = writeln!(stdout, "{}", parts.join(" "));
     0
 }
+
+#[cfg(test)]
+mod tests {
+    use super::run;
+
+    #[test]
+    fn version_flag_returns_kernel_version() {
+        let mut output = Vec::new();
+        assert_eq!(run(&mut output, &["-v".into()]), 0);
+        assert!(!output.is_empty());
+    }
+
+    #[test]
+    fn operating_system_flag_returns_a_name() {
+        let mut output = Vec::new();
+        assert_eq!(run(&mut output, &["-o".into()]), 0);
+        assert!(!output.is_empty());
+    }
+}

@@ -49,3 +49,17 @@ def test_uname_all(capsys):
 def test_uname_invalid_option():
     result = uname.run(["-x"])
     assert result == 1
+
+
+def test_uname_v(capsys):
+    result = uname.run(["-v"])
+    out, _ = capsys.readouterr()
+    assert result == 0
+    assert out.strip()
+
+
+def test_uname_o(capsys):
+    result = uname.run(["-o"])
+    out, _ = capsys.readouterr()
+    assert result == 0
+    assert out.strip() == "GNU/Linux"
