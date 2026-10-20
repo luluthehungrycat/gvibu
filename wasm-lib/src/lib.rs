@@ -32,32 +32,56 @@ impl Write for WasmWriter {
 /// Arguments:
 ///   name   - Command name (e.g. "echo", "true", "pwd")
 ///   args   - Array of command arguments (excluding the command name itself)
-///   _stdin - Optional stdin input string (unused currently; commands that
-///            read stdin will panic in WASM)
+///   stdin  - Optional stdin input; missing input is treated as empty stdin.
 ///
 /// Returns the command's stdout output as a string.
 ///
-/// Commands requiring filesystem access (touch, cat FILE, wc FILE) or
-/// interactive stdin will panic in the browser WASM environment.
-/// Non-filesystem commands (echo, true, false, whoami, pwd, basename,
-/// dirname, printenv, seq, yes) work fully.
+/// Stdin-reading commands consume the supplied text, treating a missing value
+/// as empty input. Browser WASM does not expose a host filesystem, so file
+/// operations may fail. Host-specific commands (including `ls`, `chmod`,
+/// `id`, `who`, `kill`, `df`, `uname`, `uptime`, `ln`, `which`, and `split`)
+/// return an explicit unsupported-platform error.
 #[wasm_bindgen]
-pub fn run_command(name: &str, args: Vec<String>, _stdin: Option<String>) -> Result<String, JsValue> {
-    // Lookup and run the command
-    let cmd = gvibu::commands::lookup(name)
-        .ok_or_else(|| JsValue::from_str(&format!("unknown command: {}", name)))?;
+pub fn run_command(name: &str, args: Vec<String>, stdin: Option<String>) -> Result<String, JsValue> {
+    dispatch_command(name, &args, stdin.as_deref()).map_err(|error| JsValue::from_str(&error))
+}
 
-    let mut writer = WasmWriter::new();
-    let exit_code = (cmd.run)(&mut writer, &args);
-    let output = writer.into_string();
+fn dispatch_command(name: &str, args: &[String], stdin: Option<&str>) -> Result<String, String> {
+    // A browser call always owns its stdin. Missing input means an empty
+    // buffer, never the unavailable host process stdin.
+    gvibu::set_wasm_stdin(Some(stdin.unwrap_or("")));
+    let result = (|| {
+        let cmd = gvibu::commands::lookup(name)
+            .ok_or_else(|| format!("unknown command: {}", name))?;
 
-    if exit_code == 0 {
-        Ok(output)
-    } else {
-        Err(JsValue::from_str(&format!(
-            "Command '{}' exited with code {}:\n{}",
-            name, exit_code, output
-        )))
+        let mut writer = WasmWriter::new();
+        let exit_code = (cmd.run)(&mut writer, &args);
+        let output = writer.into_string();
+
+        if exit_code == 0 {
+            Ok(output)
+        } else {
+            Err(format!(
+                "Command '{}' exited with code {}:\n{}",
+                name, exit_code, output
+            ))
+        }
+    })();
+    gvibu::clear_wasm_stdin();
+    result
+}
+
+#[cfg(test)]
+mod tests {
+    use super::dispatch_command;
+
+    #[test]
+    fn each_call_gets_its_own_stdin_and_clears_it_afterward() {
+        assert_eq!(dispatch_command("wc", &["-l".into()], Some("one\n")), Ok("      1\n".into()));
+        assert_eq!(dispatch_command("wc", &["-l".into()], Some("one\ntwo\n")), Ok("      2\n".into()));
+        assert_eq!(dispatch_command("wc", &["-l".into()], None), Ok("      0\n".into()));
+        assert!(dispatch_command("missing", &[], Some("unused")).is_err());
+        assert_eq!(gvibu::get_wasm_stdin(), None);
     }
 }
 

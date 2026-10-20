@@ -1,6 +1,6 @@
+use crate::pwriteln;
 /// fold: wrap each input line to fit in specified width.
 use std::io::{self, BufRead, Write};
-use crate::pwriteln;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut width: usize = 80;
@@ -9,7 +9,9 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { break; }
+        if arg == "--" {
+            break;
+        }
         if arg == "-w" {
             i += 1;
             if i >= args.len() {
@@ -41,8 +43,13 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         return 1;
     }
 
+    let stdin_text = crate::get_wasm_stdin();
     let stdin = io::stdin();
-    for line in stdin.lock().lines() {
+    let reader: Box<dyn BufRead + '_> = match stdin_text.as_deref() {
+        Some(text) => Box::new(io::Cursor::new(text.as_bytes())),
+        None => Box::new(stdin.lock()),
+    };
+    for line in reader.lines() {
         match line {
             Ok(l) => {
                 let mut remaining = l.as_str();
@@ -65,18 +72,9 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                     };
 
                     let (chunk, rest) = remaining.split_at(split);
-                    let trimmed_chunk = if break_spaces {
-                        chunk.trim_end()
-                    } else {
-                        chunk
-                    };
-                    pwriteln!(w, "{}", trimmed_chunk);
+                    pwriteln!(w, "{}", chunk);
 
-                    remaining = if break_spaces {
-                        rest.trim_start()
-                    } else {
-                        rest
-                    };
+                    remaining = if break_spaces { rest.trim_start() } else { rest };
                 }
             }
             Err(e) => {

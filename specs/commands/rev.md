@@ -8,7 +8,7 @@ Reverse the characters in each input line.
 rev [FILE]...
 ```
 
-With no files, read standard input. With files, process them in order. Preserve
+With no files, or when a file operand is `-`, read standard input. With files, process them in order. Preserve
 line endings and preserve a final line without a newline.
 
 ## Options

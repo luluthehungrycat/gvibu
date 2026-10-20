@@ -23,7 +23,7 @@ def run(args: list[str]) -> int:
     for arg in args:
         if parsing_options and arg == "--":
             parsing_options = False
-        elif parsing_options and arg.startswith("-"):
+        elif parsing_options and arg.startswith("-") and arg != "-":
             print(f"rev: invalid option: {arg}", file=sys.stderr)
             return 1
         else:
@@ -40,7 +40,7 @@ def run(args: list[str]) -> int:
     exit_code = 0
     for path in paths:
         try:
-            text = Path(path).read_text()
+            text = sys.stdin.read() if path == "-" else Path(path).read_text()
             sys.stdout.write(reverse_lines(text))
         except OSError as error:
             print(f"rev: {path}: {error}", file=sys.stderr)

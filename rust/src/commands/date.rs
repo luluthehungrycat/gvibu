@@ -2,28 +2,28 @@
 use std::io::Write;
 use crate::pwriteln;
 
-use chrono::{DateTime, Datelike, Local, Timelike, Utc, Duration, NaiveDate};
+use chrono::{DateTime, Datelike, Local, Timelike, Utc, Duration, NaiveDate, NaiveDateTime};
 
 /// Parse a date string and return a DateTime<Utc>
 fn parse_date_string(date_str: &str, reference: DateTime<Utc>) -> Result<DateTime<Utc>, String> {
     let date_str = date_str.trim();
-    
+
     // Handle special keywords
     match date_str.to_lowercase().as_str() {
         "now" | "today" => Ok(reference),
-        "yesterday" => Ok(reference - Duration::days(1)),
-        "tomorrow" => Ok(reference + Duration::days(1)),
+        "yesterday" => reference.checked_sub_signed(Duration::days(1)).ok_or_else(|| format!("date: invalid date '{}'", date_str)),
+        "tomorrow" => reference.checked_add_signed(Duration::days(1)).ok_or_else(|| format!("date: invalid date '{}'", date_str)),
         _ => {
             // Try parsing as ISO 8601 date (YYYY-MM-DD)
             if let Ok(naive_date) = NaiveDate::parse_from_str(date_str, "%Y-%m-%d") {
                 return Ok(naive_date.and_hms_opt(0, 0, 0).unwrap().and_local_timezone(Utc).unwrap());
             }
-            
+
             // Try parsing as full ISO 8601 datetime
             if let Ok(dt) = DateTime::parse_from_rfc3339(date_str) {
                 return Ok(dt.with_timezone(&Utc));
             }
-            
+
             // Try parsing with various common formats
             let formats = [
                 "%Y-%m-%d %H:%M:%S",
@@ -34,23 +34,26 @@ fn parse_date_string(date_str: &str, reference: DateTime<Utc>) -> Result<DateTim
                 "%B %d, %Y",
                 "%d %B %Y",
             ];
-            
+
             for fmt in formats.iter() {
-                if let Ok(naive_dt) = NaiveDate::parse_from_str(date_str, fmt) {
-                    return Ok(naive_dt.and_hms_opt(0, 0, 0).unwrap().and_local_timezone(Utc).unwrap());
+                if let Ok(naive_dt) = NaiveDateTime::parse_from_str(date_str, fmt) {
+                    return Ok(naive_dt.and_utc());
+                }
+                if let Ok(naive_date) = NaiveDate::parse_from_str(date_str, fmt) {
+                    return Ok(naive_date.and_hms_opt(0, 0, 0).unwrap().and_utc());
                 }
             }
-            
+
             // Try DateTime parsing with chrono's flexible parser
             if let Ok(dt) = DateTime::parse_from_str(date_str, "%Y-%m-%d %H:%M:%S %z") {
                 return Ok(dt.with_timezone(&Utc));
             }
-            
+
             // Handle relative dates like "+1 day", "-2 weeks", etc.
             if date_str.starts_with('+') || date_str.starts_with('-') {
                 return parse_relative_date(date_str, reference);
             }
-            
+
             Err(format!("date: invalid date '{}'", date_str))
         }
     }
@@ -59,7 +62,7 @@ fn parse_date_string(date_str: &str, reference: DateTime<Utc>) -> Result<DateTim
 /// Parse relative date strings like "+1 day", "-2 weeks", etc.
 fn parse_relative_date(date_str: &str, reference: DateTime<Utc>) -> Result<DateTime<Utc>, String> {
     let date_str = date_str.trim();
-    
+
     // Parse the sign and value
     let (sign, rest) = if date_str.starts_with('+') {
         (1, &date_str[1..])
@@ -68,36 +71,49 @@ fn parse_relative_date(date_str: &str, reference: DateTime<Utc>) -> Result<DateT
     } else {
         return Err(format!("date: invalid relative date '{}'", date_str));
     };
-    
+
     let parts: Vec<&str> = rest.trim().split_whitespace().collect();
     if parts.len() != 2 {
         return Err(format!("date: invalid relative date format '{}'", date_str));
     }
-    
+
     let value: i64 = parts[0].parse().map_err(|_| format!("date: invalid number in '{}'", date_str))?;
     let unit = parts[1].to_lowercase();
-    
-    let multiplier = match unit.as_str() {
-        "second" | "seconds" | "sec" | "s" => 1,
-        "minute" | "minutes" | "min" | "m" => 60,
-        "hour" | "hours" | "hr" | "h" => 3600,
-        "day" | "days" | "d" => 86400,
-        "week" | "weeks" | "w" => 604800,
+
+    let invalid_date = || format!("date: invalid date '{}'", date_str);
+    let duration = match unit.as_str() {
+        "second" | "seconds" | "sec" | "s" => {
+            let seconds = value.checked_mul(sign).ok_or_else(invalid_date)?;
+            Duration::try_seconds(seconds).ok_or_else(invalid_date)?
+        }
+        "minute" | "minutes" | "min" | "m" => {
+            let seconds = value.checked_mul(60).and_then(|n| n.checked_mul(sign)).ok_or_else(invalid_date)?;
+            Duration::try_seconds(seconds).ok_or_else(invalid_date)?
+        }
+        "hour" | "hours" | "hr" | "h" => {
+            let seconds = value.checked_mul(3600).and_then(|n| n.checked_mul(sign)).ok_or_else(invalid_date)?;
+            Duration::try_seconds(seconds).ok_or_else(invalid_date)?
+        }
+        "day" | "days" | "d" => {
+            let days = value.checked_mul(sign).ok_or_else(invalid_date)?;
+            Duration::try_days(days).ok_or_else(invalid_date)?
+        }
+        "week" | "weeks" | "w" => {
+            let days = value.checked_mul(7).and_then(|n| n.checked_mul(sign)).ok_or_else(invalid_date)?;
+            Duration::try_days(days).ok_or_else(invalid_date)?
+        }
         "month" | "months" | "mon" => {
-            // For months, approximate as 30 days
-            let days = value * sign * 30;
-            return Ok(reference + Duration::days(days));
+            let days = value.checked_mul(30).and_then(|n| n.checked_mul(sign)).ok_or_else(invalid_date)?;
+            Duration::try_days(days).ok_or_else(invalid_date)?
         }
         "year" | "years" | "yr" | "y" => {
-            // For years, approximate as 365 days
-            let days = value * sign * 365;
-            return Ok(reference + Duration::days(days));
+            let days = value.checked_mul(365).and_then(|n| n.checked_mul(sign)).ok_or_else(invalid_date)?;
+            Duration::try_days(days).ok_or_else(invalid_date)?
         }
         _ => return Err(format!("date: unknown time unit '{}'", unit)),
     };
-    
-    let total_seconds = value * multiplier * sign;
-    Ok(reference + Duration::seconds(total_seconds))
+
+    reference.checked_add_signed(duration).ok_or_else(invalid_date)
 }
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
@@ -111,14 +127,14 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = args[i].as_str();
-        
+
         if parsing_date_arg {
             date_str = Some(arg.to_string());
             parsing_date_arg = false;
             i += 1;
             continue;
         }
-        
+
         match arg {
             "-d" | "--date" => {
                 parsing_date_arg = true;
@@ -129,7 +145,6 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
             "-R" | "--rfc-2822" | "--rfc-email" => rfc2822 = true,
             "-I" | "--iso-8601" => iso8601 = true,
             "--" => {
-                i += 1;
                 break;
             }
             s if s.starts_with('+') => {
@@ -267,6 +282,22 @@ fn format_custom(dt: &DateTime<Utc>, fmt: &str) -> String {
 mod tests {
     use super::*;
     use chrono::TimeZone;
+
+    #[test]
+    fn date_argument_preserves_datetime_time() {
+        let reference = Utc.with_ymd_and_hms(2026, 1, 1, 0, 0, 0).unwrap();
+        let parsed = parse_date_string("2026-01-02 12:34:56", reference).unwrap();
+        assert_eq!(parsed.format("%Y-%m-%d %H:%M:%S").to_string(), "2026-01-02 12:34:56");
+    }
+
+    #[test]
+    fn relative_date_overflow_returns_error_without_panicking() {
+        let code = run(
+            &mut std::io::sink(),
+            &["-d".into(), "+9223372036854775807 weeks".into(), "+%F".into()],
+        );
+        assert_eq!(code, 1);
+    }
 
     #[test]
     fn test_date_invalid_option() {

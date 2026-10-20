@@ -1,6 +1,7 @@
 /// cp: copy files and directories.
 use std::fs;
 use std::io::Write;
+use std::path::Path;
 use crate::pwriteln;
 
 fn basename(path: &str) -> String {
@@ -9,6 +10,105 @@ fn basename(path: &str) -> String {
         Some(i) => s[i + 1..].to_string(),
         None => s.to_string(),
     }
+}
+
+#[cfg(unix)]
+fn create_symlink(target: &Path, destination: &Path) -> std::io::Result<()> {
+    std::os::unix::fs::symlink(target, destination)
+}
+
+#[cfg(not(unix))]
+fn create_symlink(_target: &Path, _destination: &Path) -> std::io::Result<()> {
+    Err(std::io::Error::new(
+        std::io::ErrorKind::Unsupported,
+        "preserving symbolic links is unsupported on this platform",
+    ))
+}
+
+
+fn same_source_and_destination(src: &str, dst: &str, archive: bool, src_meta: &fs::Metadata) -> bool {
+    if Path::new(src) == Path::new(dst) {
+        return true;
+    }
+    let Ok(dst_lmeta) = fs::symlink_metadata(dst) else {
+        return false;
+    };
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        if src_meta.dev() == dst_lmeta.dev() && src_meta.ino() == dst_lmeta.ino() {
+            return true;
+        }
+        // Archive symlinks are copied as links. Other copies follow source and
+        // destination links, so compare their target inodes to avoid truncating
+        // a source reached through the destination link.
+        if archive && src_meta.file_type().is_symlink() {
+            return false;
+        }
+        let (Ok(src_followed), Ok(dst_followed)) = (fs::metadata(src), fs::metadata(dst)) else {
+            return false;
+        };
+        src_followed.dev() == dst_followed.dev() && src_followed.ino() == dst_followed.ino()
+    }
+    #[cfg(not(unix))]
+    {
+        if archive && src_meta.file_type().is_symlink() {
+            return false;
+        }
+        fs::canonicalize(src).ok() == fs::canonicalize(dst).ok()
+            && fs::canonicalize(src).is_ok()
+    }
+}
+
+fn normalize_absolute(path: &Path) -> std::path::PathBuf {
+    let absolute = if path.is_absolute() {
+        path.to_path_buf()
+    } else {
+        std::env::current_dir().unwrap_or_default().join(path)
+    };
+    let mut normalized = std::path::PathBuf::new();
+    for component in absolute.components() {
+        match component {
+            std::path::Component::CurDir => {}
+            std::path::Component::ParentDir => { normalized.pop(); }
+            other => normalized.push(other.as_os_str()),
+        }
+    }
+    normalized
+}
+
+fn resolve_existing_ancestor(path: &Path) -> std::io::Result<std::path::PathBuf> {
+    let absolute = normalize_absolute(path);
+    let mut ancestor = absolute.as_path();
+    let mut suffix = Vec::new();
+    while !ancestor.exists() {
+        let name = ancestor.file_name().ok_or_else(|| {
+            std::io::Error::new(std::io::ErrorKind::NotFound, "no existing path ancestor")
+        })?;
+        suffix.push(name.to_os_string());
+        ancestor = ancestor.parent().ok_or_else(|| {
+            std::io::Error::new(std::io::ErrorKind::NotFound, "no existing path ancestor")
+        })?;
+    }
+    let mut resolved = fs::canonicalize(ancestor)?;
+    for part in suffix.iter().rev() {
+        resolved.push(part);
+    }
+    Ok(normalize_absolute(&resolved))
+}
+
+fn destination_is_inside_source(src: &str, dst: &str) -> bool {
+    let Ok(source_root) = fs::canonicalize(src) else {
+        return false;
+    };
+    let destination = Path::new(dst);
+    let candidate = match destination.file_name() {
+        Some(name) => destination.parent().unwrap_or_else(|| Path::new(".")).join(name),
+        None => destination.to_path_buf(),
+    };
+    resolve_existing_ancestor(&candidate)
+        .map(|path| path.starts_with(source_root))
+        .unwrap_or(false)
 }
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
@@ -104,7 +204,16 @@ fn copy_one(
         }
     };
 
+    if same_source_and_destination(src, dst, archive, &src_meta) {
+        eprintln!("cp: '{}' and '{}' are the same file", src, dst);
+        return 1;
+    }
+
     if src_meta.is_dir() {
+        if destination_is_inside_source(src, dst) {
+            eprintln!("cp: cannot copy '{}' into itself, '{}', or a subdirectory of itself", src, dst);
+            return 1;
+        }
         if !recursive {
             eprintln!("cp: -r not specified; omitting directory '{}'", src);
             return 1;
@@ -127,7 +236,7 @@ fn copy_one(
     }
 
     // No-clobber check
-    if no_clobber && fs::metadata(dst).is_ok() {
+    if no_clobber && fs::symlink_metadata(dst).is_ok() {
         if verbose {
             pwriteln!(w, "skip '{}' (no-clobber)", dst);
         }
@@ -135,7 +244,7 @@ fn copy_one(
     }
 
     // Interactive check
-    if interactive && fs::metadata(dst).is_ok() {
+    if interactive && fs::symlink_metadata(dst).is_ok() {
         eprint!("cp: overwrite '{}'? ", dst);
         let _ = std::io::Write::flush(&mut std::io::stderr());
         let mut input = String::new();
@@ -148,19 +257,38 @@ fn copy_one(
     }
 
     // Force: if dest exists and is writable, remove it first
-    if force {
-        if let Ok(dst_meta) = fs::metadata(dst) {
-            if dst_meta.is_file() {
-                let _ = fs::remove_file(dst);
-            } else if dst_meta.is_dir() {
+    let src_is_archive_link = archive && src_meta.file_type().is_symlink();
+    if force && !src_is_archive_link {
+        if let Ok(dst_meta) = fs::symlink_metadata(dst) {
+            if dst_meta.is_dir() && !dst_meta.file_type().is_symlink() {
                 let _ = fs::remove_dir_all(dst);
+            } else {
+                let _ = fs::remove_file(dst);
             }
         }
     }
 
-    match fs::copy(src, dst) {
-        Ok(_) => {
-            if archive {
+    let copy_result = if src_is_archive_link {
+        let dst_path = Path::new(dst);
+        let remove_existing = match fs::symlink_metadata(dst_path) {
+            Ok(metadata) if metadata.is_dir() && !metadata.file_type().is_symlink() => {
+                eprintln!("cp: cannot overwrite directory '{}' with a symbolic link", dst);
+                return 1;
+            }
+            Ok(_) => fs::remove_file(dst_path),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
+            Err(error) => Err(error),
+        };
+        remove_existing.and_then(|()| {
+            fs::read_link(src).and_then(|target| create_symlink(&target, dst_path))
+        })
+    } else {
+        fs::copy(src, dst).map(|_| ())
+    };
+
+    match copy_result {
+        Ok(()) => {
+            if archive && !src_is_archive_link {
                 if let Err(e) = fs::set_permissions(dst, src_meta.permissions()) {
                     eprintln!("cp: cannot preserve mode for '{}': {}", dst, e);
                     return 1;
@@ -309,6 +437,68 @@ mod tests {
         assert_eq!(basename("/"), "");
     }
 
+    #[cfg(unix)]
+    #[test]
+    fn archive_rejects_same_file_and_preserves_sources() {
+        use std::os::unix::fs::symlink;
+
+        let root = std::env::temp_dir().join(format!("gvibu_cp_same_{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(&root).unwrap();
+
+        let file = root.join("file");
+        let alias = root.join("alias");
+        std::fs::write(&file, "keep").unwrap();
+        std::fs::hard_link(&file, &alias).unwrap();
+        let regular_result = run(
+            &mut std::io::sink(),
+            &["-af".into(), file.to_string_lossy().into_owned(), alias.to_string_lossy().into_owned()],
+        );
+        assert_eq!(regular_result, 1);
+        assert_eq!(std::fs::read_to_string(&file).unwrap(), "keep");
+        assert_eq!(std::fs::read_to_string(&alias).unwrap(), "keep");
+
+        let source = root.join("source");
+        let destination_link = root.join("destination-link");
+        std::fs::write(&source, "source survives").unwrap();
+        symlink("source", &destination_link).unwrap();
+        let followed_alias_result = run(
+            &mut std::io::sink(),
+            &["-f".into(), source.to_string_lossy().into_owned(), destination_link.to_string_lossy().into_owned()],
+        );
+        assert_eq!(followed_alias_result, 1);
+        assert_eq!(std::fs::read_to_string(&source).unwrap(), "source survives");
+        assert!(std::fs::symlink_metadata(&destination_link).unwrap().file_type().is_symlink());
+
+        let link = root.join("link");
+        symlink("missing", &link).unwrap();
+        let link_result = run(
+            &mut std::io::sink(),
+            &["-a".into(), link.to_string_lossy().into_owned(), link.to_string_lossy().into_owned()],
+        );
+        assert_eq!(link_result, 1);
+        assert_eq!(std::fs::read_link(&link).unwrap(), Path::new("missing"));
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn archive_rejects_copying_directory_into_itself() {
+        let root = std::env::temp_dir().join(format!("gvibu_cp_nested_{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        let source = root.join("source");
+        std::fs::create_dir_all(&source).unwrap();
+        std::fs::write(source.join("file"), "contents").unwrap();
+
+        let code = run(
+            &mut std::io::sink(),
+            &["-a".into(), source.to_string_lossy().into_owned(), source.to_string_lossy().into_owned()],
+        );
+        assert_eq!(code, 1);
+        assert!(!source.join("source").exists());
+        assert_eq!(std::fs::read_to_string(source.join("file")).unwrap(), "contents");
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
     #[test]
     fn test_cp_archive_flag() {
         let root = std::env::temp_dir().join(format!("gvibu_cp_archive_{}", std::process::id()));
@@ -326,5 +516,53 @@ mod tests {
         assert_eq!(result, 0);
         assert_eq!(std::fs::read_to_string(dst.join("nested/file")).unwrap(), "archive content");
         let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn archive_preserves_valid_and_dangling_symlinks() {
+        use std::os::unix::fs::symlink;
+
+        let root = std::env::temp_dir().join(format!("gvibu_cp_symlinks_{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        let src = root.join("src");
+        let dst = root.join("dst");
+        std::fs::create_dir_all(&src).unwrap();
+        std::fs::write(src.join("target"), "target").unwrap();
+        symlink("target", src.join("valid")).unwrap();
+        symlink("missing", src.join("dangling")).unwrap();
+
+        let code = run(
+            &mut std::io::sink(),
+            &["-a".into(), src.to_string_lossy().into_owned(), dst.to_string_lossy().into_owned()],
+        );
+
+        assert_eq!(code, 0);
+        assert!(std::fs::symlink_metadata(dst.join("valid")).unwrap().file_type().is_symlink());
+        assert!(std::fs::symlink_metadata(dst.join("dangling")).unwrap().file_type().is_symlink());
+        assert_eq!(std::fs::read_link(dst.join("valid")).unwrap(), Path::new("target"));
+        assert_eq!(std::fs::read_link(dst.join("dangling")).unwrap(), Path::new("missing"));
+
+        let nested_dst = dst.join("src");
+        std::fs::create_dir_all(&nested_dst).unwrap();
+        std::fs::write(nested_dst.join("valid"), "old destination").unwrap();
+        symlink("old-missing", nested_dst.join("dangling")).unwrap();
+        let replace_result = run(
+            &mut std::io::sink(),
+            &["-a".into(), src.to_string_lossy().into_owned(), dst.to_string_lossy().into_owned()],
+        );
+        assert_eq!(replace_result, 0);
+        assert!(std::fs::symlink_metadata(nested_dst.join("valid")).unwrap().file_type().is_symlink());
+        assert_eq!(std::fs::read_link(nested_dst.join("dangling")).unwrap(), Path::new("missing"));
+
+        std::fs::remove_file(nested_dst.join("valid")).unwrap();
+        std::fs::write(nested_dst.join("valid"), "keep me").unwrap();
+        let no_clobber_result = run(
+            &mut std::io::sink(),
+            &["-a".into(), "-n".into(), src.to_string_lossy().into_owned(), dst.to_string_lossy().into_owned()],
+        );
+        assert_eq!(no_clobber_result, 0);
+        assert_eq!(std::fs::read_to_string(nested_dst.join("valid")).unwrap(), "keep me");
+        std::fs::remove_dir_all(root).unwrap();
     }
 }

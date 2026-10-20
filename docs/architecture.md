@@ -123,7 +123,8 @@ descriptor I/O. It does not own shell parsing, init policy, or coreutils
 flags.
 
 The current flat-binary compatibility path uses registered syscall 1/2.
-Canonical VFS syscall 14/15 wrappers are named but remain pending until the
-VIBIX kernel registers and verifies them. VISH and VIBIT consumers require an
+VIBIX main registers canonical VFS syscalls 14/15 and `brk` syscall 4. The
+shared wrappers need host and no-std validation, followed by QEMU verification
+of kernel behavior. VISH and VIBIT consumers require an
 explicit runtime handoff; image packaging and QEMU smoke coverage belong to
 the integration owner.

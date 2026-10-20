@@ -1,81 +1,50 @@
 # WASM Support
 
-gvibu commands can run directly in the browser via WebAssembly.
+gvibu supports two WebAssembly targets: a WASI CLI (`wasm32-wasip1`) and browser bindings (`wasm32-unknown-unknown`). The WASI CLI can use process stdin and files exposed by the host. The browser binding receives stdin as an argument and has no host filesystem by default.
 
-## How It Works
+## Browser binding
 
-The `wasm-lib/` crate wraps the `gvibu` library with `wasm-bindgen` bindings:
+The `wasm-lib/` crate exposes `run_command(name, args, stdin)` and `list_commands()` through `wasm-bindgen`. Each call supplies its own stdin text; a missing value means empty stdin. The binding captures stdout and returns command failures as JavaScript errors.
 
-```rust
-#[wasm_bindgen]
-pub fn run_command(name: &str, args: Vec<String>) -> String {
-    let mut buf = Vec::new();
-    if let Some(cmd) = commands::lookup(name) {
-        (cmd.run)(&mut buf, &args);
-    }
-    String::from_utf8(buf).unwrap_or_default()
-}
+Build it with:
 
-#[wasm_bindgen]
-pub fn list_commands() -> Vec<String> {
-    commands::COMMANDS.iter()
-        .flat_map(|c| c.names.iter().map(|n| (*n).to_string()))
-        .collect()
-}
-```
-
-The key enabler is the **writer pattern** — commands write to a `Vec<u8>` buffer instead of stdout.
-
-## Building
-
-```bash
+```sh
 make wasm-browser-build
 ```
 
-This runs `wasm-pack build --target web` on `wasm-lib/`, producing:
-- `wasm-lib/pkg/gvibu_wasm.js` — JavaScript glue
-- `wasm-lib/pkg/gvibu_wasm_bg.wasm` — WASM binary
+This creates `wasm-lib/pkg/gvibu_wasm.js` and `wasm-lib/pkg/gvibu_wasm_bg.wasm`. Start the demo with:
 
-## Running the Demo
-
-```bash
+```sh
 make wasm-browser-serve
-# Open http://localhost:8080
 ```
 
-The demo page (`wasm-lib/index.html`):
-- Displays all 51 commands as clickable tiles
-- Provides a terminal-style input for command + args
-- Shows command output in real time
-- Supports Tab-based autocomplete
-- Handles error states gracefully
+The demo lists all 60 registered commands, accepts command arguments and optional stdin text, and displays output or errors.
 
-## CI Build
+## WASI CLI
 
-The WASM build is verified in CI via the `wasm` job in `parity.yml`:
+Build the CLI with:
 
-```yaml
-wasm:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: dtolnay/rust-toolchain@stable
-      with:
-        targets: wasm32-unknown-unknown
-    - run: cargo install wasm-pack
-    - run: make wasm-browser-build
-    - run: ls wasm-lib/pkg/gvibu_wasm.js wasm-lib/pkg/gvibu_wasm_bg.wasm
+```sh
+cargo build --locked --manifest-path rust/Cargo.toml --target wasm32-wasip1 --release
 ```
 
-## npm Package
+Run it with Wasmtime:
 
-When a `v*` tag is pushed, the release workflow:
+```sh
+wasmtime run rust/target/wasm32-wasip1/release/gvibu.wasm echo hello
+printf 'alpha\nbeta\n' | wasmtime run rust/target/wasm32-wasip1/release/gvibu.wasm cat
+```
 
-1. Builds the WASM package with `wasm-pack`
-2. Patches `package.json` with GitHub Packages scope
-3. Publishes to `npm.pkg.github.com/@luluthehungrycat/gvibu-wasm`
+WASI filesystem commands can access directories preopened by the runtime. For example, with a recent Wasmtime release:
 
-## Limitations
+```sh
+wasmtime run --dir ./fixtures::/fixtures rust/target/wasm32-wasip1/release/gvibu.wasm cat /fixtures/input.txt
+```
 
-- **Filesystem**: WASM runs in a sandbox — commands that read files (`cat`, `head`) cannot access the host filesystem. The demo handles this gracefully.
-- **Stdin**: Commands that read stdin (like `tee`, `cat -`) need explicit stdin input. The WASM runner accepts an optional stdin string.
-- **System calls**: `who` (utmp), `id` (getuid/getgid), `kill` (kill) — these may not work in all WASM environments, but the bindings compile and return appropriate errors.
+## Platform limits
+
+The browser target cannot access host process stdin or a host filesystem. Use the binding’s stdin argument for input-only commands. Commands that read or write paths depend on host support and may fail when no virtual filesystem is available. `split` is explicitly unsupported in browser WASM because it consumes process stdin and creates files.
+
+Commands that depend on Unix identity, process, permission, mount, or system APIs report that they are unsupported on WebAssembly. This includes `id`, `who`, `kill`, `ls`, `chmod`, `chown`, `ln`, `which`, `uname`, `uptime`, and `df`. Native builds retain these commands.
+
+The `wasm` CI job builds the WASI CLI and browser package, checks WASI stdin and preopened-file behavior, and runs a Node smoke test against the browser binding.

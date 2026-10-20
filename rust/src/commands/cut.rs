@@ -185,22 +185,37 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     if field_indices.is_some() { mode_count += 1; }
     if byte_indices.is_some() { mode_count += 1; }
     if char_indices.is_some() { mode_count += 1; }
-    
+
     if mode_count == 0 {
         eprintln!("cut: you must specify a list of fields, bytes, or characters");
         return 1;
     }
-    
+
     if mode_count > 1 {
         eprintln!("cut: can only specify one of -f, -b, or -c");
         return 1;
     }
 
     if files.is_empty() {
-        let mut reader = BufReader::new(io::stdin());
-        process_reader(stdout, &mut reader, delimiter, field_indices.as_ref(), byte_indices.as_ref(), char_indices.as_ref(), suppress_non_matching);
+        if let Some(input) = crate::get_wasm_stdin() {
+            let mut reader = io::Cursor::new(input.into_bytes());
+            process_reader(stdout, &mut reader, delimiter, field_indices.as_ref(), byte_indices.as_ref(), char_indices.as_ref(), suppress_non_matching);
+        } else {
+            let mut reader = BufReader::new(io::stdin());
+            process_reader(stdout, &mut reader, delimiter, field_indices.as_ref(), byte_indices.as_ref(), char_indices.as_ref(), suppress_non_matching);
+        }
     } else {
         for f in &files {
+            if f == "-" {
+                if let Some(input) = crate::get_wasm_stdin() {
+                    let mut reader = io::Cursor::new(input.into_bytes());
+                    process_reader(stdout, &mut reader, delimiter, field_indices.as_ref(), byte_indices.as_ref(), char_indices.as_ref(), suppress_non_matching);
+                } else {
+                    let mut reader = BufReader::new(io::stdin());
+                    process_reader(stdout, &mut reader, delimiter, field_indices.as_ref(), byte_indices.as_ref(), char_indices.as_ref(), suppress_non_matching);
+                }
+                continue;
+            }
             match File::open(f) {
                 Ok(file) => {
                     let mut reader = BufReader::new(file);
@@ -234,7 +249,7 @@ fn process_reader(
 
         // Check if we should suppress this line due to -s flag
         if suppress_non_matching {
-            if let Some(indices) = field_indices {
+            if field_indices.is_some() {
                 // For field mode: suppress lines without delimiter
                 let delim_char = delimiter as char;
                 if !line.contains(delim_char) {

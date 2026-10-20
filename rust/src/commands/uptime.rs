@@ -39,7 +39,7 @@ fn get_uptime_seconds() -> u64 {
 
 pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     if !args.is_empty() {
-        eprintln!("uptime: unexpected argument: {}", args[0]);
+        eprintln!("uptime: too many arguments");
         return 1;
     }
     let seconds = get_uptime_seconds();

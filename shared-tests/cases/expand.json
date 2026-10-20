@@ -16,6 +16,14 @@
       "stdout": "ab  cd\n",
       "stderr": "",
       "exit_code": 0
+    },
+    {
+      "name": "dash_reads_stdin",
+      "args": ["-"],
+      "stdin": "\tstdin\n",
+      "stdout": "        stdin\n",
+      "stderr": "",
+      "exit_code": 0
     }
   ]
 }

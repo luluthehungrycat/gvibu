@@ -2,45 +2,91 @@
   "cases": [
     {
       "name": "invalid_option",
-      "args": ["-x"],
+      "args": [
+        "-x"
+      ],
       "stdout": "",
       "stderr": "*",
       "exit_code": 1
     },
     {
       "name": "extra_operand",
-      "args": ["foo"],
+      "args": [
+        "foo"
+      ],
       "stdout": "",
       "stderr": "*",
       "exit_code": 1
     },
     {
       "name": "custom_format",
-      "args": ["+%Y-%m-%d"],
+      "args": [
+        "+%Y-%m-%d"
+      ],
       "stdout": "*",
       "stderr": "",
       "exit_code": 0
     },
     {
       "name": "rfc2822",
-      "args": ["-R"],
+      "args": [
+        "-R"
+      ],
       "stdout": "*",
       "stderr": "",
       "exit_code": 0
     },
     {
       "name": "iso8601",
-      "args": ["-I"],
+      "args": [
+        "-I"
+      ],
       "stdout": "*",
       "stderr": "",
       "exit_code": 0
     },
     {
       "name": "epoch_seconds",
-      "args": ["+%s"],
+      "args": [
+        "+%s"
+      ],
       "stdout": "*",
       "stderr": "",
       "exit_code": 0
+    },
+    {
+      "name": "datetime_preserves_time",
+      "args": [
+        "-d",
+        "2026-01-02 12:34:56",
+        "+%F %T"
+      ],
+      "stdout": "2026-01-02 12:34:56\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "offset_datetime_normalizes_to_utc",
+      "args": [
+        "-u",
+        "-d",
+        "2026-01-02T12:34:56+02:00",
+        "+%H:%M:%S"
+      ],
+      "stdout": "10:34:56\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "relative_week_overflow_is_error",
+      "args": [
+        "-d",
+        "+9223372036854775807 weeks",
+        "+%F"
+      ],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
     }
   ]
 }

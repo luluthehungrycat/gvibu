@@ -78,7 +78,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         }
     }
 
-    let mut exit_code = 0;
+    let exit_code = 0;
 
     for mount in &mounts {
         if !explicit_paths.is_empty() {
@@ -258,7 +258,6 @@ fn get_inode_stats(path: &str) -> Option<(u64, u64, u64, u64)> {
 
     let files = stat.f_files as u64;
     let ffree = stat.f_ffree as u64;
-    let favail = stat.f_favail as u64;
     let used = files.saturating_sub(ffree);
     let use_pct = if files > 0 {
         (used * 100) / files

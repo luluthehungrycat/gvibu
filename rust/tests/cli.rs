@@ -172,7 +172,7 @@ fn echo_e_with_n() {
 fn echo_e_disables_escapes() {
     let (code, out, err) = run(&["echo", "-E", "-e", "hello\\nworld"]);
     assert_eq!(code, 0);
-    // -E is sticky and disables escape interpretation for the invocation.
+    // Explicit -E disables escapes even when -e is also present.
     assert_eq!(out, "hello\\nworld\n", "stderr: {}", err);
     assert_eq!(err, "");
 }
@@ -457,6 +457,29 @@ fn head_multi_file_dev_null() {
     assert_eq!(code, 0);
     assert!(out.contains("==>"), "multi-file output should have headers");
     assert_eq!(err, "");
+}
+
+#[test]
+fn head_quiet_multi_file_emits_content_without_headers() {
+    let dir = std::env::temp_dir().join(format!("gvibu_head_quiet_{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let first = dir.join("first.txt");
+    let second = dir.join("second.txt");
+    std::fs::write(&first, "first file\n").unwrap();
+    std::fs::write(&second, "second file\n").unwrap();
+
+    let (code, out, err) = run(&[
+        "head",
+        "-q",
+        first.to_str().unwrap(),
+        second.to_str().unwrap(),
+    ]);
+
+    assert_eq!(code, 0);
+    assert_eq!(out, "first file\nsecond file\n");
+    assert!(!out.contains("==>"));
+    assert_eq!(err, "");
+    let _ = std::fs::remove_dir_all(dir);
 }
 
 #[test]
@@ -930,7 +953,8 @@ fn id_name_user() {
 fn id_supp_groups() {
     let (code, out, err) = run(&["id", "-G"]);
     assert_eq!(code, 0, "stderr: {}", err);
-    assert!(!out.trim().is_empty(), "should output group list");
+    let groups: Vec<u32> = out.split_whitespace().map(|g| g.parse().unwrap()).collect();
+    assert!(groups.contains(&unsafe { libc::getegid() }), "should include effective GID: {:?}", groups);
 }
 
 #[test]
@@ -939,6 +963,14 @@ fn id_real_user() {
     assert_eq!(code, 0, "stderr: {}", err);
     let val = out.trim().parse::<u32>().unwrap_or(0);
     assert!(val > 0, "real uid should be positive");
+}
+
+#[test]
+fn id_real_groups_include_real_gid() {
+    let (code, out, err) = run(&["id", "-rG"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    let groups: Vec<u32> = out.split_whitespace().map(|g| g.parse().unwrap()).collect();
+    assert!(groups.contains(&unsafe { libc::getgid() }), "should include real GID: {:?}", groups);
 }
 
 // ---------------------------------------------------------------------------
@@ -1064,6 +1096,13 @@ fn tr_squeeze() {
 }
 
 #[test]
+fn tr_squeeze_only_does_not_translate() {
+    let (code, out, err) = run_with_stdin(&["tr", "-s", "ab"], "abbbaccc");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "abac");
+}
+
+#[test]
 fn tr_invalid_option() {
     let (code, out, err) = run(&["tr", "-x"]);
     assert_eq!(code, 1);
@@ -1114,6 +1153,34 @@ fn rm_force_nonexistent() {
     let (code, out, err) = run(&["rm", "-f", "/nonexistent_rm_xyz"]);
     assert_eq!(code, 0, "stderr: {}", err);
     assert_eq!(out, "");
+}
+
+#[test]
+fn rm_interactive_decline_preserves_target() {
+    let path = std::env::temp_dir().join(format!("gvibu-rm-interactive-{}", std::process::id()));
+    std::fs::write(&path, b"keep").unwrap();
+    let path_arg = path.to_string_lossy().to_string();
+    let (code, _out, err) = run_with_stdin(&["rm", "-i", &path_arg], "n\n");
+    assert_eq!(code, 0, "stderr: {err}");
+    assert!(path.exists());
+    std::fs::remove_file(path).unwrap();
+}
+
+#[test]
+fn rm_preserve_root_rejects_root_alias() {
+    let (code, _out, err) = run(&["rm", "--preserve-root", "/tmp/.."]);
+    assert_eq!(code, 1);
+    assert!(err.contains("dangerous"));
+}
+
+#[test]
+fn rm_double_dash_ends_option_parsing() {
+    let path = std::env::temp_dir().join(format!("-gvibu-rm-dash-{}", std::process::id()));
+    std::fs::write(&path, b"remove").unwrap();
+    let path_arg = path.to_string_lossy().to_string();
+    let (code, _out, err) = run(&["rm", "--", &path_arg]);
+    assert_eq!(code, 0, "stderr: {err}");
+    assert!(!path.exists());
 }
 
 // ---------------------------------------------------------------------------
@@ -1712,6 +1779,14 @@ fn tail_invalid_option() {
     assert!(!err.is_empty(), "should print error");
 }
 
+#[test]
+fn tail_follow_rejects_multiple_files_before_output() {
+    let (code, out, err) = run(&["tail", "-f", "first", "second"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(err.contains("multiple files"), "stderr: {err}");
+}
+
 // ---------------------------------------------------------------------------
 // tac
 // ---------------------------------------------------------------------------
@@ -1937,6 +2012,34 @@ fn ls_nonexistent() {
     assert!(!err.is_empty(), "should print error");
 }
 
+#[test]
+fn ls_new_flags_list_directory_indicators_inode_and_color() {
+    let root = std::env::temp_dir().join(format!("gvibu-ls-flags-{}", std::process::id()));
+    std::fs::create_dir_all(&root).unwrap();
+    let executable = root.join("run");
+    std::fs::write(&executable, b"x").unwrap();
+    #[cfg(unix)] {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o755)).unwrap();
+    }
+    let root_arg = root.to_string_lossy().to_string();
+
+    let (code, out, err) = run(&["ls", "-dF", &root_arg]);
+    assert_eq!(code, 0, "stderr: {err}");
+    assert!(out.trim().starts_with("gvibu-ls-flags-") && out.trim().ends_with('/'));
+    let (code, out, err) = run(&["ls", "-F", &root_arg]);
+    assert_eq!(code, 0, "stderr: {err}");
+    assert!(out.lines().any(|line| line == "run*"));
+    let (code, out, err) = run(&["ls", "-i", &root_arg]);
+    assert_eq!(code, 0, "stderr: {err}");
+    assert!(out.split_whitespace().next().unwrap().parse::<u64>().is_ok());
+    let (code, out, err) = run(&["ls", "--color=always", &root_arg]);
+    assert_eq!(code, 0, "stderr: {err}");
+    assert!(out.contains("\x1b[32mrun\x1b[0m"));
+
+    std::fs::remove_dir_all(root).unwrap();
+}
+
 // ---------------------------------------------------------------------------
 // grep
 // ---------------------------------------------------------------------------
@@ -1962,6 +2065,41 @@ fn grep_invalid_pattern() {
     assert_eq!(code, 1);
     assert_eq!(out, "");
     assert!(!err.is_empty(), "should print error");
+}
+
+#[test]
+fn grep_dash_operand_reads_stdin() {
+    let (code, out, err) = run_with_stdin(&["grep", "needle", "-"], "needle here\n");
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "needle here\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn grep_double_dash_ends_option_parsing() {
+    let path = std::env::temp_dir().join(format!("gvibu_grep_dashdash_{}.txt", std::process::id()));
+    std::fs::write(&path, "needle here\n").unwrap();
+    let path = path.to_string_lossy().into_owned();
+    let (code, out, err) = run(&["grep", "--", "needle", &path]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "needle here\n");
+    assert_eq!(err, "");
+    let _ = std::fs::remove_file(path);
+}
+
+#[test]
+fn grep_recursive_match_returns_success() {
+    let dir = std::env::temp_dir().join(format!("gvibu_grep_recursive_{}", std::process::id()));
+    let nested = dir.join("nested");
+    std::fs::create_dir_all(&nested).unwrap();
+    std::fs::write(nested.join("match.txt"), "needle here\n").unwrap();
+    std::fs::write(dir.join("no-match.txt"), "other\n").unwrap();
+    let dir_arg = dir.to_string_lossy().into_owned();
+    let (code, out, err) = run(&["grep", "-r", "needle", &dir_arg]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert!(out.contains("needle here\n"));
+    assert_eq!(err, "");
+    let _ = std::fs::remove_dir_all(dir);
 }
 
 #[test]
@@ -2022,6 +2160,50 @@ fn grep_bundled_flags() {
 }
 
 #[test]
+fn grep_fixed_ignore_case_keeps_unicode_offsets_safe() {
+    let (code, out, err) = run_with_stdin(&["grep", "-Fio", "a"], "İa\n");
+    assert_eq!(code, 0, "stderr: {err}");
+    assert_eq!(out, "a\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn grep_fixed_empty_only_matching_does_not_panic() {
+    let (code, out, err) = run_with_stdin(&["grep", "-Fo", ""], "é\n");
+    assert_eq!(code, 0, "stderr: {err}");
+    assert_eq!(out, "");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn grep_only_matching_omits_line_numbers_unless_requested() {
+    let (code, out, err) = run_with_stdin(&["grep", "-Fwo", "é"], "éé\n");
+    assert_eq!(code, 0, "stderr: {err}");
+    assert_eq!(out, "é\né\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn grep_context_groups_skip_printed_lines_and_separate_gaps() {
+    let input = "before1\nhit1\nhit2\nafter1\ngap1\ngap2\nbefore2\nhit3\nafter2\n";
+    let (code, out, err) = run_with_stdin(&["grep", "-C", "1", "hit"], input);
+    assert_eq!(code, 0, "stderr: {err}");
+    assert_eq!(
+        out,
+        "before1\nhit1\nhit2\nafter1\n--\nbefore2\nhit3\nafter2\n"
+    );
+    assert_eq!(err, "");
+}
+
+#[test]
+fn grep_count_prints_zero_for_no_matches() {
+    let (code, out, err) = run_with_stdin(&["grep", "-c", "missing"], "present\n");
+    assert_eq!(code, 1);
+    assert_eq!(out, "0\n");
+    assert_eq!(err, "");
+}
+
+#[test]
 fn grep_nonexistent_file() {
     let (code, out, err) = run(&["grep", "pattern", "/nonexistent_grep_test_xyz"]);
     assert_eq!(code, 1);
@@ -2051,23 +2233,17 @@ fn du_human_readable_dev_null() {
 #[test]
 fn du_invalid_option() {
     let (code, out, err) = run(&["du", "-x"]);
-    // Accept 0 or 1 — some envs may not have /proc
-    assert!(code == 0 || code == 1, "code: {}, stderr: {}", code, err);
-    if code == 1 {
-        assert_eq!(out, "");
-        assert!(!err.is_empty(), "should print error");
-    }
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error on stderr");
 }
 
 #[test]
 fn du_nonexistent() {
     let (code, out, err) = run(&["du", "/nonexistent_du_test_xyz"]);
-    // Accept 0 or 1 — some envs may not have /proc
-    assert!(code == 0 || code == 1, "code: {}, stderr: {}", code, err);
-    if code == 1 {
-        assert_eq!(out, "");
-        assert!(!err.is_empty(), "should print error");
-    }
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(!err.is_empty(), "should print error on stderr");
 }
 
 #[test]
@@ -2078,12 +2254,43 @@ fn du_bundled_flags() {
     assert_eq!(err, "");
 }
 
+#[test]
+fn du_max_depth_limits_descendants() {
+    let root = std::env::temp_dir().join(format!("gvibu-du-depth-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&root);
+    let nested = root.join("a").join("b");
+    std::fs::create_dir_all(&nested).unwrap();
+    std::fs::write(nested.join("file.txt"), b"payload").unwrap();
+    let root_path = root.to_str().unwrap();
+
+    let (code, out, err) = run(&["du", "--max-depth=1", root_path]);
+    assert_eq!(code, 0, "stderr: {err}");
+    assert_eq!(err, "");
+    assert!(!out.contains("file.txt"), "depth 3 entry leaked: {out}");
+    assert!(out.contains(&root.join("a").to_string_lossy().to_string()));
+    assert!(out.lines().any(|line| line.ends_with(root_path)));
+
+    let (full_code, full_out, full_err) = run(&["du", root_path]);
+    let (root_code, root_out, root_err) = run(&["du", "--max-depth=0", root_path]);
+    assert_eq!(full_code, 0, "stderr: {full_err}");
+    assert_eq!(root_code, 0, "stderr: {root_err}");
+    let root_size = |output: &str| {
+        output
+            .lines()
+            .find(|line| line.ends_with(root_path))
+            .and_then(|line| line.split_once('\t'))
+            .map(|(size, _)| size.to_string())
+    };
+    assert_eq!(root_size(&full_out), root_size(&root_out));
+    std::fs::remove_dir_all(root).unwrap();
+}
+
 // ---------------------------------------------------------------------------
 // df
 // ---------------------------------------------------------------------------
 #[test]
 fn df_invalid_option() {
-    let (code, out, err) = run(&["df", "-x"]);
+    let (code, _out, err) = run(&["df", "-x"]);
     // Accept 0 or 1 — some envs may not have /proc/mounts
     assert!(code == 0 || code == 1, "code: {}, stderr: {}", code, err);
 }
@@ -2228,6 +2435,22 @@ fn date_format_string() {
     assert_eq!(trimmed.len(), 10, "YYYY-MM-DD should be 10 chars, got: {:?}", trimmed);
     assert!(trimmed.contains('-'), "should contain dashes");
     assert_eq!(err, "");
+}
+
+#[test]
+fn date_datetime_argument_preserves_time() {
+    let (code, out, err) = run(&["date", "-d", "2026-01-02 12:34:56", "+%F %T"]);
+    assert_eq!(code, 0, "stderr: {}", err);
+    assert_eq!(out, "2026-01-02 12:34:56\n");
+    assert_eq!(err, "");
+}
+
+#[test]
+fn date_relative_overflow_returns_error_instead_of_panicking() {
+    let (code, out, err) = run(&["date", "-d", "+9223372036854775807 weeks", "+%F"]);
+    assert_eq!(code, 1);
+    assert_eq!(out, "");
+    assert!(err.contains("invalid date"));
 }
 
 #[test]

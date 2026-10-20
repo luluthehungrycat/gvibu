@@ -41,6 +41,17 @@ def test_fold_break_spaces():
     assert "world" in result.stdout
 
 
+def test_fold_preserves_whitespace_without_s():
+    result = subprocess.run(
+        [sys.executable, "-m", "gvibu_ref", "fold", "-w", "5"],
+        input="ab   cd",
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, f"stderr: {result.stderr}"
+    assert result.stdout == "ab   \ncd\n"
+
+
 def test_fold_invalid_width():
     """fold with invalid width should error."""
     result = subprocess.run(

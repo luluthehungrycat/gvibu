@@ -103,3 +103,27 @@ def test_format_r(capsys):
     assert ret == 0
     assert err == ""
     assert ":" in out
+
+
+def test_date_argument_preserves_datetime(capsys):
+    ret = date.run(["-d", "2026-01-02 12:34:56", "+%F %T"])
+    out, err = capsys.readouterr()
+    assert ret == 0
+    assert out == "2026-01-02 12:34:56\n"
+    assert err == ""
+
+
+def test_date_offset_datetime_normalizes_to_utc(capsys):
+    ret = date.run(["-u", "-d", "2026-01-02T12:34:56+02:00", "+%H:%M:%S"])
+    out, err = capsys.readouterr()
+    assert ret == 0
+    assert out == "10:34:56\n"
+    assert err == ""
+
+
+def test_relative_date_overflow_is_reported(capsys):
+    ret = date.run(["-d", "+9223372036854775807 weeks", "+%F"])
+    out, err = capsys.readouterr()
+    assert ret == 1
+    assert out == ""
+    assert "invalid date" in err

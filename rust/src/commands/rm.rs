@@ -13,9 +13,19 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let mut targets: Vec<String> = Vec::new();
 
     let mut i = 0;
+    let mut end_options = false;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { break; }
+        if end_options {
+            targets.push(arg.clone());
+            i += 1;
+            continue;
+        }
+        if arg == "--" {
+            end_options = true;
+            i += 1;
+            continue;
+        }
         if arg == "-r" || arg == "-R" || arg == "--recursive" {
             recursive = true;
         } else if arg == "-f" || arg == "--force" {
@@ -69,19 +79,19 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
 
     for target in &targets {
         let path = Path::new(target);
-        
+
         // Handle interactive mode
         if interactive && !force {
             let prompt = format!("rm: remove '{}'? ", target);
             eprint!("{}", prompt);
             let _ = std::io::stdout().flush();
-            
+
             let mut input = String::new();
             if let Err(e) = std::io::stdin().read_line(&mut input) {
                 eprintln!("rm: cannot read input: {}", e);
                 return 1;
             }
-            
+
             let input = input.trim();
             if input != "y" && input != "Y" && input != "yes" && input != "Yes" {
                 continue; // Skip this file
@@ -89,19 +99,10 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
         }
 
         let result = if dir_only {
-            // -d flag: only remove if it's an empty directory
-            if path.is_dir() {
-                if path.read_dir().map_or(true, |mut d| d.next().is_none()) {
-                    fs::remove_dir(target)
-                } else {
-                    eprintln!("rm: cannot remove '{}': Is a directory", target);
-                    exit_code = 1;
-                    continue;
-                }
-            } else {
-                eprintln!("rm: cannot remove '{}': Not a directory", target);
-                exit_code = 1;
-                continue;
+            match fs::symlink_metadata(path) {
+                Ok(metadata) if metadata.is_dir() => fs::remove_dir(target),
+                Ok(_) => fs::remove_file(target),
+                Err(error) => Err(error),
             }
         } else if recursive {
             fs::remove_dir_all(target)
@@ -166,5 +167,29 @@ mod tests {
         // This should not fail due to preserve_root, but will fail because we can't actually remove /
         // We're mainly testing that --no-preserve-root doesn't trigger the preserve_root error
         assert_eq!(run(&mut std::io::sink(), &["--no-preserve-root".into(), "/".into()]), 1);
+    }
+
+    #[test]
+    fn dir_flag_removes_files_and_empty_directories_only() {
+        let root = std::env::temp_dir().join(format!("gvibu-rm-dir-{}", std::process::id()));
+        let empty = root.join("empty");
+        let nonempty = root.join("nonempty");
+        std::fs::create_dir_all(&empty).unwrap();
+        std::fs::create_dir_all(&nonempty).unwrap();
+        std::fs::write(nonempty.join("child"), b"x").unwrap();
+        let file = root.join("file");
+        std::fs::write(&file, b"x").unwrap();
+
+        let file_result = run(&mut std::io::sink(), &["-d".into(), file.to_string_lossy().into_owned()]);
+        let empty_result = run(&mut std::io::sink(), &["-d".into(), empty.to_string_lossy().into_owned()]);
+        let nonempty_result = run(&mut std::io::sink(), &["-d".into(), nonempty.to_string_lossy().into_owned()]);
+
+        assert_eq!(file_result, 0);
+        assert_eq!(empty_result, 0);
+        assert_eq!(nonempty_result, 1);
+        assert!(!file.exists());
+        assert!(!empty.exists());
+        assert!(nonempty.join("child").exists());
+        std::fs::remove_dir_all(root).unwrap();
     }
 }

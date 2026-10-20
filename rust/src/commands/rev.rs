@@ -28,13 +28,22 @@ fn write_input(stdout: &mut dyn Write, input: &str) -> i32 {
     }
 }
 
+fn read_stdin() -> io::Result<String> {
+    if let Some(input) = crate::get_wasm_stdin() {
+        return Ok(input);
+    }
+    let mut input = String::new();
+    io::stdin().read_to_string(&mut input)?;
+    Ok(input)
+}
+
 pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let mut paths = Vec::new();
     let mut parsing_options = true;
     for arg in args {
         if parsing_options && arg == "--" {
             parsing_options = false;
-        } else if parsing_options && arg.starts_with('-') {
+        } else if parsing_options && arg.starts_with('-') && arg != "-" {
             eprintln!("rev: invalid option: {}", arg);
             return 1;
         } else {
@@ -43,17 +52,20 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     }
 
     if paths.is_empty() {
-        let mut input = String::new();
-        if io::stdin().read_to_string(&mut input).is_err() {
-            eprintln!("rev: error reading standard input");
-            return 1;
-        }
+        let input = match read_stdin() {
+            Ok(input) => input,
+            Err(_) => {
+                eprintln!("rev: error reading standard input");
+                return 1;
+            }
+        };
         return write_input(stdout, &input);
     }
 
     let mut exit_code = 0;
     for path in paths {
-        match fs::read_to_string(path) {
+        let input_result = if path == "-" { read_stdin() } else { fs::read_to_string(path) };
+        match input_result {
             Ok(input) => {
                 if write_input(stdout, &input) != 0 {
                     return 1;

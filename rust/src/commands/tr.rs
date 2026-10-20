@@ -59,7 +59,9 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         let arg = &args[i];
-        if arg == "--" { break; }
+        if arg == "--" {
+            break;
+        }
         if arg == "-d" {
             delete = true;
         } else if arg == "-s" {
@@ -75,22 +77,22 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
         i += 1;
     }
 
-    if delete && sets.is_empty() {
+    if delete && sets.len() < 1 {
         eprintln!("tr: missing operand");
         return 1;
     }
-    if !delete && !squeeze && sets.len() < 2 {
+    if !delete && ((!squeeze && sets.len() < 2) || (squeeze && sets.is_empty())) {
         eprintln!("tr: missing operand");
         return 1;
     }
 
-    let translate = !delete && sets.len() >= 2;
     let set1_str = if sets.is_empty() { "" } else { &sets[0] };
     let set2_str = if sets.len() < 2 { "" } else { &sets[1] };
+    let translate = !delete && sets.len() >= 2;
 
     let set1 = build_char_set(set1_str, complement);
 
-    let set2: Vec<u8> = if !translate {
+    let set2: Vec<u8> = if delete || (squeeze && sets.len() == 1) {
         Vec::new()
     } else {
         let expanded = expand_set(set2_str);
@@ -127,8 +129,12 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     }
 
     // Stream stdin in chunks
+    let stdin_text = crate::get_wasm_stdin();
     let stdin = io::stdin();
-    let mut handle = stdin.lock();
+    let mut handle: Box<dyn io::Read + '_> = match stdin_text {
+        Some(text) => Box::new(io::Cursor::new(text.into_bytes())),
+        None => Box::new(stdin.lock()),
+    };
     let mut in_buf = [0u8; 8192];
     let mut out_buf = [0u8; 8192];
     let mut out_pos = 0;

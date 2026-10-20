@@ -64,8 +64,8 @@ verification impact.
 - GVIBU is not yet fully VIBIX-portable.
 - Building `vibix.bin` does not prove VFS, process, TTY, descriptor inheritance,
   or full-stack behavior.
-- Canonical VIBIX VFS syscall 14/15 support is not available from GVIBU until
-  the VIBIX kernel registers and verifies those slots.
+- VIBIX main registers canonical VFS syscall 14/15 and `brk` syscall 4. The
+  repaired shared wrappers still need runtime and QEMU integration evidence.
 - A global allocator is intentionally not installed yet.
 
 ## GVIBU image artifacts
@@ -205,7 +205,8 @@ not kernel descriptor inheritance. That evidence must come from VIBIX/QEMU.
 
 ### M4 — Canonical VIBIX runtime
 
-- [ ] VIBIX registers and tests canonical VFS syscall 14/15.
+- [ ] Validate the shared VFS syscall 14/15 wrappers against the registered VIBIX
+  handlers, then verify them under QEMU.
 - [ ] GVIBU switches consumers only after the kernel handoff passes QEMU.
 - [ ] Runtime process, descriptor, and terminal APIs are extended only as
       required by VISH/VIBIT consumers.
@@ -250,8 +251,8 @@ integration owner.
 
 ## Blockers
 
-- VIBIX kernel source currently does not register canonical syscall 14/15,
-  although the ABI document specifies them.
+- VIBIX main registers canonical VFS syscall 14/15 and `brk` syscall 4; shared
+  wrapper validation and QEMU evidence remain outstanding.
 - The initial stack/entry-register contract needs one authoritative agreement
   between the VIBIX loader, VIBIT, VISH, and the GVIBU Rust flat entrypoint.
 - Full QEMU verification is not available from this repository alone.

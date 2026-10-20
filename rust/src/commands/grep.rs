@@ -1,5 +1,5 @@
 /// grep: print lines matching a pattern.
-use regex::Regex;
+use regex::{Regex, RegexBuilder};
 use std::collections::VecDeque;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
@@ -56,8 +56,7 @@ enum Matcher {
     Regex(Regex),
     RegexWord(Regex),
     Literal {
-        pattern: String,
-        ignore_case: bool,
+        regex: Regex,
         whole_word: bool,
     },
 }
@@ -65,9 +64,12 @@ enum Matcher {
 impl Matcher {
     fn new(pattern: &str, cfg: &GrepConfig) -> Result<Self, String> {
         if cfg.fixed_strings {
+            let regex = RegexBuilder::new(&regex::escape(pattern))
+                .case_insensitive(cfg.ignore_case)
+                .build()
+                .map_err(|e| e.to_string())?;
             Ok(Matcher::Literal {
-                pattern: pattern.to_string(),
-                ignore_case: cfg.ignore_case,
+                regex,
                 whole_word: cfg.word_regexp,
             })
         } else if cfg.word_regexp {
@@ -95,15 +97,9 @@ impl Matcher {
             Matcher::RegexWord(re) => re
                 .find_iter(line)
                 .any(|m| check_word_bounds(line, m.start(), m.end())),
-            Matcher::Literal { pattern, ignore_case, whole_word } => {
-                if *ignore_case {
-                    let line_lower = line.to_lowercase();
-                    let pat_lower = pattern.to_lowercase();
-                    find_literal(&line_lower, &pat_lower, *whole_word, line).is_some()
-                } else {
-                    find_literal(line, pattern.as_str(), *whole_word, line).is_some()
-                }
-            }
+            Matcher::Literal { regex, whole_word } => regex
+                .find_iter(line)
+                .any(|m| !*whole_word || check_word_bounds(line, m.start(), m.end())),
         }
     }
 
@@ -120,9 +116,11 @@ impl Matcher {
                 .map(|m| m.as_str())
                 .filter(|s| !s.is_empty())
                 .collect(),
-            Matcher::Literal { pattern, ignore_case, whole_word } => {
-                find_literal_all(line, pattern, *ignore_case, *whole_word)
-            }
+            Matcher::Literal { regex, whole_word } => regex
+                .find_iter(line)
+                .filter(|m| !m.is_empty() && (!*whole_word || check_word_bounds(line, m.start(), m.end())))
+                .map(|m| &line[m.start()..m.end()])
+                .collect(),
         }
     }
 }
@@ -140,58 +138,6 @@ fn check_word_bounds(line: &str, start: usize, end: usize) -> bool {
     let prev_word = start > 0 && bytes.get(start - 1).map_or(false, |&b| is_word_char_byte(b));
     let next_word = end < bytes.len() && bytes.get(end).map_or(false, |&b| is_word_char_byte(b));
     !prev_word && !next_word
-}
-
-/// Find the first occurrence of `pattern` in `search_in`.
-fn find_literal(search_in: &str, pattern: &str, whole_word: bool, original: &str) -> Option<usize> {
-    let mut offset = 0;
-    while let Some(pos) = search_in[offset..].find(pattern) {
-        let abs_pos = offset + pos;
-        let end_pos = abs_pos + pattern.len();
-        if !whole_word || check_word_bounds(original, abs_pos, end_pos) {
-            return Some(abs_pos);
-        }
-        offset = abs_pos + 1;
-    }
-    None
-}
-
-/// Find all non-overlapping literal matches.
-fn find_literal_all<'a>(
-    line: &'a str,
-    pattern: &str,
-    ignore_case: bool,
-    whole_word: bool,
-) -> Vec<&'a str> {
-    let mut result = Vec::new();
-    let search_line = if ignore_case {
-        line.to_lowercase()
-    } else {
-        line.to_string()
-    };
-    let search_pat = if ignore_case {
-        pattern.to_lowercase()
-    } else {
-        pattern.to_string()
-    };
-
-    let mut offset = 0;
-    while let Some(pos) = search_line[offset..].find(&search_pat) {
-        let abs_pos = offset + pos;
-        let end_pos = abs_pos + pattern.len();
-        if !whole_word || check_word_bounds(line, abs_pos, end_pos) {
-            result.push(&line[abs_pos..end_pos]);
-        }
-        if end_pos > abs_pos {
-            offset = end_pos;
-        } else {
-            offset = abs_pos + 1;
-            if offset > line.len() {
-                break;
-            }
-        }
-    }
-    result
 }
 
 // ---------------------------------------------------------------------------
@@ -228,6 +174,7 @@ fn grep_reader_impl<R: BufRead>(
     let mut before_buf: VecDeque<(usize, String)> = VecDeque::new();
     let mut after_left: usize = 0;
     let mut is_first_group = true;
+    let mut last_printed_line: Option<usize> = None;
     let use_separator = cfg.before_context > 0 || cfg.after_context > 0;
 
     for (line_num, line_result) in reader.lines().enumerate() {
@@ -247,10 +194,6 @@ fn grep_reader_impl<R: BufRead>(
 
             if cfg.count {
                 match_count += 1;
-                before_buf.push_back((line_num, line));
-                if cfg.before_context > 0 && before_buf.len() > cfg.before_context {
-                    before_buf.pop_front();
-                }
                 continue;
             }
 
@@ -261,37 +204,56 @@ fn grep_reader_impl<R: BufRead>(
                 return 0;
             }
 
-            if !is_first_group && use_separator {
+            let group_start = before_buf
+                .iter()
+                .find(|(number, _)| last_printed_line.map_or(true, |last| *number > last))
+                .map(|(number, _)| *number)
+                .unwrap_or(line_num);
+            if !is_first_group
+                && use_separator
+                && last_printed_line.is_some_and(|last| group_start > last + 1)
+            {
                 pwriteln!(w, "--");
             }
             is_first_group = false;
 
-            for (_, ctx_line) in before_buf.drain(..) {
-                if let Err(_) = write_line(w, &ctx_line, filename, None) {
-                    return 1;
+            for (context_num, ctx_line) in before_buf.drain(..) {
+                if last_printed_line.map_or(true, |last| context_num > last) {
+                    let context_line_num = cfg.line_numbers.then_some(context_num + 1);
+                    if write_line(w, &ctx_line, filename, context_line_num).is_err() {
+                        return 1;
+                    }
+                    last_printed_line = Some(context_num);
                 }
             }
 
             if cfg.only_matching {
-                for m in matcher.find_matches(&line) {
-                    if let Err(_) = write_line(w, m, filename, Some(line_num + 1)) {
+                let matches = matcher.find_matches(&line);
+                for m in &matches {
+                    let line_number = cfg.line_numbers.then_some(line_num + 1);
+                    if write_line(w, m, filename, line_number).is_err() {
                         return 1;
                     }
+                }
+                if !matches.is_empty() {
+                    last_printed_line = Some(line_num);
                 }
             } else {
                 let ln = if cfg.line_numbers { Some(line_num + 1) } else { None };
                 if let Err(_) = write_line(w, &line, filename, ln) {
                     return 1;
                 }
+                last_printed_line = Some(line_num);
             }
 
             match_count += 1;
-            after_left = cfg.after_context;
+            after_left = if cfg.only_matching { 0 } else { cfg.after_context };
         } else if after_left > 0 {
             let ln = if cfg.line_numbers { Some(line_num + 1) } else { None };
             if let Err(_) = write_line(w, &line, filename, ln) {
                 return 1;
             }
+            last_printed_line = Some(line_num);
             after_left -= 1;
         }
 
@@ -303,7 +265,7 @@ fn grep_reader_impl<R: BufRead>(
         }
     }
 
-    if cfg.count && matched {
+    if cfg.count {
         if let Some(fname) = filename {
             pwriteln!(w, "{}:{}", fname, match_count);
         } else {
@@ -341,7 +303,9 @@ fn grep_dir_impl(
             Ok(e) => {
                 let path = e.path();
                 if path.is_dir() {
-                    exit_code |= grep_dir_impl(w, matcher, cfg, &path, show_filename);
+                    if grep_dir_impl(w, matcher, cfg, &path, show_filename) == 0 {
+                        exit_code = 0;
+                    }
                 } else if path.is_file() {
                     let filename = if show_filename {
                         Some(path.to_string_lossy().into_owned())
@@ -383,6 +347,18 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
 
     while i < args.len() {
+        if args[i] == "--" {
+            i += 1;
+            while i < args.len() {
+                if pattern_str.is_none() {
+                    pattern_str = Some(args[i].clone());
+                } else {
+                    paths.push(args[i].clone());
+                }
+                i += 1;
+            }
+            break;
+        }
         match args[i].as_str() {
             "-i" | "--ignore-case" => cfg.ignore_case = true,
             "-r" | "-R" | "--recursive" => cfg.recursive = true,
@@ -441,15 +417,14 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                     }
                 }
             }
-            "--" => break,
             s if s.starts_with('-') && s.len() > 1 => {
                 // Handle bundled flags like -iv or -A5
                 let chars: Vec<char> = s[1..].chars().collect();
                 let mut j = 0;
-                
+
                 while j < chars.len() {
                     let c = chars[j];
-                    
+
                     // Check for bundled context arguments like -A5, -B2, -C3
                     if (c == 'A' || c == 'B' || c == 'C') && j + 1 < chars.len() {
                         // Try to parse the number part
@@ -459,7 +434,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                             num_chars.push(chars[k]);
                             k += 1;
                         }
-                        
+
                         if !num_chars.is_empty() {
                             let num_str: String = num_chars.iter().collect();
                             match num_str.parse::<usize>() {
@@ -483,7 +458,7 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                             }
                         }
                     }
-                    
+
                     // Handle single character flags
                     match c {
                         'i' => cfg.ignore_case = true,
@@ -535,6 +510,9 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     };
 
     if paths.is_empty() && !cfg.recursive {
+        if let Some(input) = crate::get_wasm_stdin() {
+            return grep_reader_impl(w, &matcher, &cfg, None, io::Cursor::new(input.into_bytes()));
+        }
         return grep_reader_impl(w, &matcher, &cfg, None, io::stdin().lock());
     }
 
@@ -546,7 +524,9 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
 
         if path.is_dir() {
             if cfg.recursive {
-                exit_code |= grep_dir_impl(w, &matcher, &cfg, path, show_filename);
+                if grep_dir_impl(w, &matcher, &cfg, path, show_filename) == 0 {
+                    exit_code = 0;
+                }
             } else {
                 if !cfg.no_messages {
                     eprintln!("grep: {}: Is a directory", path_str);
@@ -554,20 +534,26 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                 exit_code = 1;
             }
         } else if path.is_file() || path_str == "-" {
-            let filename = if path_str == "-" { None } else { Some(path_str.as_str()) };
-            match File::open(path_str) {
-                Ok(f) => {
-                    let result = grep_reader_impl(w, &matcher, &cfg, filename, BufReader::new(f));
-                    if result == 0 {
-                        exit_code = 0;
+            let filename = if path_str == "-" || !show_filename { None } else { Some(path_str.as_str()) };
+            let result = if path_str == "-" {
+                if let Some(input) = crate::get_wasm_stdin() {
+                    grep_reader_impl(w, &matcher, &cfg, None, io::Cursor::new(input.into_bytes()))
+                } else {
+                    grep_reader_impl(w, &matcher, &cfg, None, io::stdin().lock())
+                }
+            } else {
+                match File::open(path_str) {
+                    Ok(f) => grep_reader_impl(w, &matcher, &cfg, filename, BufReader::new(f)),
+                    Err(e) => {
+                        if !cfg.no_messages {
+                            eprintln!("grep: {}: {}", path_str, e);
+                        }
+                        1
                     }
                 }
-                Err(e) => {
-                    if !cfg.no_messages {
-                        eprintln!("grep: {}: {}", path_str, e);
-                    }
-                    exit_code = 1;
-                }
+            };
+            if result == 0 {
+                exit_code = 0;
             }
         } else {
             if !cfg.no_messages {

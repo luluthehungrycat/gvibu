@@ -67,6 +67,7 @@ fn read_n_bytes<R: Read>(mut reader: R, num_bytes: usize) -> Vec<u8> {
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut num_lines: usize = 10;
     let mut num_bytes: Option<usize> = None;
+    let mut quiet = false;
     let mut files: Vec<String> = Vec::new();
     let mut i = 0;
 
@@ -90,6 +91,8 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                     return 1;
                 }
             }
+        } else if arg == "-q" {
+            quiet = true;
         } else if arg == "-c" {
             i += 1;
             if i >= args.len() {
@@ -119,6 +122,15 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut exit_code = 0;
 
     if files.is_empty() {
+        if let Some(input) = crate::get_wasm_stdin() {
+            let reader = io::Cursor::new(input.into_bytes());
+            if let Some(nbytes) = num_bytes {
+                let data = read_n_bytes(reader, nbytes);
+                return print_bytes(w, &data, nbytes);
+            }
+            let lines = read_n_lines(reader, num_lines);
+            return print_lines(w, &lines, num_lines);
+        }
         if let Some(nbytes) = num_bytes {
             let stdin = io::stdin();
             let data = read_n_bytes(stdin.lock(), nbytes);
@@ -131,14 +143,25 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     }
 
     for (idx, fname) in files.iter().enumerate() {
-        if files.len() > 1 {
-                    if idx > 0 {
+        if files.len() > 1 && !quiet {
+            if idx > 0 {
                 pwriteln!(w);
             }
             pwriteln!(w, "==> {} <==", fname);
         }
 
         if fname == "-" {
+            if let Some(input) = crate::get_wasm_stdin() {
+                let reader = io::Cursor::new(input.into_bytes());
+                if let Some(nbytes) = num_bytes {
+                    let data = read_n_bytes(reader, nbytes);
+                    exit_code |= print_bytes(w, &data, nbytes);
+                } else {
+                    let lines = read_n_lines(reader, num_lines);
+                    exit_code |= print_lines(w, &lines, num_lines);
+                }
+                continue;
+            }
             if let Some(nbytes) = num_bytes {
                 let stdin = io::stdin();
                 let data = read_n_bytes(stdin.lock(), nbytes);

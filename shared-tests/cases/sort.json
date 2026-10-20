@@ -1,38 +1,95 @@
 [
-    {
-        "name": "no_args",
-        "args": [],
-        "expected_exit_code": 0
-    },
-    {
-        "name": "dev_null",
-        "args": ["/dev/null"],
-        "expected_exit_code": 0
-    },
-    {
-        "name": "invalid_option",
-        "args": ["-x"],
-        "expected_exit_code": 1,
-        "expected_stderr": "sort: invalid option: -x"
-    },
-    {
-        "name": "combined_flags",
-        "args": ["-rn", "/dev/null"],
-        "expected_exit_code": 0
-    },
-    {
-        "name": "key_flag_basic",
-        "args": ["-k2,2n", "/dev/null"],
-        "expected_exit_code": 0
-    },
-    {
-        "name": "key_flag_multi",
-        "args": ["-k1,1", "-k2,2n", "/dev/null"],
-        "expected_exit_code": 0
-    },
-    {
-        "name": "key_flag_reverse",
-        "args": ["-k1,1r", "/dev/null"],
-        "expected_exit_code": 0
-    }
+  {
+    "name": "no_args",
+    "args": [],
+    "expected_exit_code": 0
+  },
+  {
+    "name": "dev_null",
+    "args": [
+      "/dev/null"
+    ],
+    "expected_exit_code": 0
+  },
+  {
+    "name": "invalid_option",
+    "args": [
+      "-x"
+    ],
+    "expected_exit_code": 1,
+    "expected_stderr": "sort: invalid option: -x"
+  },
+  {
+    "name": "combined_flags",
+    "args": [
+      "-rn",
+      "/dev/null"
+    ],
+    "expected_exit_code": 0
+  },
+  {
+    "name": "key_flag_basic",
+    "args": [
+      "-k2,2n",
+      "/dev/null"
+    ],
+    "expected_exit_code": 0
+  },
+  {
+    "name": "key_flag_multi",
+    "args": [
+      "-k1,1",
+      "-k2,2n",
+      "/dev/null"
+    ],
+    "expected_exit_code": 0
+  },
+  {
+    "name": "key_flag_reverse",
+    "args": [
+      "-k1,1r",
+      "/dev/null"
+    ],
+    "expected_exit_code": 0
+  },
+  {
+    "name": "version_sort",
+    "stdin": "pkg10\npkg2\npkg1\n",
+    "args": [
+      "-V"
+    ],
+    "expected_stdout": "pkg1\npkg2\npkg10\n",
+    "expected_stderr": "",
+    "expected_exit_code": 0
+  },
+  {
+    "name": "month_sort",
+    "stdin": "Dec\nfoo\nJan\nFeb\n",
+    "args": [
+      "-M"
+    ],
+    "expected_stdout": "foo\nJan\nFeb\nDec\n",
+    "expected_stderr": "",
+    "expected_exit_code": 0
+  },
+  {
+    "name": "check_sorted",
+    "stdin": "a\nb\n",
+    "args": [
+      "-c"
+    ],
+    "expected_stdout": "",
+    "expected_stderr": "",
+    "expected_exit_code": 0
+  },
+  {
+    "name": "check_unsorted",
+    "stdin": "b\na\n",
+    "args": [
+      "-c"
+    ],
+    "expected_stdout": "",
+    "expected_stderr": "*",
+    "expected_exit_code": 1
+  }
 ]

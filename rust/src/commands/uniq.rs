@@ -17,14 +17,18 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
         }
     }
 
-    let stdin = io::stdin();
     let mut lines: Vec<String> = Vec::new();
-    for line in stdin.lock().lines() {
-        match line {
-            Ok(l) => lines.push(l),
-            Err(e) => {
-                eprintln!("uniq: read error: {}", e);
-                return 1;
+    if let Some(input) = crate::get_wasm_stdin() {
+        lines.extend(input.lines().map(str::to_owned));
+    } else {
+        let stdin = io::stdin();
+        for line in stdin.lock().lines() {
+            match line {
+                Ok(l) => lines.push(l),
+                Err(e) => {
+                    eprintln!("uniq: read error: {}", e);
+                    return 1;
+                }
             }
         }
     }

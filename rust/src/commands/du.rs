@@ -1,7 +1,7 @@
+use crate::pwriteln;
 /// du: estimate file space usage.
 use std::fs;
 use std::io::Write;
-use crate::pwriteln;
 use std::path::Path;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
@@ -13,74 +13,46 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
-            "-h" => human = true,
-            "-s" => summary = true,
-            "-d" => {
-                if i + 1 < args.len() {
-                    match args[i + 1].parse::<usize>() {
-                        Ok(d) => max_depth = Some(d),
-                        Err(_) => {
-                            pwriteln!(w, "du: invalid max depth: {}", args[i + 1]);
-                            return 1;
-                        }
-                    }
-                    i += 1;
-                } else {
-                    pwriteln!(w, "du: -d requires an argument");
+            arg if arg == "--max-depth" => {
+                i += 1;
+                let Some(value) = args.get(i) else {
+                    eprintln!("du: option '--max-depth' requires an argument");
                     return 1;
-                }
-            }
-            arg if arg.starts_with("--max-depth=") => {
-                let value = &arg[12..]; // "--max-depth=" is 12 chars
+                };
                 match value.parse::<usize>() {
-                    Ok(d) => max_depth = Some(d),
+                    Ok(depth) => max_depth = Some(depth),
                     Err(_) => {
-                        eprintln!("du: invalid max depth: {}", value);
+                        eprintln!("du: invalid maximum depth: {}", value);
                         return 1;
                     }
                 }
             }
-            "--max-depth" => {
-                if i + 1 < args.len() {
-                    match args[i + 1].parse::<usize>() {
-                        Ok(d) => max_depth = Some(d),
-                        Err(_) => {
-                            eprintln!("du: invalid max depth: {}", args[i + 1]);
-                            return 1;
-                        }
+            arg if arg.starts_with("--max-depth=") => {
+                match arg[12..].parse::<usize>() {
+                    Ok(depth) => max_depth = Some(depth),
+                    Err(_) => {
+                        eprintln!("du: invalid maximum depth: {}", &arg[12..]);
+                        return 1;
                     }
-                    i += 1;
-                } else {
-                    eprintln!("du: --max-depth requires an argument");
-                    return 1;
                 }
             }
-            "--" => { break; }
+            "-h" => human = true,
+            "-s" => summary = true,
+            "--" => {
+                paths.extend(args[i + 1..].iter().map(String::as_str));
+                break;
+            }
             arg if arg.starts_with('-') && arg.len() > 1 => {
                 // Handle bundled flags: -hs, -sh
-                let mut j = 1;
-                while j < arg.len() {
-                    let c = arg.chars().nth(j).unwrap();
+                for c in arg[1..].chars() {
                     match c {
                         'h' => human = true,
                         's' => summary = true,
-                        '0'..='9' => {
-                            // Handle -dN or --max-depth=N
-                            let num_str: String = arg.chars().skip(j).collect();
-                            if let Ok(d) = num_str.parse::<usize>() {
-                                max_depth = Some(d);
-                                break;
-                            } else {
-                                eprintln!("du: invalid option: -{}", c);
-                                return 1;
-                            }
-                        }
                         _ => {
                             eprintln!("du: invalid option: -{}", c);
                             return 1;
                         }
                     }
-                    j += 1;
                 }
             }
             p => paths.push(p),
@@ -137,6 +109,7 @@ fn du_walk(path: &Path, summary: bool, depth: usize) -> Result<Vec<(u64, String,
 
     if meta.is_dir() && !summary {
         let mut entries: Vec<(u64, String, usize)> = Vec::new();
+        let mut dir_size = 0;
         let dir_entries = fs::read_dir(path).map_err(|e| format!("{}", e))?;
 
         for entry in dir_entries {
@@ -150,15 +123,17 @@ fn du_walk(path: &Path, summary: bool, depth: usize) -> Result<Vec<(u64, String,
 
             if sub_meta.is_dir() {
                 let sub_entries = du_walk(&sub_path, false, depth + 1)?;
+                dir_size += sub_entries.last().map(|(size, _, _)| *size).unwrap_or(0);
                 entries.extend(sub_entries);
             } else {
-                entries.push((sub_meta.len(), sub_path.to_string_lossy().to_string(), depth + 1));
+                let size = sub_meta.len();
+                dir_size += size;
+                entries.push((size, sub_path.to_string_lossy().to_string(), depth + 1));
             }
         }
 
         entries.sort_by(|a, b| a.1.cmp(&b.1));
 
-        let dir_size: u64 = entries.iter().map(|(s, _, _)| s).sum();
         entries.push((dir_size, path.to_string_lossy().to_string(), depth));
         Ok(entries)
     } else {
@@ -167,18 +142,6 @@ fn du_walk(path: &Path, summary: bool, depth: usize) -> Result<Vec<(u64, String,
     }
 }
 
-fn count_path_depth(path: &Path, base: &Path) -> usize {
-    let path_str = path.to_string_lossy();
-    let base_str = base.to_string_lossy();
-    if path_str == base_str {
-        0
-    } else {
-        path_str
-            .split('/')
-            .count()
-            .saturating_sub(base_str.split('/').count())
-    }
-}
 fn human_size(bytes: u64) -> String {
     const UNITS: &[&str] = &["", "K", "M", "G", "T", "P"];
     let mut size = bytes as f64;
@@ -211,7 +174,10 @@ mod tests {
 
     #[test]
     fn test_human_readable_dev_null() {
-        assert_eq!(run(&mut std::io::sink(), &["-h".into(), "/dev/null".into()]), 0);
+        assert_eq!(
+            run(&mut std::io::sink(), &["-h".into(), "/dev/null".into()]),
+            0
+        );
     }
 
     #[test]
@@ -221,7 +187,10 @@ mod tests {
 
     #[test]
     fn test_bundled_flags() {
-        assert_eq!(run(&mut std::io::sink(), &["-hs".into(), "/dev/null".into()]), 0);
+        assert_eq!(
+            run(&mut std::io::sink(), &["-hs".into(), "/dev/null".into()]),
+            0
+        );
     }
 
     #[test]
@@ -256,11 +225,4 @@ mod tests {
         assert_eq!(run(&mut std::io::sink(), &["--max-depth=1".into(), "/dev/null".into()]), 0);
     }
 
-    #[test]
-    fn test_count_path_depth() {
-        let path = Path::new("/tmp/test");
-        let base = Path::new("/tmp");
-        assert_eq!(count_path_depth(path, base), 1);
-        assert_eq!(count_path_depth(base, base), 0);
-    }
 }

@@ -49,17 +49,32 @@ def test_no_files():
     assert run(["755"]) == 1
 
 
-def test_dev_null_octal():
-    assert run(["644", "/dev/null"]) == 1
+def test_regular_file_octal(tmp_path):
+    path = tmp_path / "file"
+    path.write_text("content")
+    assert run(["644", str(path)]) == 0
+    assert path.stat().st_mode & 0o777 == 0o644
 
 
-def test_dev_null_symbolic():
-    assert run(["u+x", "/dev/null"]) == 1
+def test_regular_file_symbolic(tmp_path):
+    path = tmp_path / "file"
+    path.write_text("content")
+    assert run(["u+x", str(path)]) == 0
+    assert path.stat().st_mode & 0o700 == 0o700
 
 
-def test_dev_null_recursive():
-    assert run(["-R", "755", "/dev/null"]) == 1
+def test_regular_directory_recursive(tmp_path):
+    nested = tmp_path / "nested"
+    nested.mkdir()
+    child = nested / "file"
+    child.write_text("content")
+    assert run(["-R", "755", str(nested)]) == 0
+    assert nested.stat().st_mode & 0o777 == 0o755
+    assert child.stat().st_mode & 0o777 == 0o755
 
 
-def test_dev_null_verbose():
-    assert run(["-v", "644", "/dev/null"]) == 1
+def test_regular_file_verbose(tmp_path, capsys):
+    path = tmp_path / "file"
+    path.write_text("content")
+    assert run(["-v", "644", str(path)]) == 0
+    assert str(path) in capsys.readouterr().out

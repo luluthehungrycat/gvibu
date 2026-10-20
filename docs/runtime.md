@@ -28,9 +28,9 @@ VIBIX kernel → SYSCALL.md ABI → vibix-lib
   global allocator and does not expose failure sentinels as heap pointers.
 
 The current flat-binary kernel path registers compatibility syscalls 1/2, so
-migrated output uses syscall 1. The ABI's canonical VFS numbers 14/15 are
-named in `sys.rs` but remain pending until the VIBIX kernel registers them and
-QEMU verifies their behavior.
+migrated output uses syscall 1. VIBIX main registers canonical VFS syscalls
+14/15 and `brk` syscall 4. The shared wrappers need host and no-std validation,
+followed by QEMU verification of kernel behavior.
 
 ## Command semantics
 
@@ -54,9 +54,9 @@ integration.
 
 ## Required handoffs
 
-- **VIBIX:** register and verify canonical syscall 14/15 behavior, including
-  negative errno returns and pointer/descriptor validation; confirm ABI
-  versioning and clobber behavior in kernel/QEMU tests.
+- **VIBIX:** verify canonical syscall 14/15 behavior, including negative errno
+  returns and pointer/descriptor validation; confirm ABI versioning and clobber
+  behavior in kernel/QEMU tests.
 - **VIBIT:** consume the shared runtime for launch, wait, exit, and standard
   descriptor setup without copying wrappers into init policy.
 - **VISH:** consume typed descriptors, checked I/O, and later process/terminal

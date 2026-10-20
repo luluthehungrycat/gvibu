@@ -152,8 +152,8 @@ errno/sentinel conversion, descriptors, checked I/O, and the allocator-facing
 VIBIX owns kernel mechanisms and the syscall ABI; VIBIT owns PID 1,
 launch/reaping, and supervision; VISH owns parsing, expansion, interactive
 behavior, and shell policy; image packaging belongs to the integration owner.
-Do not edit sibling repositories from this worktree. Record exact ABI,
-consumer, and QEMU verification handoffs instead.
+Record exact ABI, consumer, and QEMU verification handoffs when a cross-repo
+change depends on them.
 
 The Linux and WASM writer-based command surfaces are distinct from the no-std
 VIBIX runtime. A compile or local unit test does not establish VIBIX

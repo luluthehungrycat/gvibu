@@ -37,13 +37,21 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut exit_code = 0;
 
     if files.is_empty() {
-        let stdin = io::stdin();
-        exit_code = number_lines(w, stdin.lock(), &mut line_num);
+        if let Some(input) = crate::get_wasm_stdin() {
+            exit_code = number_lines(w, io::Cursor::new(input), &mut line_num);
+        } else {
+            let stdin = io::stdin();
+            exit_code = number_lines(w, stdin.lock(), &mut line_num);
+        }
     } else {
         for fname in files {
             if fname == "-" {
-                let stdin = io::stdin();
-                exit_code |= number_lines(w, stdin.lock(), &mut line_num);
+                if let Some(input) = crate::get_wasm_stdin() {
+                    exit_code |= number_lines(w, io::Cursor::new(input), &mut line_num);
+                } else {
+                    let stdin = io::stdin();
+                    exit_code |= number_lines(w, stdin.lock(), &mut line_num);
+                }
             } else {
                 match File::open(&fname) {
                     Ok(file) => {

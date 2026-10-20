@@ -12,7 +12,15 @@ pub mod printenv;
 pub mod sleep;
 pub mod touch;
 pub mod seq;
+#[cfg(not(target_arch = "wasm32"))]
 pub mod which_cmd;
+#[cfg(target_arch = "wasm32")]
+#[path = "unsupported_wasm.rs"]
+pub mod which_cmd;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod uname;
+#[cfg(target_arch = "wasm32")]
+#[path = "unsupported_wasm.rs"]
 pub mod uname;
 pub mod env_cmd;
 pub mod whoami;
@@ -27,21 +35,53 @@ pub mod logname;
 pub mod readlink;
 pub mod realpath;
 pub mod uniq;
+#[cfg(not(target_arch = "wasm32"))]
 pub mod uptime;
+#[cfg(target_arch = "wasm32")]
+#[path = "unsupported_wasm.rs"]
+pub mod uptime;
+#[cfg(not(target_arch = "wasm32"))]
 pub mod id;
+#[cfg(target_arch = "wasm32")]
+#[path = "unsupported_wasm.rs"]
+pub mod id;
+#[cfg(not(target_arch = "wasm32"))]
 pub mod who;
+#[cfg(target_arch = "wasm32")]
+#[path = "unsupported_wasm.rs"]
+pub mod who;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod kill;
+#[cfg(target_arch = "wasm32")]
+#[path = "unsupported_wasm.rs"]
 pub mod kill;
 pub mod cut;
 pub mod tr;
 pub mod mv;
 pub mod rm;
+#[cfg(not(target_arch = "wasm32"))]
 pub mod ln;
+#[cfg(target_arch = "wasm32")]
+#[path = "unsupported_wasm.rs"]
+pub mod ln;
+#[cfg(not(target_arch = "wasm32"))]
 pub mod chmod;
+#[cfg(target_arch = "wasm32")]
+#[path = "unsupported_wasm.rs"]
+pub mod chmod;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod chown;
+#[cfg(target_arch = "wasm32")]
+#[path = "unsupported_wasm.rs"]
 pub mod chown;
 pub mod sort;
 pub mod test_cmd;
 
 pub mod grep;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod ls;
+#[cfg(target_arch = "wasm32")]
+#[path = "unsupported_wasm.rs"]
 pub mod ls;
 pub mod tail;
 pub mod tac;
@@ -58,8 +98,16 @@ pub mod cp;
 pub mod printf;
 pub mod date;
 pub mod expr;
+#[cfg(not(all(target_arch = "wasm32", target_os = "unknown")))]
+pub mod split;
+#[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
+#[path = "unsupported_wasm.rs"]
 pub mod split;
 pub mod du;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod df;
+#[cfg(target_arch = "wasm32")]
+#[path = "unsupported_wasm.rs"]
 pub mod df;
 
 pub const BINARY_NAMES: &[&str] = &["gvibu", "gvibu-ref"];

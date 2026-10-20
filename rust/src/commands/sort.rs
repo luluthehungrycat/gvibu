@@ -10,6 +10,9 @@ fn read_lines(files: &[String]) -> Vec<String> {
     let mut lines = Vec::new();
 
     if files.is_empty() {
+        if let Some(input) = crate::get_wasm_stdin() {
+            return input.lines().map(str::to_owned).collect();
+        }
         let stdin = io::stdin();
         for line in stdin.lock().lines() {
             match line {
@@ -20,11 +23,15 @@ fn read_lines(files: &[String]) -> Vec<String> {
     } else {
         for fname in files {
             if fname == "-" {
-                let stdin = io::stdin();
-                for line in stdin.lock().lines() {
-                    match line {
-                        Ok(l) => lines.push(l),
-                        Err(_) => break,
+                if let Some(input) = crate::get_wasm_stdin() {
+                    lines.extend(input.lines().map(str::to_owned));
+                } else {
+                    let stdin = io::stdin();
+                    for line in stdin.lock().lines() {
+                        match line {
+                            Ok(l) => lines.push(l),
+                            Err(_) => break,
+                        }
                     }
                 }
             } else {

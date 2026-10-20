@@ -9,24 +9,98 @@
     },
     {
       "name": "invalid_option",
-      "args": ["-x", "pattern"],
+      "args": [
+        "-x",
+        "pattern"
+      ],
       "stdout": "",
       "stderr": "*",
       "exit_code": 1
     },
     {
       "name": "invalid_pattern",
-      "args": ["[invalid"],
+      "args": [
+        "[invalid"
+      ],
       "stdout": "",
       "stderr": "*",
       "exit_code": 1
     },
     {
       "name": "no_match_stdin",
-      "args": ["xyz"],
+      "args": [
+        "xyz"
+      ],
       "stdout": "",
       "stderr": "",
       "exit_code": 1
+    },
+    {
+      "name": "fixed_ignore_case_unicode_offsets",
+      "args": [
+        "-Fio",
+        "a"
+      ],
+      "stdin": "\u0130a\n",
+      "stdout": "a\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "fixed_word_only_matching_without_line_numbers",
+      "args": [
+        "-Fwo",
+        "\u00e9"
+      ],
+      "stdin": "\u00e9\u00e9\n",
+      "stdout": "\u00e9\n\u00e9\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "empty_fixed_only_matching",
+      "args": [
+        "-Fo",
+        ""
+      ],
+      "stdin": "\u00e9\n",
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "context_groups_are_deduplicated",
+      "args": [
+        "-C",
+        "1",
+        "hit"
+      ],
+      "stdin": "before1\nhit1\nhit2\nafter1\ngap1\ngap2\nbefore2\nhit3\nafter2\n",
+      "stdout": "before1\nhit1\nhit2\nafter1\n--\nbefore2\nhit3\nafter2\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "count_zero_without_matches",
+      "args": [
+        "-c",
+        "missing"
+      ],
+      "stdin": "present\n",
+      "stdout": "0\n",
+      "stderr": "",
+      "exit_code": 1
+    },
+    {
+      "name": "dash_operand_reads_stdin",
+      "args": [
+        "needle",
+        "-"
+      ],
+      "stdin": "needle here\n",
+      "stdout": "needle here\n",
+      "stderr": "",
+      "exit_code": 0
     }
   ]
 }

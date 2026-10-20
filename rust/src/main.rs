@@ -3,27 +3,20 @@ use std::env;
 use std::io;
 use std::process;
 
-fn resolve_command<'a>(argv0_basename: &'a str, args: &'a [String]) -> Option<(&'a str, &'a [String])> {
-    // Symlink mode: argv0 basename is the command name.
+fn resolve_command<'a>(
+    argv0_basename: &'a str,
+    args: &'a [String],
+) -> Option<(&'a str, &'a [String])> {
+    // Symlink mode: argv0 basename is the command name
     if commands::lookup(argv0_basename).is_some() {
-        let run_args = if argv0_basename == "[" {
-            args
-        } else {
-            &args[1..]
-        };
-        return Some((argv0_basename, run_args));
+        return Some((argv0_basename, &args[1..]));
     }
 
-    // Subcommand mode: argv0 is the binary name, args[1] is the command.
+    // Subcommand mode: argv0 is the binary name, args[1] is the command
     if commands::BINARY_NAMES.contains(&argv0_basename.as_ref()) && args.len() > 1 {
         let cmd_name = &args[1];
         if commands::lookup(cmd_name).is_some() {
-            let run_args = if cmd_name == "[" {
-                &args[1..]
-            } else {
-                &args[2..]
-            };
-            return Some((cmd_name.as_str(), run_args));
+            return Some((cmd_name.as_str(), &args[2..]));
         }
     }
 
@@ -48,6 +41,12 @@ fn main() {
     };
 
     if let Some(cmd) = commands::lookup(cmd_name) {
+        if cmd_name == "[" {
+            let mut bracket_args = vec!["[".to_string()];
+            bracket_args.extend_from_slice(run_args);
+            let exit_code = (cmd.run)(&mut io::stdout(), &bracket_args);
+            process::exit(exit_code);
+        }
         let exit_code = (cmd.run)(&mut io::stdout(), run_args);
         process::exit(exit_code);
     } else {

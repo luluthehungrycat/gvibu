@@ -65,7 +65,7 @@ This is NOT a GNU replacement. Commands are learning exercises and may lack feat
 | WASM writer path | Supported for writer-compatible commands | WASM build and wrapper checks |
 | VIBIX `vibix-lib` raw/runtime layer | In progress; checked `echo` slice only | no-std build, runtime contract tests |
 | VIBIX flat-binary integration | Compatibility path, not fully portable | VIBIX kernel plus QEMU command smoke |
-| VIBIX canonical VFS 14/15 | Pending kernel registration handoff | kernel tests and QEMU verification |
+| VIBIX canonical VFS 14/15 | Registered in VIBIX main; wrapper validation pending | runtime tests and QEMU verification |
 
 VIBIX runtime errors are typed before use: negative errno encodings and
 `u64::MAX` sentinels are not successful pointers, lengths, descriptors, or

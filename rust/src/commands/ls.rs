@@ -1,9 +1,16 @@
 /// ls: list directory contents.
 use std::fs::{self, Metadata};
-use std::io::Write;
+use std::io::{IsTerminal, Write};
 use std::os::unix::fs::{MetadataExt, PermissionsExt};
 use std::time::UNIX_EPOCH;
 use crate::pwriteln;
+
+#[derive(Clone, Copy)]
+enum ColorMode {
+    Never,
+    Auto,
+    Always,
+}
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut show_all = false;
@@ -14,14 +21,23 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut reverse = false;
     let mut sort_size = false;
     let mut _one_per_line = true; // default to 1-column
-    let mut color = false;
+    let mut color_mode = ColorMode::Never;
     let mut append_indicator = false;
     let mut list_directories_themselves = false;
     let mut recursive = false;
     let mut show_inode = false;
     let mut paths: Vec<&str> = Vec::new();
+    let mut end_options = false;
 
     for arg in args {
+        if end_options {
+            paths.push(arg.as_str());
+            continue;
+        }
+        if arg == "--" {
+            end_options = true;
+            continue;
+        }
         match arg.as_str() {
             "-a" => show_all = true,
             "-A" => show_almost_all = true,
@@ -31,7 +47,10 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
             "-r" => reverse = true,
             "-S" => sort_size = true,
             "-1" => _one_per_line = true,
-            "--color" => color = true,
+            "--color" => color_mode = ColorMode::Auto,
+            "--color=auto" => color_mode = ColorMode::Auto,
+            "--color=always" => color_mode = ColorMode::Always,
+            "--color=never" => color_mode = ColorMode::Never,
             "-F" => append_indicator = true,
             "-d" => list_directories_themselves = true,
             "-R" => recursive = true,
@@ -64,6 +83,12 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         }
     }
 
+    let color = match color_mode {
+        ColorMode::Never => false,
+        ColorMode::Always => true,
+        ColorMode::Auto => std::io::stdout().is_terminal(),
+    };
+
     if paths.is_empty() {
         paths.push(".");
     }
@@ -72,7 +97,12 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut first = true;
 
     for path in &paths {
-        match fs::metadata(path) {
+        let metadata = if list_directories_themselves {
+            fs::symlink_metadata(path)
+        } else {
+            fs::metadata(path)
+        };
+        match metadata {
             Ok(meta) => {
                 if meta.is_dir() && !list_directories_themselves {
                     if !first {
@@ -92,7 +122,11 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                     }
                     first = false;
                     if long {
-                        pwriteln!(w, "{}", format_long(path, &meta, human, show_inode));
+                        let mut shown_path = path.to_string();
+                        if append_indicator {
+                            shown_path.push_str(get_indicator(&meta));
+                        }
+                        pwriteln!(w, "{}", format_long(&shown_path, &meta, human, show_inode));
                     } else {
                         let name = display_name(path);
                         if show_inode {
@@ -179,7 +213,12 @@ fn list_directory(
 
     if long {
         for (name, meta) in &items {
-            pwriteln!(w, "{}", format_long(name, meta, human, show_inode));
+            let shown_name = if append_indicator {
+                format!("{}{}", name, get_indicator(meta))
+            } else {
+                name.clone()
+            };
+            pwriteln!(w, "{}", format_long(&shown_name, meta, human, show_inode));
         }
     } else {
         for (name, meta) in &items {
@@ -196,6 +235,7 @@ fn list_directory(
     }
 
     // Handle recursive listing
+    let mut exit_code = 0;
     if recursive {
         for (name, meta) in &items {
             if meta.is_dir() {
@@ -206,12 +246,12 @@ fn list_directory(
                 };
                 pwriteln!(w);
                 pwriteln!(w, "{}:", subdir_path);
-                let _ = list_directory(w, &subdir_path, long, show_all, show_almost_all, human, sort_time, reverse, sort_size, color, append_indicator, recursive, show_inode);
+                exit_code |= list_directory(w, &subdir_path, long, show_all, show_almost_all, human, sort_time, reverse, sort_size, color, append_indicator, recursive, show_inode);
             }
         }
     }
 
-    0
+    exit_code
 }
 
 fn format_long(name: &str, meta: &Metadata, human: bool, show_inode: bool) -> String {

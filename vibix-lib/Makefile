@@ -10,29 +10,33 @@
 
 TARGET = x86_64-unknown-none
 NAME = vibix
-BIN_DIR = target/$(TARGET)/release
+CARGO ?= cargo
+OBJCOPY ?= objcopy
+CARGO_TARGET_DIR ?= target
+BIN_DIR = $(CARGO_TARGET_DIR)/$(TARGET)/release
 
 .PHONY: all elf clean size symbols disasm
 
 all: $(NAME).bin
 
 elf:
-	cargo build --release
+	CARGO_TARGET_DIR="$(CARGO_TARGET_DIR)" $(CARGO) build --release --offline
 
 $(NAME).bin: elf
-	llvm-objcopy -O binary $(BIN_DIR)/$(NAME) $@
-	@echo "Built $@ ($(shell du -h $@ | cut -f1))"
+	$(OBJCOPY) -O binary $(BIN_DIR)/$(NAME) $@
+	@echo "Built $@"
+	@du -h $@
 
 clean:
-	cargo clean
+	CARGO_TARGET_DIR="$(CARGO_TARGET_DIR)" $(CARGO) clean
 	rm -f $(NAME).bin
 
 size: $(NAME).bin
 	@echo "Flat binary size: $$(stat --format=%s $(NAME).bin) bytes"
-	@llvm-size $(BIN_DIR)/$(NAME)
+	@size $(BIN_DIR)/$(NAME)
 
 symbols:
 	nm -C $(BIN_DIR)/$(NAME) | sort | grep -E ' [Tt] '
 
 disasm:
-	llvm-objdump -d $(BIN_DIR)/$(NAME)
+	objdump -d $(BIN_DIR)/$(NAME)

@@ -13,3 +13,6 @@ name = "vibix"
 path = "src/main.rs"
 
 [dependencies]
+
+[profile.release]
+panic = "abort"

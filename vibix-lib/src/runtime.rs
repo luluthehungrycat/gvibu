@@ -6,7 +6,7 @@ use crate::sys;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum SysError {
     /// A negative errno value returned by the kernel.
-    Errno(u16),
+    Errno(u64),
     /// The syscall-specific `u64::MAX` failure sentinel.
     FailureSentinel,
     /// A non-empty write made no progress.
@@ -23,7 +23,7 @@ pub const fn decode_raw(raw: u64) -> SysResult<u64> {
     if raw == u64::MAX {
         Err(SysError::FailureSentinel)
     } else if (raw as i64) < 0 {
-        Err(SysError::Errno((-(raw as i64)) as u16))
+        Err(SysError::Errno((raw as i64).unsigned_abs()))
     } else {
         Ok(raw)
     }
@@ -59,7 +59,7 @@ pub fn write(fd: Fd, bytes: &[u8]) -> SysResult<usize> {
         return Ok(0);
     }
 
-    let raw = sys::sys_write(fd.raw(), bytes.as_ptr(), bytes.len());
+    let raw = unsafe { sys::sys_write(fd.raw(), bytes.as_ptr(), bytes.len()) };
     let count = decode_raw(raw)? as usize;
     if count > bytes.len() {
         Err(SysError::InvalidWriteCount)
@@ -127,6 +127,14 @@ mod tests {
     #[test]
     fn decodes_negative_errno() {
         assert_eq!(decode_raw((-9i64) as u64), Err(SysError::Errno(9)));
+    }
+
+    #[test]
+    fn safely_decodes_minimum_signed_raw_value() {
+        assert_eq!(
+            decode_raw(i64::MIN as u64),
+            Err(SysError::Errno(1u64 << 63))
+        );
     }
 
     #[test]

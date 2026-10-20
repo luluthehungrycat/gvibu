@@ -24,3 +24,10 @@ def test_rev_rejects_unknown_option():
     assert result.returncode == 1
     assert result.stdout == ""
     assert "invalid option" in result.stderr
+
+
+def test_rev_dash_reads_stdin():
+    result = run_cli("-", stdin="abc\n")
+    assert result.returncode == 0
+    assert result.stdout == "cba\n"
+    assert result.stderr == ""

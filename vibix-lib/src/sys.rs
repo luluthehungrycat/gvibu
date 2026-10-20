@@ -1,158 +1,134 @@
-// VIBIX syscall wrappers via inline assembly.
-//
-// The VIBIX ABI passes the syscall number in rax and arguments in
-// rdi/rsi/rdx/r8/r9. The kernel preserves only rcx and r11; every other
-// general-purpose register is caller-clobbered. Keep these wrappers as the
-// single unsafe boundary for the shared runtime.
-#![allow(dead_code)]
+//! VIBIX syscall wrappers.
+//!
+//! Process read/write/exit use syscall numbers 2/1/0.  File open/close are
+//! VFS calls 12/13; 11 is mmap in the kernel.  The assembly boundary saves
+//! every SysV callee-saved register because VIBIX syscall handlers do not
+//! promise to preserve them.
 
-pub const SYS_EXIT: u64 = 0;
-pub const SYS_WRITE_COMPAT: u64 = 1;
-pub const SYS_READ_COMPAT: u64 = 2;
-pub const SYS_BRK: u64 = 4;
-pub const SYS_WRITE_VFS: u64 = 15;
-pub const SYS_READ_VFS: u64 = 14;
+core::arch::global_asm!(
+    ".section .text.gvibu_syscalls,\"ax\"",
+    ".macro SAVE_CALLEE_SAVED",
+    "push rbx",
+    "push rbp",
+    "push r12",
+    "push r13",
+    "push r14",
+    "push r15",
+    ".endm",
+    ".macro RESTORE_CALLEE_SAVED",
+    "pop r15",
+    "pop r14",
+    "pop r13",
+    "pop r12",
+    "pop rbp",
+    "pop rbx",
+    ".endm",
+    ".global gvibu_sys_exit",
+    ".type gvibu_sys_exit,@function",
+    "gvibu_sys_exit:",
+    "SAVE_CALLEE_SAVED",
+    "mov rax, 0",
+    "syscall",
+    "RESTORE_CALLEE_SAVED",
+    "ret",
+    ".size gvibu_sys_exit, .-gvibu_sys_exit",
+    ".global gvibu_sys_write",
+    ".type gvibu_sys_write,@function",
+    "gvibu_sys_write:",
+    "SAVE_CALLEE_SAVED",
+    "mov rax, 1",
+    "syscall",
+    "RESTORE_CALLEE_SAVED",
+    "ret",
+    ".size gvibu_sys_write, .-gvibu_sys_write",
+    ".global gvibu_sys_read",
+    ".type gvibu_sys_read,@function",
+    "gvibu_sys_read:",
+    "SAVE_CALLEE_SAVED",
+    "mov rax, 2",
+    "syscall",
+    "RESTORE_CALLEE_SAVED",
+    "ret",
+    ".size gvibu_sys_read, .-gvibu_sys_read",
+    ".global gvibu_sys_open",
+    ".type gvibu_sys_open,@function",
+    "gvibu_sys_open:",
+    "SAVE_CALLEE_SAVED",
+    "mov rax, 12",
+    "syscall",
+    "RESTORE_CALLEE_SAVED",
+    "ret",
+    ".size gvibu_sys_open, .-gvibu_sys_open",
+    ".global gvibu_sys_close",
+    ".type gvibu_sys_close,@function",
+    "gvibu_sys_close:",
+    "SAVE_CALLEE_SAVED",
+    "mov rax, 13",
+    "syscall",
+    "RESTORE_CALLEE_SAVED",
+    "ret",
+    ".size gvibu_sys_close, .-gvibu_sys_close",
+    ".global gvibu_sys_brk",
+    ".type gvibu_sys_brk,@function",
+    "gvibu_sys_brk:",
+    "SAVE_CALLEE_SAVED",
+    "mov rax, 4",
+    "syscall",
+    "RESTORE_CALLEE_SAVED",
+    "ret",
+    ".size gvibu_sys_brk, .-gvibu_sys_brk",
+);
 
-/// Exit the current process with the given code. Never returns.
+unsafe extern "C" {
+    fn gvibu_sys_exit(code: i32) -> i32;
+    fn gvibu_sys_write(fd: i32, buffer: *const u8, length: usize) -> u64;
+    fn gvibu_sys_read(fd: i32, buffer: *mut u8, length: usize) -> u64;
+    fn gvibu_sys_open(path: *const u8, flags: i32, mode: i32) -> u64;
+    fn gvibu_sys_close(fd: i32) -> u64;
+    fn gvibu_sys_brk(addr: usize) -> u64;
+}
+
+/// Exit the current process with `code`. The kernel should not return.
 #[inline]
 pub fn sys_exit(code: i32) -> ! {
-    unsafe {
-        core::arch::asm!(
-            "syscall",
-            in("rax") SYS_EXIT,
-            in("rdi") code as u64,
-            clobber_abi("C"),
-            options(noreturn, nostack)
-        );
+    unsafe { gvibu_sys_exit(code) };
+    loop {
+        core::hint::spin_loop();
     }
 }
 
-/// Write `len` bytes from `buf` to file descriptor `fd`.
-///
-/// This is syscall 1, the compatibility path currently registered by VIBIX.
-/// The raw `u64` return is intentionally decoded by `runtime`, not here.
+/// Write bytes to a process file descriptor.
 #[inline]
-pub fn sys_write(fd: i32, buf: *const u8, len: usize) -> u64 {
-    let ret: u64;
-    unsafe {
-        core::arch::asm!(
-            "syscall",
-            inlateout("rax") SYS_WRITE_COMPAT => ret,
-            in("rdi") fd as u64,
-            in("rsi") buf as u64,
-            in("rdx") len as u64,
-            clobber_abi("C"),
-            options(nostack)
-        );
-    }
-    ret
+/// # Safety
+/// `buf` must be readable for `len` bytes in the current VIBIX address space.
+pub unsafe fn sys_write(fd: i32, buf: *const u8, len: usize) -> u64 {
+    unsafe { gvibu_sys_write(fd, buf, len) }
 }
 
-/// Read up to `len` bytes into `buf` from file descriptor `fd`.
-///
-/// This is syscall 2, the compatibility path currently registered by VIBIX.
+/// Read bytes from a process file descriptor.
 #[inline]
-pub fn sys_read(fd: i32, buf: *mut u8, len: usize) -> u64 {
-    let ret: u64;
-    unsafe {
-        core::arch::asm!(
-            "syscall",
-            inlateout("rax") SYS_READ_COMPAT => ret,
-            in("rdi") fd as u64,
-            in("rsi") buf as u64,
-            in("rdx") len as u64,
-            clobber_abi("C"),
-            options(nostack)
-        );
-    }
-    ret
+/// # Safety
+/// `buf` must be writable for `len` bytes in the current VIBIX address space.
+pub unsafe fn sys_read(fd: i32, buf: *mut u8, len: usize) -> u64 {
+    unsafe { gvibu_sys_read(fd, buf, len) }
 }
 
-/// Write through the canonical VIBIX VFS syscall slot.
-///
-/// The current kernel source does not register syscall 15 yet; callers must
-/// use this only after the ABI handoff and QEMU verification.
+/// Open a VFS path using the kernel's syscall 12 ABI.
 #[inline]
-pub fn sys_write_vfs(fd: i32, buf: *const u8, len: usize) -> u64 {
-    let ret: u64;
-    unsafe {
-        core::arch::asm!(
-            "syscall",
-            inlateout("rax") SYS_WRITE_VFS => ret,
-            in("rdi") fd as u64,
-            in("rsi") buf as u64,
-            in("rdx") len as u64,
-            clobber_abi("C"),
-            options(nostack)
-        );
-    }
-    ret
+/// # Safety
+/// `path` must point to a readable, NUL-terminated path string.
+pub unsafe fn sys_open(path: *const u8, flags: i32, mode: i32) -> u64 {
+    unsafe { gvibu_sys_open(path, flags, mode) }
 }
 
-/// Read through the canonical VIBIX VFS syscall slot.
-#[inline]
-pub fn sys_read_vfs(fd: i32, buf: *mut u8, len: usize) -> u64 {
-    let ret: u64;
-    unsafe {
-        core::arch::asm!(
-            "syscall",
-            inlateout("rax") SYS_READ_VFS => ret,
-            in("rdi") fd as u64,
-            in("rsi") buf as u64,
-            in("rdx") len as u64,
-            clobber_abi("C"),
-            options(nostack)
-        );
-    }
-    ret
-}
-
-/// Query or update the process program break.
-#[inline]
-pub fn sys_brk(addr: usize) -> u64 {
-    let ret: u64;
-    unsafe {
-        core::arch::asm!(
-            "syscall",
-            inlateout("rax") SYS_BRK => ret,
-            in("rdi") addr as u64,
-            clobber_abi("C"),
-            options(nostack)
-        );
-    }
-    ret
-}
-
-/// Open a file at `path` with the given flags and mode.
-#[inline]
-pub fn sys_open(path: *const u8, flags: i32, mode: i32) -> u64 {
-    let ret: u64;
-    unsafe {
-        core::arch::asm!(
-            "syscall",
-            inlateout("rax") 12u64 => ret,
-            in("rdi") path as u64,
-            in("rsi") flags as u64,
-            in("rdx") mode as u64,
-            clobber_abi("C"),
-            options(nostack)
-        );
-    }
-    ret
-}
-
-/// Close a file descriptor.
+/// Close a VFS file descriptor using syscall 13.
 #[inline]
 pub fn sys_close(fd: i32) -> u64 {
-    let ret: u64;
-    unsafe {
-        core::arch::asm!(
-            "syscall",
-            inlateout("rax") 13u64 => ret,
-            in("rdi") fd as u64,
-            clobber_abi("C"),
-            options(nostack)
-        );
-    }
-    ret
+    unsafe { gvibu_sys_close(fd) }
+}
+
+/// Query or update the kernel-managed process break using syscall 4.
+#[inline]
+pub fn sys_brk(addr: usize) -> u64 {
+    unsafe { gvibu_sys_brk(addr) }
 }

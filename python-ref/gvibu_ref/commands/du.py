@@ -7,12 +7,38 @@ import sys
 def run(args: list[str]) -> int:
     human = False
     summary = False
+    max_depth: int | None = None
     paths = []
 
     i = 0
     while i < len(args):
         arg = args[i]
-        if arg == "-h":
+        if arg == "--max-depth":
+            i += 1
+            if i >= len(args):
+                print("du: option '--max-depth' requires an argument", file=sys.stderr)
+                return 1
+            value = args[i]
+            try:
+                max_depth = int(value)
+                if max_depth < 0:
+                    raise ValueError
+            except ValueError:
+                print(f"du: invalid maximum depth: {value}", file=sys.stderr)
+                return 1
+        elif arg.startswith("--max-depth="):
+            value = arg[len("--max-depth="):]
+            try:
+                max_depth = int(value)
+                if max_depth < 0:
+                    raise ValueError
+            except ValueError:
+                print(f"du: invalid maximum depth: {value}", file=sys.stderr)
+                return 1
+        elif arg == "--":
+            paths.extend(args[i + 1:])
+            break
+        elif arg == "-h":
             human = True
         elif arg == "-s":
             summary = True
@@ -38,7 +64,9 @@ def run(args: list[str]) -> int:
     for path_str in paths:
         try:
             entries = _du_walk(path_str, summary)
-            for size, p in entries:
+            for size, p, depth in entries:
+                if max_depth is not None and depth > max_depth:
+                    continue
                 display = path_str if p == "." else p
                 if human:
                     print(f"{_human_size(size)}\t{display}")
@@ -59,28 +87,31 @@ def run(args: list[str]) -> int:
     return exit_code
 
 
-def _du_walk(path: str, summary: bool) -> list[tuple[int, str]]:
+def _du_walk(path: str, summary: bool, depth: int = 0) -> list[tuple[int, str, int]]:
     meta = os.lstat(path)
-    entries: list[tuple[int, str]] = []
+    entries: list[tuple[int, str, int]] = []
 
     if os.path.isdir(path) and not os.path.islink(path) and not summary:
         try:
+            dir_size = 0
             for entry in os.listdir(path):
                 sub_path = os.path.join(path, entry)
                 sub_meta = os.lstat(sub_path)
                 if os.path.isdir(sub_path) and not os.path.islink(sub_path):
-                    sub_entries = _du_walk(sub_path, False)
+                    sub_entries = _du_walk(sub_path, False, depth + 1)
+                    if sub_entries:
+                        dir_size += sub_entries[-1][0]
                     entries.extend(sub_entries)
                 else:
-                    entries.append((sub_meta.st_size, sub_path))
+                    dir_size += sub_meta.st_size
+                    entries.append((sub_meta.st_size, sub_path, depth + 1))
         except PermissionError as e:
             print(f"du: {path}: {e}", file=sys.stderr)
 
         entries.sort(key=lambda x: x[1])
-        dir_size = sum(s for s, _ in entries)
-        entries.append((dir_size, path))
+        entries.append((dir_size, path, depth))
     else:
-        entries.append((meta.st_size, path))
+        entries.append((meta.st_size, path, depth))
 
     return entries
 

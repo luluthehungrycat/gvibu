@@ -83,7 +83,7 @@ def run(args: list[str]) -> int:
             except ValueError as error:
                 print(f"expand: {error}", file=sys.stderr)
                 return 1
-        elif parsing_options and arg.startswith("-"):
+        elif parsing_options and arg.startswith("-") and arg != "-":
             print(f"expand: invalid option: {arg}", file=sys.stderr)
             return 1
         else:
@@ -101,7 +101,8 @@ def run(args: list[str]) -> int:
     exit_code = 0
     for path in paths:
         try:
-            sys.stdout.write(expand_text(Path(path).read_text(), stops, initial_only))
+            text = sys.stdin.read() if path == "-" else Path(path).read_text()
+            sys.stdout.write(expand_text(text, stops, initial_only))
         except OSError as error:
             print(f"expand: {path}: {error}", file=sys.stderr)
             exit_code = 1

@@ -11,11 +11,23 @@
     },
     {
       "name": "invalid_option",
-      "args": ["-x"],
+      "args": [
+        "-x"
+      ],
       "stdin": "",
       "stdout": "",
       "stderr": "*",
       "exit_code": 1
+    },
+    {
+      "name": "dash_reads_stdin",
+      "args": [
+        "-"
+      ],
+      "stdin": "abc\n",
+      "stdout": "cba\n",
+      "stderr": "",
+      "exit_code": 0
     }
   ]
 }
