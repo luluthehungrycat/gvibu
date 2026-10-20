@@ -31,14 +31,15 @@ cargo build --locked --manifest-path rust/Cargo.toml --target wasm32-wasip1 --re
 Run it with Wasmtime:
 
 ```sh
-wasmtime run rust/target/wasm32-wasip1/release/gvibu.wasm echo hello
-printf 'alpha\nbeta\n' | wasmtime run rust/target/wasm32-wasip1/release/gvibu.wasm cat
+wasmtime run --argv0 gvibu rust/target/wasm32-wasip1/release/gvibu.wasm true
+wasmtime run --argv0 gvibu rust/target/wasm32-wasip1/release/gvibu.wasm echo hello
+printf 'alpha\nbeta\n' | wasmtime run --argv0 gvibu rust/target/wasm32-wasip1/release/gvibu.wasm cat
 ```
 
 WASI filesystem commands can access directories preopened by the runtime. For example, with a recent Wasmtime release:
 
 ```sh
-wasmtime run --dir ./fixtures::/fixtures rust/target/wasm32-wasip1/release/gvibu.wasm cat /fixtures/input.txt
+wasmtime run --dir ./fixtures::/fixtures --argv0 gvibu rust/target/wasm32-wasip1/release/gvibu.wasm cat /fixtures/input.txt
 ```
 
 ## Platform limits

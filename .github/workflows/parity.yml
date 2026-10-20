@@ -69,9 +69,9 @@ jobs:
           set -euo pipefail
           export PATH="$HOME/.wasmtime/bin:$PATH"
           wasm=rust/target/wasm32-wasip1/release/gvibu.wasm
-          wasmtime run "$wasm" true
-          test "$(wasmtime run "$wasm" echo hello)" = "hello"
-          if wasmtime run "$wasm" false; then
+          wasmtime run --argv0 gvibu "$wasm" true
+          test "$(wasmtime run --argv0 gvibu "$wasm" echo hello)" = "hello"
+          if wasmtime run --argv0 gvibu "$wasm" false; then
             echo "false unexpectedly succeeded" >&2
             exit 1
           else
@@ -79,13 +79,13 @@ jobs:
             test "$status" -eq 1
           fi
 
-          stdin_output="$(printf 'alpha\nbeta\n' | wasmtime run "$wasm" cat)"
+          stdin_output="$(printf 'alpha\nbeta\n' | wasmtime run --argv0 gvibu "$wasm" cat)"
           test "$stdin_output" = "$(printf 'alpha\nbeta')"
 
           fixture_dir="$RUNNER_TEMP/gvibu-wasm-fixture"
           mkdir -p "$fixture_dir"
           printf 'from-file\n' > "$fixture_dir/input.txt"
-          file_output="$(wasmtime run --dir "$fixture_dir::/fixtures" "$wasm" cat /fixtures/input.txt)"
+          file_output="$(wasmtime run --dir "$fixture_dir::/fixtures" --argv0 gvibu "$wasm" cat /fixtures/input.txt)"
           test "$file_output" = "from-file"
 
       - name: Install wasm-pack
@@ -108,18 +108,34 @@ jobs:
 
           const wasm = await readFile('./wasm-lib/pkg/gvibu_wasm_bg.wasm');
           await init(wasm);
-          const output = run_command('wc', ['-l'], 'one\ntwo\n');
-          if (output !== '      2\n') {
-            throw new Error(`stdin binding returned ${JSON.stringify(output)}`);
-          }
-          try {
-            run_command('ls', [], null);
-            throw new Error('ls unexpectedly succeeded in browser WASM');
-          } catch (error) {
-            if (!String(error).includes('not supported on WebAssembly')) {
-              throw error;
+          const expect = (actual, expected, label) => {
+            if (actual !== expected) {
+              throw new Error(`${label}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
             }
-          }
+          };
+          expect(run_command('wc', ['-l'], 'one\n'), '      1\n', 'first stdin call');
+          expect(run_command('wc', ['-l'], 'one\ntwo\n'), '      2\n', 'second stdin call');
+          expect(run_command('wc', ['-l'], null), '      0\n', 'missing stdin call');
+          const expectFailure = (run, message, label) => {
+            let failure;
+            try {
+              run();
+            } catch (error) {
+              failure = error;
+            }
+            if (failure === undefined) throw new Error(`${label} unexpectedly succeeded`);
+            if (!String(failure).includes(message)) throw failure;
+          };
+          expectFailure(
+            () => run_command('ls', [], null),
+            'not supported on WebAssembly',
+            'unsupported command',
+          );
+          expectFailure(
+            () => run_command('not-a-command', [], null),
+            'unknown command',
+            'unknown command',
+          );
           NODE
 
   docker:
