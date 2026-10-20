@@ -17,28 +17,16 @@ def run(args):
 def test_help():
     out, code = run(["./gvibu-linux/vish", "help"])
     assert code == 0
-    assert "GVIBU minimal shell" in out
+    assert "Built-in commands:" in out
 
 
-def test_gvibu_help():
-    out, code = run(["./gvibu-linux/vish", "gvibu", "help"])
+def test_command_dispatch():
+    out, code = run(["./gvibu-linux/vish", "echo", "hello"])
     assert code == 0
-    assert "GVIBU command surface" in out
-
-
-def test_init():
-    out, code = run(["./gvibu-linux/vish", "init"])
-    assert code == 0
-    assert "GVIBU init" in out
-
-
-def test_status():
-    out, code = run(["./gvibu-linux/vish", "status"])
-    assert code == 0
-    assert "GVIBU status" in out
+    assert out == "hello"
 
 
 def test_unknown():
     out, code = run(["./gvibu-linux/vish", "not-a-command"])
     assert code != 0
-    assert "Unknown command" in out
+    assert "command not found" in out

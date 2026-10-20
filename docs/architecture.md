@@ -2,7 +2,7 @@
 
 ## Multicall Binary Pattern
 
-gvibu uses the **multicall binary** pattern: a single compiled binary serves as all 58 commands. This is the same pattern used by BusyBox and toybox.
+gvibu uses the **multicall binary** pattern: a single compiled binary serves as all 60 commands. This is the same pattern used by BusyBox and toybox.
 
 ### Dispatch Flow
 

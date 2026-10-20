@@ -16,3 +16,4 @@ wasm-lib/target/
 .claude/
 opencode-sidebar.md
 kernel/*.bin
+vish/target/

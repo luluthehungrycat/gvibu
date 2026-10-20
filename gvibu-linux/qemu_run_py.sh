@@ -1,11 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# Simple QEMU run helper for Python GVIBU variant (scaffold)
-KERNEL_PATH="${1-}"
-INITRAMFS_PATH="${2-}"
-if [[ -z "$KERNEL_PATH" || -z "$INITRAMFS_PATH" ]]; then
-  echo "Usage: ./gvibu-linux/qemu_run_py.sh /path/to/vmlinuz /path/to/initramfs.cpio"
-  exit 1
+
+REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+KERNEL_PATH="${1:-}"
+INITRAMFS_PATH="${2:-${TMPDIR:-/tmp}/gvibu_py_initramfs.cpio}"
+QEMU_BIN="${QEMU_BIN:-qemu-system-x86_64}"
+
+if [[ -z "$KERNEL_PATH" ]]; then
+    echo "Usage: $(basename "$0") KERNEL [INITRAMFS]" >&2
+    exit 2
 fi
-echo "qemu-system-x86_64 -kernel \"$KERNEL_PATH\" -initrd \"$INITRAMFS_PATH\" -append \"root=/dev/ram0 init=/init\" -m 512M -nographic"
-echo "Note: This is a scaffold for the Python GVIBU path; actual boot not performed in this script."
+if [[ ! -f "$KERNEL_PATH" ]]; then
+    echo "Error: kernel image not found: $KERNEL_PATH" >&2
+    exit 1
+fi
+if ! command -v "$QEMU_BIN" >/dev/null 2>&1; then
+    echo "Error: QEMU executable not found: $QEMU_BIN" >&2
+    exit 1
+fi
+
+python3 "$REPO_DIR/gvibu-linux/prepare_vish_initramfs.py" python "$INITRAMFS_PATH" --repo "$REPO_DIR"
+echo "Booting Python VISH from $INITRAMFS_PATH"
+exec "$QEMU_BIN" \
+    -kernel "$KERNEL_PATH" \
+    -initrd "$INITRAMFS_PATH" \
+    -append "console=ttyS0" \
+    -m 512M \
+    -nographic
