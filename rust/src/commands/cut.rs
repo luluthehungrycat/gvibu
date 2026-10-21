@@ -198,7 +198,7 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
 
     if files.is_empty() {
         if let Some(input) = crate::get_wasm_stdin() {
-            let mut reader = io::Cursor::new(input.into_bytes());
+            let mut reader = BufReader::new(io::Cursor::new(input.into_bytes()));
             process_reader(stdout, &mut reader, delimiter, field_indices.as_ref(), byte_indices.as_ref(), char_indices.as_ref(), suppress_non_matching);
         } else {
             let mut reader = BufReader::new(io::stdin());
@@ -208,7 +208,7 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
         for f in &files {
             if f == "-" {
                 if let Some(input) = crate::get_wasm_stdin() {
-                    let mut reader = io::Cursor::new(input.into_bytes());
+                    let mut reader = BufReader::new(io::Cursor::new(input.into_bytes()));
                     process_reader(stdout, &mut reader, delimiter, field_indices.as_ref(), byte_indices.as_ref(), char_indices.as_ref(), suppress_non_matching);
                 } else {
                     let mut reader = BufReader::new(io::stdin());

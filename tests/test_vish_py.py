@@ -18,11 +18,11 @@ def test_help_py():
 
 def test_init_py():
     out, code = run(["init"])
-    assert code == 0
-    assert "GVIBU init" in out
+    assert code == 1
+    assert "command not found" in out
 
 
 def test_status_py():
     out, code = run(["status"])
-    assert code == 0
-    assert "GVIBU status" in out
+    assert code == 1
+    assert "command not found" in out

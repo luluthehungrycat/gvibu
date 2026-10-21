@@ -10,8 +10,10 @@ Behavior
   - `-s` or `--kernel-name`: Print kernel name
   - `-n` or `--nodename`: Print network node hostname
   - `-r` or `--kernel-release`: Print kernel release
+  - `-v`: Print kernel version
   - `-m` or `--machine`: Print machine hardware name
-  - `-a` or `--all`: Print all information in order
+  - `-o`: Print operating system
+  - `-a` or `--all`: Print all information in order (`-s -n -r -v -m -o`)
 
 Exit Codes
 - 0: Success
@@ -23,5 +25,5 @@ Output Conventions
 
 Implementation Notes
 - Python: use `os.uname()` and `platform.uname()`.
-- Rust: use `std::process::Command` for `uname` or `std::env::consts`.
+- Rust: read Linux kernel fields from `/proc/sys/kernel` and use the POSIX `uname` system call elsewhere.
 - Platform-dependent output; parity tester must use wildcards or skip string comparisons.

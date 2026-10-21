@@ -9,56 +9,72 @@
     },
     {
       "name": "kernel_name",
-      "args": ["-s"],
+      "args": [
+        "-s"
+      ],
       "stdout": "Linux\n",
       "stderr": "",
       "exit_code": 0
     },
     {
       "name": "nodename",
-      "args": ["-n"],
+      "args": [
+        "-n"
+      ],
       "stdout": "*",
       "stderr": "",
       "exit_code": 0
     },
     {
       "name": "kernel_release",
-      "args": ["-r"],
+      "args": [
+        "-r"
+      ],
       "stdout": "*",
       "stderr": "",
       "exit_code": 0
     },
     {
       "name": "kernel_version",
-      "args": ["-v"],
+      "args": [
+        "-v"
+      ],
       "stdout": "*",
       "stderr": "",
       "exit_code": 0
     },
     {
       "name": "machine",
-      "args": ["-m"],
+      "args": [
+        "-m"
+      ],
       "stdout": "*",
       "stderr": "",
       "exit_code": 0
     },
     {
       "name": "operating_system",
-      "args": ["-o"],
+      "args": [
+        "-o"
+      ],
       "stdout": "*",
       "stderr": "",
       "exit_code": 0
     },
     {
       "name": "all",
-      "args": ["-a"],
+      "args": [
+        "-a"
+      ],
       "stdout": "*",
       "stderr": "",
       "exit_code": 0
     },
     {
       "name": "invalid_option",
-      "args": ["-x"],
+      "args": [
+        "-x"
+      ],
       "stdout": "",
       "stderr": "*",
       "exit_code": 1
