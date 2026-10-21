@@ -1,0 +1,67 @@
+{
+  "cases": [
+    {
+      "name": "default",
+      "args": [],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "kernel_name",
+      "args": ["-s"],
+      "stdout": "Linux\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "nodename",
+      "args": ["-n"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "kernel_release",
+      "args": ["-r"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "kernel_version",
+      "args": ["-v"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "machine",
+      "args": ["-m"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "operating_system",
+      "args": ["-o"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "all",
+      "args": ["-a"],
+      "stdout": "*",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "invalid_option",
+      "args": ["-x"],
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    }
+  ]
+}

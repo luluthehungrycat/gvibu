@@ -25,14 +25,21 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut exit_code = 0;
 
     if files.is_empty() {
+        if let Some(input) = crate::get_wasm_stdin() {
+            return print_lines(w, io::Cursor::new(input.into_bytes()), number_lines, &mut line_num, "-");
+        }
         let stdin = io::stdin();
         return print_lines(w, stdin.lock(), number_lines, &mut line_num, "-");
     }
 
     for filename in files {
         if filename == "-" {
-            let stdin = io::stdin();
-            exit_code |= print_lines(w, stdin.lock(), number_lines, &mut line_num, "-");
+            if let Some(input) = crate::get_wasm_stdin() {
+                exit_code |= print_lines(w, io::Cursor::new(input.into_bytes()), number_lines, &mut line_num, "-");
+            } else {
+                let stdin = io::stdin();
+                exit_code |= print_lines(w, stdin.lock(), number_lines, &mut line_num, "-");
+            }
         } else {
             match File::open(filename) {
                 Ok(file) => {

@@ -104,3 +104,27 @@ rust/
 │   └── fuzz.rs             # Property-based tests (proptest)
 └── Cargo.toml
 ```
+
+## GVIBU/VIBIX stack ownership
+
+The stack is layered:
+
+```text
+VIBIX kernel → VIBIX syscall ABI → vibix-lib shared runtime
+                                      ├→ VIBIT init/supervision
+                                      ├→ VISH shell policy
+                                      └→ GVIBU command behavior
+```
+
+`vibix-lib/` is the GVIBU-owned no-std runtime boundary. It converts raw
+VIBIX error sentinels before they become pointers, lengths, or descriptors,
+models the full syscall caller-clobber contract, and exposes checked
+descriptor I/O. It does not own shell parsing, init policy, or coreutils
+flags.
+
+The current flat-binary compatibility path uses registered syscall 1/2.
+VIBIX main registers canonical VFS syscalls 14/15 and `brk` syscall 4. The
+shared wrappers need host and no-std validation, followed by QEMU verification
+of kernel behavior. VISH and VIBIT consumers require an
+explicit runtime handoff; image packaging and QEMU smoke coverage belong to
+the integration owner.

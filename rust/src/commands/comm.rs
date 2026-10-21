@@ -36,8 +36,12 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         return 1;
     }
 
+    let input = crate::get_wasm_stdin();
     let file1: Box<dyn BufRead> = if files[0] == "-" {
-        Box::new(BufReader::new(io::stdin()))
+        match input.as_ref() {
+            Some(text) => Box::new(io::Cursor::new(text.clone())),
+            None => Box::new(BufReader::new(io::stdin())),
+        }
     } else {
         match File::open(files[0]) {
             Ok(f) => Box::new(BufReader::new(f)),
@@ -49,7 +53,10 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     };
 
     let file2: Box<dyn BufRead> = if files[1] == "-" {
-        Box::new(BufReader::new(io::stdin()))
+        match input.as_ref() {
+            Some(text) => Box::new(io::Cursor::new(text.clone())),
+            None => Box::new(BufReader::new(io::stdin())),
+        }
     } else {
         match File::open(files[1]) {
             Ok(f) => Box::new(BufReader::new(f)),

@@ -122,6 +122,15 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut exit_code = 0;
 
     if files.is_empty() {
+        if let Some(input) = crate::get_wasm_stdin() {
+            let reader = io::Cursor::new(input.into_bytes());
+            if let Some(nbytes) = num_bytes {
+                let data = read_n_bytes(reader, nbytes);
+                return print_bytes(w, &data, nbytes);
+            }
+            let lines = read_n_lines(reader, num_lines);
+            return print_lines(w, &lines, num_lines);
+        }
         if let Some(nbytes) = num_bytes {
             let stdin = io::stdin();
             let data = read_n_bytes(stdin.lock(), nbytes);
@@ -142,6 +151,17 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         }
 
         if fname == "-" {
+            if let Some(input) = crate::get_wasm_stdin() {
+                let reader = io::Cursor::new(input.into_bytes());
+                if let Some(nbytes) = num_bytes {
+                    let data = read_n_bytes(reader, nbytes);
+                    exit_code |= print_bytes(w, &data, nbytes);
+                } else {
+                    let lines = read_n_lines(reader, num_lines);
+                    exit_code |= print_lines(w, &lines, num_lines);
+                }
+                continue;
+            }
             if let Some(nbytes) = num_bytes {
                 let stdin = io::stdin();
                 let data = read_n_bytes(stdin.lock(), nbytes);

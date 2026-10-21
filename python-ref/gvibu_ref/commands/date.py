@@ -2,6 +2,7 @@
 
 import sys
 import datetime
+import re
 import time
 
 
@@ -18,9 +19,18 @@ def run(args: list[str]) -> int:
     rfc2822 = False
     iso8601 = False
     format_str = None
+    date_string = None
+    parsing_date_arg = False
+    i = 0
 
-    for arg in args:
-        if arg in ("-u", "--utc", "--universal"):
+    while i < len(args):
+        arg = args[i]
+        if parsing_date_arg:
+            date_string = arg
+            parsing_date_arg = False
+        elif arg in ("-d", "--date"):
+            parsing_date_arg = True
+        elif arg in ("-u", "--utc", "--universal"):
             utc = True
         elif arg in ("-R", "--rfc-2822", "--rfc-email"):
             rfc2822 = True
@@ -34,16 +44,27 @@ def run(args: list[str]) -> int:
         else:
             print(f"date: extra operand '{arg}'", file=sys.stderr)
             return 1
+        i += 1
+
+    if parsing_date_arg:
+        print("date: option requires an argument -- 'd'", file=sys.stderr)
+        return 1
 
     if utc:
         now = datetime.datetime.now(datetime.timezone.utc)
     else:
         now = datetime.datetime.now(datetime.timezone(datetime.timedelta(0)))
 
+    if date_string is not None:
+        try:
+            now = parse_date_argument(date_string, now)
+        except (ValueError, OverflowError) as error:
+            print(f"date: invalid date '{date_string}'", file=sys.stderr)
+            return 1
+
     local_now = datetime.datetime.now()
 
     if rfc2822:
-        # Mon, 08 Jun 2026 12:34:56 +0000
         print(now.strftime("%a, %d %b %Y %H:%M:%S %z"))
         return 0
 
@@ -55,13 +76,65 @@ def run(args: list[str]) -> int:
         print(format_custom(now, format_str))
         return 0
 
-    # Default: Mon Jun  8 12:34:56 UTC 2026
-    dt = local_now
+    dt = local_now if date_string is None else now
     wd = WEEKDAYS_ABBR[dt.weekday()]
     mo = MONTHS_ABBR[dt.month - 1]
     tz_str = time.tzname[0] if time.daylight and time.localtime().tm_isdst else time.tzname[0]
     print(f"{wd} {mo} {dt.day:2d} {dt.hour:02d}:{dt.minute:02d}:{dt.second:02d} {tz_str} {dt.year}")
     return 0
+
+
+def parse_date_argument(value: str, reference: datetime.datetime) -> datetime.datetime:
+    text = value.strip()
+    lowered = text.lower()
+    if lowered in ("now", "today"):
+        return reference
+    if lowered in ("yesterday", "tomorrow"):
+        offset = -1 if lowered == "yesterday" else 1
+        return reference + datetime.timedelta(days=offset)
+
+    try:
+        parsed = datetime.datetime.fromisoformat(text.replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            return parsed.replace(tzinfo=datetime.timezone.utc)
+        return parsed.astimezone(datetime.timezone.utc)
+    except ValueError:
+        pass
+
+    datetime_formats = ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M:%S")
+    for date_format in datetime_formats:
+        try:
+            return datetime.datetime.strptime(text, date_format).replace(tzinfo=datetime.timezone.utc)
+        except ValueError:
+            continue
+
+    date_formats = ("%Y/%m/%d", "%d %b %Y", "%b %d, %Y", "%B %d, %Y", "%d %B %Y")
+    for date_format in date_formats:
+        try:
+            return datetime.datetime.strptime(text, date_format).replace(tzinfo=datetime.timezone.utc)
+        except ValueError:
+            continue
+
+    match = re.fullmatch(r"([+-])\s*(\d+)\s+([A-Za-z]+)", text)
+    if match:
+        sign = -1 if match.group(1) == "-" else 1
+        amount = int(match.group(2)) * sign
+        unit = match.group(3).lower()
+        multipliers = {
+            "second": ("seconds", 1), "seconds": ("seconds", 1), "sec": ("seconds", 1), "s": ("seconds", 1),
+            "minute": ("seconds", 60), "minutes": ("seconds", 60), "min": ("seconds", 60), "m": ("seconds", 60),
+            "hour": ("seconds", 3600), "hours": ("seconds", 3600), "hr": ("seconds", 3600), "h": ("seconds", 3600),
+            "day": ("days", 1), "days": ("days", 1), "d": ("days", 1),
+            "week": ("days", 7), "weeks": ("days", 7), "w": ("days", 7),
+            "month": ("days", 30), "months": ("days", 30), "mon": ("days", 30),
+            "year": ("days", 365), "years": ("days", 365), "yr": ("days", 365), "y": ("days", 365),
+        }
+        if unit in multipliers:
+            quantity, multiplier = multipliers[unit]
+            delta = datetime.timedelta(**{quantity: amount * multiplier})
+            return reference + delta
+
+    raise ValueError("unrecognized date")
 
 
 def format_custom(dt: datetime.datetime, fmt: str) -> str:

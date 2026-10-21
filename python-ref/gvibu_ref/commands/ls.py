@@ -17,28 +17,43 @@ def run(args: list[str]) -> int:
     reverse = False
     sort_size = False
     one_per_line = True
+    append_indicator = False
+    list_directories_themselves = False
+    recursive = False
+    show_inode = False
+    color_mode = "never"
     paths = []
+    parsing_options = True
 
     i = 0
     while i < len(args):
         arg = args[i]
-        if arg == "-a":
+        if parsing_options and arg == "--":
+            parsing_options = False
+        elif parsing_options and arg == "-a":
             show_all = True
-        elif arg == "-A":
+        elif parsing_options and arg == "-A":
             show_almost_all = True
-        elif arg == "-l":
+        elif parsing_options and arg == "-l":
             long = True
-        elif arg == "-h":
+        elif parsing_options and arg == "-h":
             human = True
-        elif arg == "-t":
+        elif parsing_options and arg == "-t":
             sort_time = True
-        elif arg == "-r":
+        elif parsing_options and arg == "-r":
             reverse = True
-        elif arg == "-S":
+        elif parsing_options and arg == "-S":
             sort_size = True
-        elif arg == "-1":
+        elif parsing_options and arg == "-1":
             one_per_line = True
-        elif arg.startswith("-") and len(arg) > 1:
+        elif parsing_options and arg == "--color":
+            color_mode = "auto"
+        elif parsing_options and arg.startswith("--color="):
+            color_mode = arg.split("=", 1)[1]
+            if color_mode not in ("auto", "always", "never"):
+                print(f"ls: invalid color option: {color_mode}", file=sys.stderr)
+                return 1
+        elif parsing_options and arg.startswith("-") and len(arg) > 1:
             for c in arg[1:]:
                 if c == 'a':
                     show_all = True
@@ -56,12 +71,22 @@ def run(args: list[str]) -> int:
                     sort_size = True
                 elif c == '1':
                     one_per_line = True
+                elif c == 'F':
+                    append_indicator = True
+                elif c == 'd':
+                    list_directories_themselves = True
+                elif c == 'R':
+                    recursive = True
+                elif c == 'i':
+                    show_inode = True
                 else:
                     print(f"ls: invalid option: -{c}", file=sys.stderr)
                     return 1
         else:
             paths.append(arg)
         i += 1
+
+    color = color_mode == "always" or (color_mode == "auto" and sys.stdout.isatty())
 
     if not paths:
         paths.append(".")
@@ -71,19 +96,19 @@ def run(args: list[str]) -> int:
 
     for path in paths:
         try:
-            meta = os.stat(path)
+            meta = os.lstat(path) if list_directories_themselves else os.stat(path)
         except OSError as e:
             print(f"ls: cannot access '{path}': {e}", file=sys.stderr)
             exit_code = 1
             continue
 
-        if stat.S_ISDIR(meta.st_mode):
+        if stat.S_ISDIR(meta.st_mode) and not list_directories_themselves:
             if not first:
                 print()
             if len(paths) > 1:
                 print(f"{path}:")
             first = False
-            ec = _list_directory(path, long, show_all, show_almost_all, human, sort_time, reverse, sort_size)
+            ec = _list_directory(path, long, show_all, show_almost_all, human, sort_time, reverse, sort_size, color, append_indicator, recursive, show_inode)
             if ec:
                 exit_code = ec
             if len(paths) > 1:
@@ -93,15 +118,26 @@ def run(args: list[str]) -> int:
                 print()
             first = False
             if long:
-                print(_format_long(path, meta, human))
+                long_name = path + (_indicator(meta) if append_indicator else "")
+                output = _format_long(long_name, meta, human)
+                if show_inode:
+                    output = f"{meta.st_ino} {output}"
+                print(output)
             else:
-                print(_display_name(path))
+                name = _display_name(path)
+                if show_inode:
+                    name = f"{meta.st_ino} {name}"
+                if append_indicator:
+                    name += _indicator(meta)
+                print(_colorize(name, meta) if color else name)
 
     return exit_code
 
 
 def _list_directory(dir_path: str, long: bool, show_all: bool, show_almost_all: bool,
-                    human: bool, sort_time: bool, reverse: bool, sort_size: bool) -> int:
+                    human: bool, sort_time: bool, reverse: bool, sort_size: bool,
+                    color: bool = False, append_indicator: bool = False,
+                    recursive: bool = False, show_inode: bool = False) -> int:
     try:
         entries = os.listdir(dir_path)
     except OSError as e:
@@ -119,7 +155,7 @@ def _list_directory(dir_path: str, long: bool, show_all: bool, show_almost_all: 
                 continue
         full = os.path.join(dir_path, name)
         try:
-            meta = os.stat(full)
+            meta = os.lstat(full)
             items.append((name, meta))
         except OSError:
             items.append((name, None))
@@ -137,12 +173,29 @@ def _list_directory(dir_path: str, long: bool, show_all: bool, show_almost_all: 
     if long:
         for name, meta in items:
             if meta:
-                print(_format_long(name, meta, human))
+                long_name = name + (_indicator(meta) if append_indicator else "")
+                output = _format_long(long_name, meta, human)
+                if show_inode:
+                    output = f"{meta.st_ino} {output}"
+                print(output)
     else:
-        for name, _ in items:
-            print(name)
+        for name, meta in items:
+            if show_inode and meta:
+                name = f"{meta.st_ino} {name}"
+            if append_indicator and meta:
+                name += _indicator(meta)
+            print(_colorize(name, meta) if color and meta else name)
 
-    return 0
+    exit_code = 0
+    if recursive:
+        for name, meta in items:
+            if meta and stat.S_ISDIR(meta.st_mode):
+                subdir = name if dir_path == "." else os.path.join(dir_path, name)
+                print()
+                print(f"{subdir}:")
+                exit_code |= _list_directory(subdir, long, show_all, show_almost_all, human, sort_time, reverse, sort_size,
+                                             color, append_indicator, recursive, show_inode)
+    return exit_code
 
 
 def _format_long(name: str, meta: os.stat_result, human: bool) -> str:
@@ -196,3 +249,23 @@ def _format_time(secs: float) -> str:
 
 def _display_name(path: str) -> str:
     return path.rsplit("/", 1)[-1] if "/" in path else path
+
+
+def _indicator(meta: os.stat_result) -> str:
+    if stat.S_ISDIR(meta.st_mode):
+        return "/"
+    if stat.S_ISLNK(meta.st_mode):
+        return "@"
+    if meta.st_mode & 0o111:
+        return "*"
+    return ""
+
+
+def _colorize(name: str, meta: os.stat_result) -> str:
+    if stat.S_ISDIR(meta.st_mode):
+        return f"\x1b[34m{name}\x1b[0m"
+    if stat.S_ISLNK(meta.st_mode):
+        return f"\x1b[36m{name}\x1b[0m"
+    if meta.st_mode & 0o111:
+        return f"\x1b[32m{name}\x1b[0m"
+    return name

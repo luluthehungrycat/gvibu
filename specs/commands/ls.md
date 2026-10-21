@@ -20,6 +20,11 @@ ls [OPTION]... [FILE]...
 | `-r` | Reverse sort order |
 | `-S` | Sort by file size, largest first |
 | `-1` | List one file per line (default) |
+| `-F` | Append `/`, `*`, or `@` indicators to directories, executables, or symlinks |
+| `-d` | List directory arguments themselves instead of their contents |
+| `-R` | List subdirectories recursively |
+| `-i` | Show inode numbers |
+| `--color[=WHEN]` | Color names (`always`, `never`, or `auto`; bare `--color` means `auto`) |
 
 ## Arguments
 
@@ -38,5 +43,8 @@ ls -l               # Long listing format
 ls -la              # Long listing including hidden files
 ls -ltr             # Long listing sorted by time, reversed
 ls -lh              # Long listing with human-readable sizes
+ls -F --color=auto  # Add file indicators and color when stdout is a terminal
+ls -d /tmp          # List the directory entry itself
+ls -R /tmp          # List subdirectories recursively
 ls /tmp             # List /tmp directory
 ```

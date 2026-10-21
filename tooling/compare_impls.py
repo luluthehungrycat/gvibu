@@ -129,7 +129,7 @@ def main():
     python_cmd = ["python3", "python-ref/gvibu_ref/main.py"]
     rust_cmd = [os.environ.get("GVIBU_RUST_BIN", "rust/target/debug/gvibu")]
 
-    commands = ["true", "false", "echo", "pwd", "basename", "dirname", "cat", "wc", "head", "yes", "printenv", "sleep", "touch", "seq", "which", "uname", "env", "whoami", "link", "unlink", "tee", "mkdir", "rmdir", "hostname", "logname", "readlink", "realpath", "uniq", "uptime", "id", "who", "kill", "cut", "tr", "mv", "rm", "ln", "chmod", "chown", "sort", "grep", "ls", "cp", "printf", "date", "expr", "split", "tail", "tac", "fold", "comm", "join", "nl", "shuf", "sum", "du", "df", "test"]
+    commands = ["true", "false", "echo", "pwd", "basename", "dirname", "cat", "wc", "head", "yes", "printenv", "sleep", "touch", "seq", "which", "uname", "env", "whoami", "link", "unlink", "tee", "mkdir", "rmdir", "hostname", "logname", "readlink", "realpath", "uniq", "uptime", "id", "who", "kill", "cut", "tr", "mv", "rm", "ln", "chmod", "chown", "sort", "grep", "ls", "cp", "printf", "date", "expr", "split", "tail", "tac", "fold", "expand", "rev", "comm", "join", "nl", "shuf", "sum", "du", "df", "test"]
 
     all_results = []
 

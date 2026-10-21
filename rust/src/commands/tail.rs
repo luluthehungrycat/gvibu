@@ -1,11 +1,14 @@
 /// tail: output the last part of files.
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Read, Seek, SeekFrom, Write};
+use std::thread;
+use std::time::Duration;
 
 pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut num_lines: usize = 10;
     let mut num_bytes: Option<usize> = None;
     let mut files: Vec<String> = Vec::new();
+    let mut follow: bool = false;
     let mut i = 0;
 
     while i < args.len() {
@@ -45,8 +48,10 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
                     return 1;
                 }
             }
+        } else if arg == "-f" || arg == "--follow" {
+            follow = true;
         } else if arg.starts_with('-') && arg.len() > 1 {
-            eprintln!("tail: invalid option: {}", arg);
+            eprintln!("tail: invalid option: {} ", arg);
             return 1;
         } else {
             files.push(arg.clone());
@@ -54,52 +59,40 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
         i += 1;
     }
 
+    if follow && files.len() > 1 {
+        eprintln!("tail: following multiple files is not supported");
+        return 1;
+    }
+
     let mut exit_code = 0;
 
     if files.is_empty() || files == ["-"] {
-        let stdin = io::stdin();
-        let stdin = stdin.lock();
-        if let Some(nbytes) = num_bytes {
-            let data = read_last_bytes_reader(stdin, nbytes);
-            if let Err(e) = w.write_all(&data) {
-                if e.kind() == std::io::ErrorKind::BrokenPipe { return 0; }
-                return 1;
-            }
-        } else {
-            let lines = read_last_lines_reader(stdin, num_lines);
-            for line in &lines {
-                if let Err(e) = write!(w, "{}", line) {
-                    if e.kind() == std::io::ErrorKind::BrokenPipe { return 0; }
-                    return 1;
-                }
-            }
+        if follow {
+            eprintln!("tail: cannot follow standard input");
+            return 1;
         }
-        return 0;
+        return tail_stdin(w, num_lines, num_bytes, crate::get_wasm_stdin());
     }
 
     for fname in &files {
         if fname == "-" {
-            let stdin = io::stdin();
-            let stdin = stdin.lock();
-            if let Some(nbytes) = num_bytes {
-                let data = read_last_bytes_reader(stdin, nbytes);
-                if let Err(e) = w.write_all(&data) {
-                    if e.kind() == std::io::ErrorKind::BrokenPipe { return 0; }
-                    return 1;
-                }
-            } else {
-                let lines = read_last_lines_reader(stdin, num_lines);
-                for line in &lines {
-                    if let Err(e) = write!(w, "{}", line) {
-                        if e.kind() == std::io::ErrorKind::BrokenPipe { return 0; }
-                        return 1;
-                    }
-                }
+            if follow {
+                eprintln!("tail: cannot follow standard input");
+                return 1;
             }
+            let status = tail_stdin(w, num_lines, num_bytes, crate::get_wasm_stdin());
+            if status != 0 { return status; }
         } else {
             match File::open(fname) {
                 Ok(file) => {
-                    if let Some(nbytes) = num_bytes {
+                    if follow {
+                        if let Err(e) = tail_follow(w, file, num_lines, num_bytes) {
+                            if e.kind() != std::io::ErrorKind::BrokenPipe {
+                                eprintln!("tail: {}: {}", fname, e);
+                                exit_code = 1;
+                            }
+                        }
+                    } else if let Some(nbytes) = num_bytes {
                         let data = read_last_bytes_file(&file, nbytes);
                         if let Err(e) = w.write_all(&data) {
                             if e.kind() == std::io::ErrorKind::BrokenPipe { return 0; }
@@ -124,6 +117,78 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     }
 
     exit_code
+}
+
+fn tail_stdin(w: &mut dyn Write, num_lines: usize, num_bytes: Option<usize>, input: Option<String>) -> i32 {
+    if let Some(input) = input {
+        tail_reader(w, io::Cursor::new(input.into_bytes()), num_lines, num_bytes)
+    } else {
+        let stdin = io::stdin();
+        tail_reader(w, stdin.lock(), num_lines, num_bytes)
+    }
+}
+
+fn tail_reader<R: Read>(w: &mut dyn Write, reader: R, num_lines: usize, num_bytes: Option<usize>) -> i32 {
+    if let Some(nbytes) = num_bytes {
+        let data = read_last_bytes_reader(reader, nbytes);
+        match w.write_all(&data) {
+            Ok(()) => 0,
+            Err(e) if e.kind() == std::io::ErrorKind::BrokenPipe => 0,
+            Err(_) => 1,
+        }
+    } else {
+        let lines = read_last_lines_reader(BufReader::new(reader), num_lines);
+        for line in &lines {
+            if let Err(e) = write!(w, "{}", line) {
+                return if e.kind() == std::io::ErrorKind::BrokenPipe { 0 } else { 1 };
+            }
+        }
+        0
+    }
+}
+
+fn tail_follow<W: Write + ?Sized>(w: &mut W, file: File, num_lines: usize, num_bytes: Option<usize>) -> io::Result<()> {
+    let file = file;
+    let mut current_size = file.metadata()?.len();
+
+    // First, output the last part of the file (like normal tail)
+    if let Some(nbytes) = num_bytes {
+        let data = read_last_bytes_file(&file, nbytes);
+        w.write_all(&data)?;
+    } else {
+        let lines = read_last_lines_file(file.try_clone()?, num_lines);
+        for line in &lines {
+            write!(w, "{}", line)?;
+        }
+    }
+    w.flush()?;
+
+    // Then watch for new content
+    loop {
+        thread::sleep(Duration::from_millis(100));
+
+        let new_size = file.metadata()?.len();
+        if new_size < current_size {
+            // File was truncated, start from beginning
+            current_size = 0;
+        }
+
+        if new_size > current_size {
+            // New content available
+            let mut reader = BufReader::new(file.try_clone()?);
+            reader.seek(SeekFrom::Start(current_size))?;
+
+            let mut buf = Vec::new();
+            reader.read_to_end(&mut buf)?;
+
+            if !buf.is_empty() {
+                w.write_all(&buf)?;
+                w.flush()?;
+            }
+
+            current_size = new_size;
+        }
+    }
 }
 
 fn read_last_lines_file(file: File, num_lines: usize) -> Vec<String> {
@@ -247,5 +312,10 @@ mod tests {
     #[test]
     fn test_tail_c_missing_arg() {
         assert_eq!(run(&mut std::io::sink(), &["-c".into()]), 1);
+    }
+
+    #[test]
+    fn test_tail_follow_stdin() {
+        assert_eq!(run(&mut std::io::sink(), &["-f".into(), "-".into()]), 1);
     }
 }

@@ -11,13 +11,17 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut lines = Vec::new();
 
     if files.is_empty() || (files.len() == 1 && files[0] == "-") {
-        let stdin = io::stdin();
-        for line in stdin.lock().lines() {
-            match line {
-                Ok(l) => lines.push(l),
-                Err(e) => {
-                    eprintln!("shuf: stdin: {}", e);
-                    return 1;
+        if let Some(input) = crate::get_wasm_stdin() {
+            lines.extend(input.lines().map(str::to_owned));
+        } else {
+            let stdin = io::stdin();
+            for line in stdin.lock().lines() {
+                match line {
+                    Ok(l) => lines.push(l),
+                    Err(e) => {
+                        eprintln!("shuf: stdin: {}", e);
+                        return 1;
+                    }
                 }
             }
         }

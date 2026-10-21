@@ -119,6 +119,19 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     let mut total_max_line = 0usize;
 
     if files.is_empty() {
+        if let Some(input) = crate::get_wasm_stdin() {
+            let mut reader = io::Cursor::new(input.into_bytes());
+            return match count_stream(&mut reader) {
+                Ok((l, words, bytes, chars, max_line)) => {
+                    let _ = pwriteln!(w, "{}", fmt(l, words, bytes, chars, max_line, ""));
+                    0
+                }
+                Err(error) => {
+                    eprintln!("wc: stdin: {}", error);
+                    1
+                }
+            };
+        }
         let mut stdin = io::stdin().lock();
         match count_stream(&mut stdin) {
             Ok((l, wc, c, m, max_line)) => {
@@ -134,7 +147,11 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
 
     for fname in &files {
         if fname == "-" {
-            let mut stdin = io::stdin().lock();
+            let input = crate::get_wasm_stdin();
+            let mut stdin: Box<dyn Read + '_> = match input {
+                Some(text) => Box::new(io::Cursor::new(text.into_bytes())),
+                None => Box::new(io::stdin().lock()),
+            };
             match count_stream(&mut stdin) {
                     Ok((l, wc, c, m, max_line)) => {
                         total_l += l;

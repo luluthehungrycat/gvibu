@@ -5,6 +5,7 @@ on:
   pull_request:
     branches:
       - main
+      - feature/feature-depth-gaps
 
 jobs:
   test:
@@ -66,10 +67,27 @@ jobs:
 
       - name: Test WASM binary via wasmtime
         run: |
+          set -euo pipefail
           export PATH="$HOME/.wasmtime/bin:$PATH"
-          wasmtime rust/target/wasm32-wasip1/release/gvibu.wasm true && echo "PASS: true" || echo "FAIL: true"
-          wasmtime rust/target/wasm32-wasip1/release/gvibu.wasm echo hello | grep -q hello && echo "PASS: echo" || echo "FAIL: echo"
-          wasmtime rust/target/wasm32-wasip1/release/gvibu.wasm false && echo "FAIL: false (should exit 1)" || echo "PASS: false"
+          wasm=rust/target/wasm32-wasip1/release/gvibu.wasm
+          wasmtime run --argv0 gvibu "$wasm" true
+          test "$(wasmtime run --argv0 gvibu "$wasm" echo hello)" = "hello"
+          if wasmtime run --argv0 gvibu "$wasm" false; then
+            echo "false unexpectedly succeeded" >&2
+            exit 1
+          else
+            status=$?
+            test "$status" -eq 1
+          fi
+
+          stdin_output="$(printf 'alpha\nbeta\n' | wasmtime run --argv0 gvibu "$wasm" cat)"
+          test "$stdin_output" = "$(printf 'alpha\nbeta')"
+
+          fixture_dir="$RUNNER_TEMP/gvibu-wasm-fixture"
+          mkdir -p "$fixture_dir"
+          printf 'from-file\n' > "$fixture_dir/input.txt"
+          file_output="$(wasmtime run --dir "$fixture_dir::/fixtures" --argv0 gvibu "$wasm" cat /fixtures/input.txt)"
+          test "$file_output" = "from-file"
 
       - name: Install wasm-pack
         run: cargo install wasm-pack
@@ -82,7 +100,44 @@ jobs:
           ls -la wasm-lib/pkg/
           test -f wasm-lib/pkg/gvibu_wasm.js || (echo "Missing gvibu_wasm.js" && exit 1)
           test -f wasm-lib/pkg/gvibu_wasm_bg.wasm || (echo "Missing gvibu_wasm_bg.wasm" && exit 1)
-          echo "PASS: Browser WASM build verified"
+
+      - name: Smoke test browser WASM bindings
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFile } from 'node:fs/promises';
+          import init, { run_command } from './wasm-lib/pkg/gvibu_wasm.js';
+
+          const wasm = await readFile('./wasm-lib/pkg/gvibu_wasm_bg.wasm');
+          await init(wasm);
+          const expect = (actual, expected, label) => {
+            if (actual !== expected) {
+              throw new Error(`${label}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+            }
+          };
+          expect(run_command('wc', ['-l'], 'one\n'), '      1\n', 'first stdin call');
+          expect(run_command('wc', ['-l'], 'one\ntwo\n'), '      2\n', 'second stdin call');
+          expect(run_command('wc', ['-l'], null), '      0\n', 'missing stdin call');
+          const expectFailure = (run, message, label) => {
+            let failure;
+            try {
+              run();
+            } catch (error) {
+              failure = error;
+            }
+            if (failure === undefined) throw new Error(`${label} unexpectedly succeeded`);
+            if (!String(failure).includes(message)) throw failure;
+          };
+          expectFailure(
+            () => run_command('ls', [], null),
+            'not supported on WebAssembly',
+            'unsupported command',
+          );
+          expectFailure(
+            () => run_command('not-a-command', [], null),
+            'unknown command',
+            'unknown command',
+          );
+          NODE
 
   docker:
     runs-on: ubuntu-latest

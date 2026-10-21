@@ -17,6 +17,13 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     }
 
     if files.is_empty() {
+        if let Some(input) = crate::get_wasm_stdin() {
+            let lines = read_all_lines(io::Cursor::new(input));
+            for line in lines.iter().rev() {
+                pwriteln!(w, "{}", line);
+            }
+            return 0;
+        }
         let stdin = io::stdin();
         let lines = read_all_lines(stdin.lock());
         for line in lines.iter().rev() {
@@ -27,6 +34,13 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
 
     for fname in &files {
         if fname == "-" {
+            if let Some(input) = crate::get_wasm_stdin() {
+                let lines = read_all_lines(io::Cursor::new(input));
+                for line in lines.iter().rev() {
+                    pwriteln!(w, "{}", line);
+                }
+                continue;
+            }
             let stdin = io::stdin();
             let lines = read_all_lines(stdin.lock());
             for line in lines.iter().rev() {

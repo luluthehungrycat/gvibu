@@ -171,3 +171,80 @@ def test_multiple_files_line_number(tmp_path, capsys):
     lines = out.strip().split("\n")
     assert any(line.endswith("a.txt:2:match") for line in lines)
     assert any(line.endswith("b.txt:1:match") for line in lines)
+
+
+def test_fixed_ignore_case_handles_unicode_offsets(capsys, monkeypatch):
+    monkeypatch.setattr(sys, "stdin", io.StringIO("İa\n"))
+    ret = grep.run(["-Fio", "a"])
+    out, err = capsys.readouterr()
+    assert ret == 0
+    assert out == "a\n"
+    assert err == ""
+
+
+def test_only_matching_and_word_flags(capsys, monkeypatch):
+    monkeypatch.setattr(sys, "stdin", io.StringIO("éé\n"))
+    ret = grep.run(["-Fwo", "é"])
+    out, err = capsys.readouterr()
+    assert ret == 0
+    assert out == "é\né\n"
+    assert err == ""
+
+
+def test_empty_fixed_only_matching_is_safe(capsys, monkeypatch):
+    monkeypatch.setattr(sys, "stdin", io.StringIO("é\n"))
+    ret = grep.run(["-Fo", ""])
+    out, err = capsys.readouterr()
+    assert ret == 0
+    assert out == ""
+    assert err == ""
+
+
+def test_context_groups_do_not_duplicate_lines(capsys, monkeypatch):
+    input_text = "before1\nhit1\nhit2\nafter1\ngap1\ngap2\nbefore2\nhit3\nafter2\n"
+    monkeypatch.setattr(sys, "stdin", io.StringIO(input_text))
+    ret = grep.run(["-C", "1", "hit"])
+    out, err = capsys.readouterr()
+    assert ret == 0
+    assert out == "before1\nhit1\nhit2\nafter1\n--\nbefore2\nhit3\nafter2\n"
+    assert err == ""
+
+
+def test_count_prints_zero_without_matches(capsys, monkeypatch):
+    monkeypatch.setattr(sys, "stdin", io.StringIO("present\n"))
+    ret = grep.run(["-c", "missing"])
+    out, err = capsys.readouterr()
+    assert ret == 1
+    assert out == "0\n"
+    assert err == ""
+
+
+def test_dash_file_operand_reads_stdin(capsys, monkeypatch):
+    monkeypatch.setattr(sys, "stdin", io.StringIO("needle here\n"))
+    ret = grep.run(["needle", "-"])
+    out, err = capsys.readouterr()
+    assert ret == 0
+    assert out == "needle here\n"
+    assert err == ""
+
+
+def test_double_dash_allows_pattern_and_filename(tmp_path, capsys):
+    path = tmp_path / "input.txt"
+    path.write_text("needle here\n")
+    ret = grep.run(["--", "needle", str(path)])
+    out, err = capsys.readouterr()
+    assert ret == 0
+    assert out == "needle here\n"
+    assert err == ""
+
+
+def test_recursive_match_returns_success(tmp_path, capsys):
+    nested = tmp_path / "nested"
+    nested.mkdir()
+    (nested / "match.txt").write_text("needle here\n")
+    (tmp_path / "no-match.txt").write_text("other\n")
+    ret = grep.run(["-r", "needle", str(tmp_path)])
+    out, err = capsys.readouterr()
+    assert ret == 0
+    assert str(nested / "match.txt") + ":needle here\n" == out
+    assert err == ""

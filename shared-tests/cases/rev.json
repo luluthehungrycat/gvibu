@@ -1,0 +1,33 @@
+{
+  "command": "rev",
+  "cases": [
+    {
+      "name": "reverse_lines",
+      "args": [],
+      "stdin": "abc\nRust 2026\n",
+      "stdout": "cba\n6202 tsuR\n",
+      "stderr": "",
+      "exit_code": 0
+    },
+    {
+      "name": "invalid_option",
+      "args": [
+        "-x"
+      ],
+      "stdin": "",
+      "stdout": "",
+      "stderr": "*",
+      "exit_code": 1
+    },
+    {
+      "name": "dash_reads_stdin",
+      "args": [
+        "-"
+      ],
+      "stdin": "abc\n",
+      "stdout": "cba\n",
+      "stderr": "",
+      "exit_code": 0
+    }
+  ]
+}

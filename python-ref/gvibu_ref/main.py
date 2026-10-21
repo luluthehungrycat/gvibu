@@ -90,7 +90,7 @@ def dispatch():
             id, who, kill, cut, tr, mv, rm, ln,
             chmod, chown, sort, test_cmd,
             grep, ls, cp, printf, date, expr, split,
-            tail, tac, fold, comm,
+            tail, tac, fold, comm, expand, rev,
             join, nl, shuf, sum,
             du, df,
         )
@@ -102,7 +102,7 @@ def dispatch():
             id, who, kill, cut, tr, mv, rm, ln,
             chmod, chown, sort, test_cmd,
             grep, ls, cp, printf, date, expr, split,
-            tail, tac, fold, comm,
+            tail, tac, fold, comm, expand, rev,
             join, nl, shuf, sum,
             du, df,
         )
@@ -157,6 +157,8 @@ def dispatch():
     COMMANDS["tail"] = tail
     COMMANDS["tac"] = tac
     COMMANDS["fold"] = fold
+    COMMANDS["expand"] = expand
+    COMMANDS["rev"] = rev
     COMMANDS["comm"] = comm
     COMMANDS["join"] = join
     COMMANDS["nl"] = nl

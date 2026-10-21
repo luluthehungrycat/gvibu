@@ -38,12 +38,19 @@ fn run_with_stdin(args: &[&str], stdin: &str) -> (i32, String, String) {
         .spawn()
         .expect("failed to run gvibu");
     use std::io::Write;
-    child
+    match child
         .stdin
         .take()
         .unwrap()
         .write_all(stdin.as_bytes())
-        .expect("failed to write stdin");
+    {
+        Ok(()) => {}
+        Err(error) if error.kind() == std::io::ErrorKind::BrokenPipe => {
+            // Commands may reject their arguments and exit before consuming
+            // stdin. Keep checking their status and output below.
+        }
+        Err(error) => panic!("failed to write stdin: {}", error),
+    }
     let output = child.wait_with_output().expect("failed to read output");
     (
         output.status.code().unwrap_or(-1),

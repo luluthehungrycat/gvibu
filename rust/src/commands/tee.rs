@@ -43,8 +43,13 @@ pub fn run(w: &mut dyn Write, args: &[String]) -> i32 {
     }
 
     // Read stdin and write to all outputs
+    let input = crate::get_wasm_stdin();
     let stdin = io::stdin();
-    for line in stdin.lock().lines() {
+    let reader: Box<dyn BufRead + '_> = match input.as_deref() {
+        Some(text) => Box::new(io::Cursor::new(text.as_bytes())),
+        None => Box::new(stdin.lock()),
+    };
+    for line in reader.lines() {
         match line {
             Ok(l) => {
                 let data = format!("{}\n", l);

@@ -88,6 +88,7 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
 
     let set1_str = if sets.is_empty() { "" } else { &sets[0] };
     let set2_str = if sets.len() < 2 { "" } else { &sets[1] };
+    let translate = !delete && sets.len() >= 2;
 
     let set1 = build_char_set(set1_str, complement);
 
@@ -106,9 +107,10 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
         }
     };
 
+
     // Build translation map: [256] of Option<u8>
     let mut translate_map: [Option<u8>; 256] = [None; 256];
-    if !delete {
+    if translate {
         for (i, &c) in set1.iter().enumerate() {
             if i < set2.len() {
                 translate_map[c as usize] = Some(set2[i]);
@@ -127,8 +129,12 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
     }
 
     // Stream stdin in chunks
+    let stdin_text = crate::get_wasm_stdin();
     let stdin = io::stdin();
-    let mut handle = stdin.lock();
+    let mut handle: Box<dyn io::Read + '_> = match stdin_text {
+        Some(text) => Box::new(io::Cursor::new(text.into_bytes())),
+        None => Box::new(stdin.lock()),
+    };
     let mut in_buf = [0u8; 8192];
     let mut out_buf = [0u8; 8192];
     let mut out_pos = 0;
@@ -148,7 +154,7 @@ pub fn run(stdout: &mut dyn Write, args: &[String]) -> i32 {
             }
 
             // Translate mode
-            let translated = if !delete {
+            let translated = if translate {
                 translate_map[byte as usize].unwrap_or(byte)
             } else {
                 byte

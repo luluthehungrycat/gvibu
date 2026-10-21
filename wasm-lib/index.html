@@ -56,6 +56,13 @@
     outline: none;
   }
   .input-line input::placeholder { color: #444; }
+  .stdin-line { margin-top: 8px; }
+  .stdin-line label { display: block; color: #777; font-size: 11px; margin-bottom: 4px; }
+  .stdin-line textarea {
+    width: 100%; min-height: 56px; resize: vertical;
+    background: #0d1117; border: 1px solid #222; border-radius: 8px;
+    color: #e0e0e0; padding: 8px 12px; font: inherit; font-size: 12px;
+  }
   .controls {
     display: flex; gap: 8px; margin-top: 12px;
     flex-wrap: wrap; align-items: center;
@@ -93,7 +100,7 @@
 <div class="container">
   <h1>
     <span>⋊></span> gvibu
-    <span class="badge">29 commands</span>
+    <span class="badge">60 commands</span>
   </h1>
 
   <div class="terminal" id="terminal">
@@ -105,6 +112,10 @@
   <div class="input-line">
     <span class="prompt-symbol">$</span>
     <input type="text" id="cmdInput" placeholder="Type a command (e.g. echo hello world)" autofocus>
+  </div>
+  <div class="stdin-line">
+    <label for="stdinInput">stdin (optional, for commands such as cat, grep, sort, and wc)</label>
+    <textarea id="stdinInput" placeholder="Text passed to the command as stdin"></textarea>
   </div>
 
   <div class="controls">
@@ -130,6 +141,7 @@ async function main() {
   const cmdSet = new Set(commands);
   const terminal = document.getElementById('terminal');
   const cmdInput = document.getElementById('cmdInput');
+  const stdinInput = document.getElementById('stdinInput');
   const runBtn = document.getElementById('runBtn');
   const clearBtn = document.getElementById('clearBtn');
   const cmdList = document.getElementById('cmdList');
@@ -183,17 +195,14 @@ async function main() {
     }
 
     try {
-      const result = run_command(name, args, null);
+      const stdin = stdinInput.value.length > 0 ? stdinInput.value : null;
+      const result = run_command(name, args, stdin);
       if (result) {
         addOutput(`<span class="stdout">${result.replace(/\n/g, '<br>')}</span>`);
       }
     } catch (e) {
       let msg = String(e);
       // Clean up WASM panic messages
-      if (msg.includes('panicked')) {
-        msg = `Error: command '${name}' cannot run in browser WASM` +
-              ` (needs filesystem or stdin access)`;
-      }
       addOutput(`<span class="stderr">${msg}</span>`);
     }
   }

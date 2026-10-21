@@ -22,5 +22,9 @@ rand = "0.8"
 regex = "1"
 chrono = "0.4"
 
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+# rand's thread_rng needs browser entropy on wasm32-unknown-unknown.
+getrandom = { version = "0.2", features = ["js"] }
+
 [dev-dependencies]
 proptest = "1"
